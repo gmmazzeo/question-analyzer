@@ -1,0 +1,7 @@
+(ROOT
+  (SBARQ
+    (WHADVP (WRB (*/how)) (RB (*#1)))
+    (SQ (VBD (*/do))
+      (NP#2)
+      (VP#3))
+    ))

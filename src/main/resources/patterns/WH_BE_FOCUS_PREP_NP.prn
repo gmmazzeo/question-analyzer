@@ -1,0 +1,17 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ (VBZ|VBD|VBP (*/be))
+      (NP
+        (NP#1)
+        (PP (IN (*#2))
+          (NP#3))))
+    ))
+
+w(3) l(1)+l(2) ?ans
+
+?ans l(1)+l(2) l(3).
+optional ?ans rdf:type l(1)
+
+?ans l(2) l(3).
+optional ?ans rdf:type l(1)

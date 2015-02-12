@@ -1,0 +1,8 @@
+(ROOT
+  (SBARQ
+    (WHADJP (WRB (*/how)) (JJ (*#1)))
+    (SQ (VBZ|VBP (*/be))
+      (NP#2))
+    ))
+
+w(2) l(1) ?ans
