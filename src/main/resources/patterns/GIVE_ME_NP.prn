@@ -1,6 +1,10 @@
 (ROOT
   (S
     (VP (VB (*/give|tell|show))
-      (NP (PRP (*/me|us)))
+      (NP (PRP))
       (NP#1))
     ))
+
+entities(1)
+
+values(1)

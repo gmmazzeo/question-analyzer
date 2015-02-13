@@ -2,16 +2,16 @@
   (SBARQ
     (WHNP (WP))
     (SQ (VBZ|VBD|VBP (*/be))
-      (NP
-        (NP#1)
-        (PP (IN (*#2))
-          (NP#3))))
+      (NP#1
+        (NP#2)
+        (PP (IN (*#3))
+          (NP#4))))
     ))
 
-w(3) l(1)+l(2) ?ans
+e(1) l(2) ?ans
 
-?ans l(1)+l(2) l(3).
-optional ?ans rdf:type l(1)
+?ans l(2)+l(3) l(4).
+optional ?ans rdf:type l(2)
 
-?ans l(2) l(3).
-optional ?ans rdf:type l(1)
+?ans l(3) l(4).
+optional ?ans rdf:type l(2)

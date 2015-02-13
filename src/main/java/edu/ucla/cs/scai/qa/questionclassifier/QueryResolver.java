@@ -61,6 +61,14 @@ public class QueryResolver {
             expr = expr.replaceFirst("l\\(", "");
             expr = expr.substring(0, expr.length() - 1);
             return tree.labelledNodes.get(expr).getLeafLemmas();
+        } if (expr.startsWith("entities(")) {
+            expr = expr.replaceFirst("entities\\(", "");
+            expr = expr.substring(0, expr.length() - 1);
+            return "entities(\n"+tree.labelledNodes.get(expr).toString()+"\n)";
+        }  if (expr.startsWith("values(")) {
+            expr = expr.replaceFirst("values\\(", "");
+            expr = expr.substring(0, expr.length() - 1);
+            return "values(\n"+tree.labelledNodes.get(expr).toString()+"\n)";
         }
         return expr;
     }

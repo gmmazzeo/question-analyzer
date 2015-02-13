@@ -60,8 +60,14 @@ public class PennTreebankPattern {
                 constraint = constraint.replaceFirst("optional", "").trim();
             }
             String[] exprs = constraint.split(" ");
-            QueryConstraint qc = new QueryConstraint(exprs[0], exprs[1], exprs[2], optional);
-            qm.getConstraints().add(qc);
+            if (exprs.length>1) {
+                QueryConstraint qc = new QueryConstraint(exprs[0], exprs[1], exprs[2], optional);
+                qm.getConstraints().add(qc);
+            } else {
+                QueryConstraint qc = new QueryConstraint(exprs[0], "", "", optional);
+                qm.getConstraints().add(qc);                
+            }
+            
         }
         return qm;
     }

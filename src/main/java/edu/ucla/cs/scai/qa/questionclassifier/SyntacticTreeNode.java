@@ -214,41 +214,44 @@ public class SyntacticTreeNode implements Externalizable {
      return null;
      }
      */
-
     public String getLeafValues() {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         fillLeafValues(sb);
         return sb.toString();
     }
-    
+
     public void fillLeafValues(StringBuilder sb) {
         if (children.isEmpty()) {
-            if (sb.length()>0) {
-                sb.append(" ");                
+            if (sb.length() > 0) {
+                sb.append(" ");
             }
             sb.append(value);
         } else {
-            for (SyntacticTreeNode c:children) {
-                c.fillLeafValues(sb);
+            if (value.startsWith("N")) {
+                for (SyntacticTreeNode c : children) {
+                    c.fillLeafValues(sb);
+                }
             }
         }
     }
 
     public String getLeafLemmas() {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         fillLeafLemmas(sb);
         return sb.toString();
     }
-    
+
     public void fillLeafLemmas(StringBuilder sb) {
         if (children.isEmpty()) {
-            if (sb.length()>0) {
-                sb.append(" ");                
+            if (sb.length() > 0) {
+                sb.append(" ");
             }
             sb.append(lemma);
         } else {
-            for (SyntacticTreeNode c:children) {
-                c.fillLeafLemmas(sb);
+            if (value.startsWith("N")) {
+                for (SyntacticTreeNode c : children) {
+                    c.fillLeafLemmas(sb);
+                }
             }
         }
     }

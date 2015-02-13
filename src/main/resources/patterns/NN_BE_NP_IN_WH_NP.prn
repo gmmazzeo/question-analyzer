@@ -1,0 +1,12 @@
+(ROOT
+  (S
+    (NP#1)
+    (VP (VBZ|VBD|VBP (*/be))
+      (NP
+        (NP#2)
+        (WHPP (IN (*#3))
+          (WHNP#4))))
+    ))
+
+?ans l(2) w(1).
+optional ?ans rdf:type l(4)

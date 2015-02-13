@@ -125,6 +125,9 @@ public class PennTreebankPatternMatcher {
         QueryResolver qr=new QueryResolver();
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
+                if (l.equals("Give me all members of Prodigy.")) {
+                    System.out.print("");
+                }
                 System.out.println();
                 tot++;
                 System.out.println(l);
