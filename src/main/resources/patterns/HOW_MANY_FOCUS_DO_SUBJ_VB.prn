@@ -1,0 +1,15 @@
+(ROOT
+  (SBARQ
+    (WHNP
+      (WHADJP (WRB (*/how)) (JJ (*/many)))
+      (NNS (*#1)))
+    (SQ (VBD|VBP|VBZ (*/do))
+      (NP#2)
+      (VP (VB (*#3))))
+    ))
+
+w(2) l(1)+l(3) ?ans
+
+w(2) l(3) ?ans.
+optional ?ans rdf:type l(1).
+COUNT(?ans)
