@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 /**
@@ -144,6 +145,14 @@ public class PennTreebankPatternMatcher {
                     if (!matches.isEmpty()) {
                         ok++;
                     }
+                    else {
+                        ArrayList<String> q = questions.get("> No match");
+                        if (q == null) {
+                            q = new ArrayList<>();
+                            questions.put("> No match", q);
+                        }
+                        q.add(l);
+                    }
                     for (PennTreebankPattern pattern:matches.keySet()) {
                         System.out.println(pattern.name);
                         for (QueryModel qm:qr.resolveQueries(matches.get(pattern), pattern)) {
@@ -159,7 +168,7 @@ public class PennTreebankPatternMatcher {
             l = in.readLine();
         }
         System.out.println(ok + "/" + tot);
-        for (String t : questions.keySet()) {
+        for (String t : new TreeSet<String>(questions.keySet())) {
             System.out.println("==========================================");
             System.out.println(t);
             System.out.println("------------------------------------------");
