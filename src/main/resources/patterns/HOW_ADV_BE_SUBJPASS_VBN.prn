@@ -3,5 +3,5 @@
     (WHADVP (WRB (*/how)) (RB (*#1)))
     (SQ (VBD|VBP|VBZ (*/be))
       (NP#2)
-      (VP (VBN (*#2))))
+      (VP (VBN (*#3))))
     ))

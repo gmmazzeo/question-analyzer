@@ -1,6 +1,9 @@
 (ROOT
-  (S
-    (VP (VB (*/give|tell|show))
-      (NP (PRP (*/me|us)))
-      (NP#1))
+  (SBARQ
+    (WHADJP (WRB (*/how)) (JJ (*#1)))
+    (SQ (VBZ (*/be))
+      (NP#2))
     ))
+
+w(2) l(1) ?ans.
+COUNT(?ans)

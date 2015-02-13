@@ -1,0 +1,10 @@
+(ROOT
+  (SBARQ
+    (WHADVP (WRB (*/when)))
+    (SQ (VBD)
+      (NP#1)
+      (VP (VB|VBN (*#2))
+        (NP#3)))
+    ))
+
+w(1) l(2)+w(3)+date ?ans

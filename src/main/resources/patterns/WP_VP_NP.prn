@@ -1,0 +1,9 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ
+      (VP (VBZ|VBD|VBN (*#1))
+        (NP#2)))
+    ))
+
+?ans l(1) w(2)
