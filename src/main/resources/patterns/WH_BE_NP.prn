@@ -1,0 +1,10 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ (VBZ|VBD|VBP (*/be))
+      (NP#1))
+    ))
+
+entities(1)
+
+values(1)
