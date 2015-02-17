@@ -1,0 +1,61 @@
+    GIVE_ME_FOCUS_OF("[*/*/give|show|tell/*/*,[iobj/*/*/PRP/*],[f321#dobj/*/*/*/*/1,[prep_of/*/*/*/*/2]]]", "*/*/give|show|tell/*/*", "?ans rdf:type l(1). ?ans ?a l(2)", "w(2) l(1) ?ans", "?a l(1) ?ans. ?a rdf:type l(2)"), //
+    GIVE_ME_FOCUS("[*/*/give|show|tell/*/*,[iobj/*/*/PRP/*],[f321#dobj/*/*/*/*/1]]", "*/*/give|show|tell/*/*", "?ans rdf:type l(1)"), //Give me all female Russian astronauts.
+
+    LIST_FOCUS("[*/*/list/*/*,[f210#dobj/*/*/*/*]]", ""), //List all games by GMT.   
+
+    HOW_ADJ_BE_SUBJ("[*/*/be/*/*,[f010#dep/*/*/JJ/*/1,[advmod/*/how/*/*]],[e#nsubj/*/*/*/*/2]]", "*/*/how/*/*", "w(2) l(1) ?ans", "?a rdf:type l(2). ?a l(1) ?ans"), //How tall is Claudia Schiffer?
+    HOW_ADV_BE_SUBJPASS_VBN("[f010#*/*/*/VBN/*,[advmod/*/*/RB/*,[advmod/*/how/*/*]],[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*]]", ""), //How often was Michael Jordan divorced?
+    HOW_ADV_DO_SUBJ_VB("[f010#*/*/*/VB/*,[advmod/*/*/RB/*,[advmod/*/how/*/*]],[aux/*/do/*/*],[e#nsubj/*/*/*/*]]", ""), //How often did Nicole Kidman marry?
+
+    HOW_MANY_SUBJ_VBD("[*/*/*/VBD|VBP/*,[f210#nsubj/*/*/*/*,[amod/*/many/*/*,[advmod/*/how/*/*]]]]", ""), //How many big fires struck Paris during the Middle Ages?
+    HOW_MANY_FOCUS_DO_SUBJ_VB("[*/*/*/VB/*,[f210#dobj/*/*/*/*,[amod/*/many/*/*,[advmod/*/how/*/*]]],[aux/*/do/*/*],[e#nsubj/*/*/*/*]]", ""), //How many films did Hal Roach produce?
+    HOW_MANY_FOCUS_BE_THERE("[*/*/be/*/*,[f210#nsubj/*/*/*/*,[amod/*/many/*/*,[advmod/*/how/*/*]]],[expl/*/there/*/*]]", ""), //How many monarchical countries are there in Europe?
+    HOW_MANY_FOCUS_BE_THERE_2("[*/*/be/*/*,[f210#nsubj/*/*/*/*,[amod/*/many/*/*,[advmod/*/how/*/*]]],[advmod/*/there/*/*]]", ""), //How many monarchical countries are there in Europe?    
+    HOW_MANY_FOCUS_BE_VBX("[*/*/*/VBN|VBP/*,[f210#nsubjpass/*/*/*/*,[amod/*/many/*/*,[advmod/*/how/*/*]]],[auxpass/*/be/*/*]]", ""), //How many official languages are spoken on the Seychelles?    
+
+    PREP_WHICH_FOCUS_DO_SUBJ_VB("[*/*/*/VB/*/1,[f120#prep_*/*/*/*/*/2,[det/*/which/*/*]],[aux/*/do/*/*],[e#nsubj/*/*/*/*/3]]", "", "w(3) l(2)+l(1)+s(2) ?ans. ?ans rdf:type l(2)"), //In which city did John F. Kennedy die?
+    PREP_WHICH_FOCUS_BE_SUBJPASS_VBN("[*/*/*/VBN/*/1,[f120#prep_*/*/*/*/*/2,[det/*/which/*/*]],[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*/3]]", "", "w(3) l(1)+l(2)+s(2) ?ans. optional ?ans rdf:type l(1)"), //In which programming language is GIMP written?
+    PREP_WHICH_FOCUS_BE_SUBJ("[*/*/be/VBZ|VBP/*,[f120#prep_*/*/*/*/*/1,[det/*/which/*/*]],[e#nsubj/*/*/*/*/2]]", "", "w(2) l(1)+s(1) ?ans"), //In which country is the Limerick Lake?
+    PREP_WHICH_FOCUS_BE_SUBJ_ADJ("[*/*/*/JJ/*/1,[f120#prep_*/*/*/*/*/2,[det/*/which/*/*]],[cop/*/be/*/*],[e#nsubj/*/*/*/*/3]]", "w(3) l(2)+l(1)+s(2) ?ans"), //In which U.S. state is Fort Knox located?
+    PREP_WHICH_FOCUS_VBN("[*/*/*/VBN/*,[f210#prep_*/*/*/*/*,[det/*/which/*/*]]]", ""), //In which films directed by Garry Marshall was Julia Roberts starring?
+
+    WHAT_BE_FOCUS("[*/*/what/*/*,[cop/*/be/*/*],[f221#nsubj/*/*/*/*]]", ""), //What is the currency of the Czech Republic?
+    WHAT_DO_SUBJ_VB_PREP("[f010#*/*/*/VB/*,[prep_*/*/what/*/*],[aux/*/do/*/*],[e#nsubj/*/*/*/*]]", ""), //What did Bruce Carver die from?
+
+    WHEN_BE_SUBJPASS_VBN("[f010#*/*/*/VBN/*/1,[advmod/*/when/*/*],[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*/2]]", "", "w(2) l(1) ?ans"), //When was Capcom founded?
+    WHEN_BE_SUBJ("[f000#*/*/be/VBD|VBZ/*,[advmod/*/when/*/*],[e#nsubj/*/*/*/*]]", ""), //When was the Battle of Gettysburg?
+    WHEN_DO_SUBJ_VB("[f010#*/*/*/VB/*,[advmod/*/when/*/*],[aux/*/do/*/*],[e#nsubj/*/*/*/*]]", ""), ///When did Latvia join the EU?
+    WHEN_BE_SUBJECT_GOING_TO_VB("[*/*/go/VBG/*,[advmod/*/when/*/*],[aux/*/be/*/*],[e#nsubj/*/*/*/*],[f010#xcomp/*/*/VB/*,[aux/*/to/*/*]]]", ""), //When is the movie Worst Case Scenario going to be in cinemas in the Netherlands?
+
+    WHERE_BE_SUBJPASS_VBN("[f010#*/*/*/VBN/*,[advmod/*/where/*/*],[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*]]", ""),
+    WHERE_BE_FOCUS("[f000#*/*/be/*/*,[advmod/*/where/*/*],[e#nsubj/*/*/*/*]]", ""), //Where is the residence of the prime minister of Spain?
+
+    //WHICH_BE_FOCUS("[*/*/which/*/*,[cop/*/be/*/*],[f110#nsubj/*/*/*/*]]"),
+    WHICH_FOCUS_BE_VBN("[*/*/*/VBN/*,[f210#nsubjpass/*/*/*/*,[det/*/which/*/*]],[auxpass/*/be/*/*]]", ""), //Which states of Germany are governed by the Social Democratic Party?
+    WHICH_FOCUS_BE_VBN_2("[*/*/*/VBN/*,[dobj/*/which/*/*],[f210#nsubjpass/*/*/*/*],[auxpass/*/be/*/*]]", ""), //Which spaceflights were launched from Baikonur?
+    //WHICH_FOCUS_HAVE_BE_VBN("[*/*/*/VBN/*,[#nsubjpass/*/*/*/*,[det/*/which/*/*]],[aux/*/have/*/*],[auxpass/*/be/*/*]]"),
+    WHICH_FOCUS_BE_ADJ("[*/*/*/JJ/*,[f100#nsubj/*/*/*/*,[det/*/which/*/*]],[cop/*/be/*/*]]", ""), //Which airports are located in California, USA?
+    WHICH_FOCUS_VBP("[*/*/*/VBP/*,[f100#nsubj/*/*/*/*,[det/*/which/*/*]]]", ""), //Which U.S. states possess gold minerals?
+    WHICH_FOCUS_DO_SUBJ_VBP_PREP("[*/*/do/VBP/*,[f120#nsubj/*/*/*/*/1],[dobj/*/which/*/*],[ccomp/*/*/VBP/*/2,[e#nsubj/*/*/*/*/3],[prep_*/*/*/*/*/4]]]", "", "w(3) l(1)+l(2)+l(4) ?ans"), //Which classis do tree frogs belong to?
+    WHICH_FOCUS_VBZ("[*/*/*/VBZ/*,[f100#nsubj/*/*/*/*,[det/*/which/*/*]]]", ""), //Which museum exhibits The Scream by Munch?
+    WHICH_FOCUS_VBD("[*/*/*/VBD/*,[f210#nsubj/*/*/*/*,[det/*/which/*/*]]]", ""), //Which countries in the European Union adopted the Euro?
+    WHICH_FOCUS_DO_SUBJ_VB("[*/*/*/VB/*/1,[f120#dobj/*/*/*/*/2,[det/*/which/*/*]],[aux/*/do/*/*],[e#nsubj/*/*/*/*/3]]", "", "w(3) l(1)+l(2) ?ans. optional ?ans rdf:type l(2)"), //Which budget did the first movie of Zdenek Sverak have?
+    WHICH_FOCUS_BE_SUBJECT("[*/*/be/*/*,[f210#dep/*/*/*/*,[det/*/which/*/*]],[nsubj/*/*/*/*]]", ""), //Which capitals in Europe were host cities of the summer olympic games?
+    SUBJ_BE_NOUN_OF_WHICH_NN("[*/*/*/NN|NNS/*,[e#nsubj/*/*/*/*],[cop/*/be/*/*],[f110#prep_of/*/*/NN|NS/*]]", ""), //Sean Parnell is the governor of which U.S. state?
+    WHICH_OF_FOCUS_VBD("[*/*/*/VBD/*,[nsubj/*/which/*/*,[f100#prep_of/*/*/*/*]]]", ""), //Which of Tim Burton's films had the highest budget?
+
+    WHO_BE_SUBJPASS_VBN_XCOMP("[f010#*/*/*/VBN/*,[dep/*/who/*/*],[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*],[xcomp/*/*/*/*]]", ""), //Who is the daughter of Ingrid Bergman married to?
+    WHO_HAVE_BE_SUBJ("[f110#*/*/*/NN/*,[nsubj/*/who/*/*],[aux/*/have/*/*],[cop/*/be/*/*]]", ""), //Who has been the 5th president of the United States of America?
+    WHO_VBDN_OBJ("[f010#*/*/*/VBD|VBN/*,[nsubj/*/who/*/*],[e#dobj/*/*/*/*]]", ""), //Who produced films starring Natalie Portman?
+    WHO_VDZ_OBJ("[f010#*/*/*/VBZ/*,[nsubj/*/who/*/*],[e#dobj/*/*/*/*]]", ""), //Who owns Aldi?
+    WHO_BE_FOCUS("[*/*/who/*/*,[cop/*/be/*/*],[f120#nsubj/*/*/*/*]]", ""), //Who is the owner of Universal Studios?
+    WHO_BE_VBN_DOBJ("[f000#*/*/*/VBN/*,[nsubjpass/*/who/*/*],[auxpass/*/be/*/*],[dobj/*/*/*/*]]", ""),//Who was called Scarface?
+
+    DO_FOCUS_VBP("[*/*/*/VBP/*,[csubj/*/do/*/*,[f111#xcomp/*/*/*/*]]]", ""), //Does Breaking Bad have more episodes than Game of Thrones?
+    DO_FOCUS_VBP_2("[*/*/do/*/*,[ccomp/*/*/VBP/*,[f111#nsubj/*/*/*/*]]]", ""), //Do Prince Harry and Prince William have the same mother?
+    DO_FOCUS_VB("[*/*/*/VB/*,[aux/*/do/*/*],[f111#nsubj/*/*/*/*]]", ""), //Did Tesla win a nobel prize in physics?    
+    BE_SUBJ_VBGFOCUS("[f000#*/*/*/VBG/*,[aux/*/be/*/*],[e#nsubj/*/*/*/*]]", ""), //Is Christian Bale starring in Velvet Goldmine?
+    BE_SUBJPASS_VBNFOCUS("[f000#*/*/*/VBN/*,[auxpass/*/be/*/*],[e#nsubjpass/*/*/*/*]]", ""), //Was Natalie Portman born in the United States?
+    BE_SUBJ_NNFOCUS("[f000#*/*/*/NN|NNS/*,[cop/*/be/*/*],[e#nsubj/*/*/*/*]]", ""), //Is proinsulin a protein?
+    BE_THERE_FOCUS("[*/*/be/*/*,[expl/*/there/*/*],[f101#nsubj/*/*/*/*]]", ""), //Is there a video game called Battle Chess?
+    BE_SUBJ_JJFOCUS("[f000#*/*/*/JJ/*,[cop/*/be/*/*],[e#nsubj/*/*/*/*]]", ""); //Is Frank Herbert still alive?
