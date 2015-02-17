@@ -1,0 +1,12 @@
+(ROOT
+  (S
+    (VP (VB (List))
+      (S
+        (NP#1)))
+    ))
+
+entities(1)
+
+values(1)
+
+%List all episodes of the first season of the HBO television series The Sopranos!

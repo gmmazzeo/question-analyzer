@@ -1,0 +1,12 @@
+(ROOT
+  (S
+    (VP (VB (List))
+      (NP#1))
+    ))
+
+entities(1)
+
+values(1)
+
+%List all games by GMT.
+%List the children of Margaret Thatcher.
