@@ -8,5 +8,10 @@
           (WHNP#4))))
     ))
 
-?ans l(2) w(1).
+?ans attributes(2) entities(1).
 optional ?ans rdf:type l(4)
+
+entities(1) attributes(2) ?ans
+optional ?ans rdf:type l(4)
+
+%Sean Parnell is the governor of which U.S. state?

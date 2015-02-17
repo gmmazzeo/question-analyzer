@@ -28,7 +28,9 @@ public class PennTreebankPattern {
         String[] lines = stringPattern.split("\n");
         int i = 0;
         while (i < lines.length && !lines[i].equals("")) {
-            treeStringPattern += lines[i];
+            if (!lines[i].startsWith("%")) {
+                treeStringPattern += lines[i];
+            }
             i++;
         }
 
@@ -37,7 +39,7 @@ public class PennTreebankPattern {
         root = new PennTreebankPatternNode(tokens, currentPosition);
 
         while (i < lines.length) {
-            if (lines[i].equals("")) {
+            if (lines[i].equals("") || lines[i].startsWith("%")) {
                 i++;
                 continue;
             }

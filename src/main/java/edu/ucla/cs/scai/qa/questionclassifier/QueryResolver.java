@@ -7,6 +7,8 @@ package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
+import edu.ucla.cs.scai.swim.qa.ontology.SpecificCategoryConstraint;
+import edu.ucla.cs.scai.swim.qa.ontology.SpecificEntityConstraint;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +16,8 @@ import java.util.ArrayList;
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
 public class QueryResolver {
+
+    private int entityCounter;
 
     public ArrayList<QueryModel> resolveQueries(SyntacticTree tree, ArrayList<PennTreebankPattern> patterns) {
         ArrayList<QueryModel> res = new ArrayList<>();
@@ -61,15 +65,53 @@ public class QueryResolver {
             expr = expr.replaceFirst("l\\(", "");
             expr = expr.substring(0, expr.length() - 1);
             return tree.labelledNodes.get(expr).getLeafLemmas();
-        } if (expr.startsWith("entities(")) {
+        }
+        if (expr.startsWith("entities(")) {
             expr = expr.replaceFirst("entities\\(", "");
             expr = expr.substring(0, expr.length() - 1);
-            return "entities(\n"+tree.labelledNodes.get(expr).toString()+"\n)";
-        }  if (expr.startsWith("values(")) {
+            return "entities(\n" + tree.labelledNodes.get(expr).toString() + "\n)";
+        }
+        if (expr.startsWith("values(")) {
             expr = expr.replaceFirst("values\\(", "");
             expr = expr.substring(0, expr.length() - 1);
-            return "values(\n"+tree.labelledNodes.get(expr).toString()+"\n)";
+            return "values(\n" + tree.labelledNodes.get(expr).toString() + "\n)";
         }
         return expr;
     }
+
+    public ArrayList<QueryConstraint> entities(SyntacticTreeNode node, String entityVariableName) {
+        ArrayList<QueryConstraint> res = new ArrayList<>();
+        if (node.npSimple) {
+            QueryConstraint qc = new SpecificEntityConstraint(entityVariableName, node.getLeafValues());
+            res.add(qc);
+        } else if (node.npCompound) {
+            QueryConstraint qc = new SpecificCategoryConstraint(entityVariableName, node.getLeafLemmas());
+            res.add(qc);
+            for (SyntacticTreeNode c : node.children) {
+                if (c.value.equals("PP")) {
+                    res.addAll(solvePPConstraints(c, entityVariableName));
+                } else if (c.value.equals("VP")) {
+                    res.addAll(solveVPConstraints(c, entityVariableName));
+                }
+            }
+        }
+        return res;
+    }
+
+    public ArrayList<QueryConstraint> solvePPConstraints(SyntacticTreeNode node, String entityVariableName) {
+        ArrayList<QueryConstraint> res = new ArrayList<>();
+        return res;
+    }
+    
+    public ArrayList<QueryConstraint> solveVPConstraints(SyntacticTreeNode node, String entityVariableName) {
+        ArrayList<QueryConstraint> res = new ArrayList<>();
+        return res;
+    }    
+
+    private String getNextEntityVariableName() {
+        String res = "e" + entityCounter;
+        entityCounter++;
+        return res;
+    }
+
 }

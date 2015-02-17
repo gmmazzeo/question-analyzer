@@ -3,7 +3,15 @@
     (WHADVP (WRB (*/when)))
     (SQ (VBD)
       (NP#1)
-      (VP (VB|VBN (*#2))))
+      (VP#2))
     ))
 
-w(1) l(2)+date ?ans
+entities(1) attributes(2) ?ans
+?ans rdf:type xsd:date
+
+%When did Latvia join the EU?
+%When was Capcom founded?
+%When was the Statue of Liberty built?
+%When was Alberta admitted as province?
+%When did Michael Jackson die?
+%When were the Hells Angels founded?

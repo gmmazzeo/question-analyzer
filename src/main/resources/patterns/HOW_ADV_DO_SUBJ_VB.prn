@@ -5,3 +5,7 @@
       (NP#2)
       (VP#3))
     ))
+
+entities(2) attributes(3) ?ans
+
+%How often did Nicole Kidman marry?

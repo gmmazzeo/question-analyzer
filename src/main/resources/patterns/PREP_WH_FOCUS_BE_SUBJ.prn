@@ -6,5 +6,11 @@
       (NP#3))
     ))
 
-w(3) l(2) ?ans.
+entities(3) attributes(2) ?ans.
 ?ans rdf:type l(2)
+
+%In which country is the Limerick Lake?
+%In which programming language is GIMP written?
+%In which city was the former Dutch queen Juliana buried?
+%In which U.S. state is Fort Knox located?
+%In which UK city are the headquarters of the MI6?

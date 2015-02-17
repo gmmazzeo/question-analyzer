@@ -7,3 +7,7 @@
         (S
           (VP (TO)))))
     ))
+
+entities(1) attributes(2+"to") ?ans
+
+%Who is the daughter of Ingrid Bergman married to?

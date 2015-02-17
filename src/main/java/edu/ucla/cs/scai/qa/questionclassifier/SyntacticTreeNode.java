@@ -34,6 +34,7 @@ public class SyntacticTreeNode implements Externalizable {
     boolean isFocus;
     int categoryPriority, attributePriority, entityPriority;
     boolean examplePage;
+    boolean npSimple, npCompound;
 
     ArrayList<SyntacticTreeNode> children;
 
@@ -53,8 +54,20 @@ public class SyntacticTreeNode implements Externalizable {
             }
         }
         children = new ArrayList<>();
+        boolean hasNPchildren = false;
         for (Tree c : t.children()) {
-            children.add(new SyntacticTreeNode(c, map));
+            SyntacticTreeNode child = new SyntacticTreeNode(c, map);
+            children.add(child);
+            if (child.value.equals("NP")) {
+                hasNPchildren = true;
+            }
+        }
+        if (value.equals("NP")) {
+            if (hasNPchildren) {
+                npCompound = true;
+            } else {
+                npSimple = true;
+            }
         }
     }
 

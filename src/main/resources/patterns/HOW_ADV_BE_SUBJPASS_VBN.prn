@@ -5,3 +5,7 @@
       (NP#2)
       (VP (VBN (*#3))))
     ))
+
+entities(2) attributes(3) ?ans
+
+%How often was Michael Jordan divorced?

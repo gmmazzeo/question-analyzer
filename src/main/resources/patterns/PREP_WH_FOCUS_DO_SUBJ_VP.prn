@@ -7,5 +7,9 @@
       (VP (VB (*#4))))
     ))
 
-w(3) l(4)+l(2) ?ans.
+entities(3) attributes(4+2) ?ans.
 ?ans rdf:type l(2)
+
+%In which city did John F. Kennedy die?
+%In which country does the Nile start?
+%For which label did Elvis record his first album?

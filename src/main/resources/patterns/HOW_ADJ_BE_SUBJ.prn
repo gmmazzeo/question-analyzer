@@ -5,4 +5,8 @@
       (NP#2))
     ))
 
-w(2) l(1) ?ans.
+entities(2) attributes(1) ?ans.
+
+%How tall is Claudia Schiffer?
+%How tall is Michael Jordan?
+%How high is the Mount Everest?

@@ -6,4 +6,22 @@
         (NP#2)))
     ))
 
-?ans l(1) w(2)
+?ans attributes(1) entities(2)
+
+%Who created Goofy?
+%Who designed the Brooklyn Bridge?
+%Who developed the video game World of Warcraft?
+%Who produced the most films?
+%Who created Wikipedia?
+%Who owns Aldi?
+%Who produced films starring Natalie Portman?
+%Who wrote the book Les Piliers de la terre?
+%Who composed the music for Harold and Maude?
+%Who invented the zipper?
+%Who developed Minecraft?
+%Who painted The Storm on the Sea of Galilee?
+%Who wrote the lyrics for the Polish national anthem?
+%Who created the comic Captain America?
+%Who was called Scarface?
+%Who founded Intel?
+%Who produces Orangina?
