@@ -1,0 +1,10 @@
+(ROOT
+  (SBARQ
+    (WHNP#1)
+    (SQ (VBP (*/be))
+      (VP#2))
+    ))
+
+entitiesWithConstraints(1,2) 
+
+attributesWithConstraints(1,2)
