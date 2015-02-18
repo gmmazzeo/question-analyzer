@@ -5,7 +5,7 @@
       (NP#2))
     ))
 
-entities(2) attributes(1) ?ans.
+values(2, lookupAttribute(1), ?ans).
 
 %How tall is Claudia Schiffer?
 %How tall is Michael Jordan?

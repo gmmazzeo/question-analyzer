@@ -34,7 +34,10 @@ public class PennTreebankPattern {
             i++;
         }
 
-        String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()");
+        if (name.equals("WH_BE_NP")) {
+            System.out.print("");
+        }
+        String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
 

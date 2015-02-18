@@ -1,11 +1,11 @@
 (ROOT
   (SBARQ
     (WHADVP (WRB (*/how)) (RB (*#1)))
-    (SQ (VBD (*/do))
+    (SQ (VBD (*/be|do))
       (NP#2)
       (VP#3))
     ))
 
-entities(2) attributes(3) ?ans
+values(2, lookupAttribute(3), ?ans).
 
 %How often did Nicole Kidman marry?

@@ -20,12 +20,20 @@ public class PennTreebankPatternNode {
     HashSet<String> ners = new HashSet<>();
     String label;
     ArrayList<PennTreebankPatternNode> children = new ArrayList<>();
+    boolean not;
 
     PennTreebankPatternNode(String[] tokens, int[] currentPosition) throws Exception {
-        if (!tokens[currentPosition[0]].equals("(")) {
-            throw new Exception("Wrong pattern - (sub)tree does not start with (");
+        if (!tokens[currentPosition[0]].equals("(") && !tokens[currentPosition[0]].equals("^")) {
+            throw new Exception("Wrong pattern - (sub)tree does not start with ( or ^");
         }
-        currentPosition[0]++;
+        if (tokens[currentPosition[0]].equals("^")) {
+            not=true;
+            currentPosition[0]++;
+            if (!tokens[currentPosition[0]].equals("(")) {
+                throw new Exception("Wrong pattern - ( required after ^");    
+            }
+        }
+        currentPosition[0]++; //skip (
         String[] s = tokens[currentPosition[0]].split("#");
         String[] elements = s[0].split("\\/");
         currentPosition[0]++;
@@ -44,7 +52,7 @@ public class PennTreebankPatternNode {
             //System.out.print("#" + label);
         }
         //System.out.println();
-        while (tokens[currentPosition[0]].equals("(")) {
+        while (tokens[currentPosition[0]].equals("(") || tokens[currentPosition[0]].equals("^")) {
             children.add(new PennTreebankPatternNode(tokens, currentPosition));
         }
         if (!tokens[currentPosition[0]].equals(")")) {
@@ -56,6 +64,9 @@ public class PennTreebankPatternNode {
     public void print(int l) {
         for (int i = 0; i < l; i++) {
             System.out.print("\t");
+        }
+        if (not) {
+            System.out.print("^");
         }
         print(values);
         if (lemmas.size() > 0) {

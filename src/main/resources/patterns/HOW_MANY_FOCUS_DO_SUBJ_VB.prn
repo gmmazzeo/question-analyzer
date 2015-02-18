@@ -8,11 +8,16 @@
       (VP (VB (*#3))))
     ))
 
-entities(2) attributes(1+3) ?ans
+values(2, lookupAttribute(1+3), ?ans).
 
-entities(2) l(3) ?ans.
-optional ?ans rdf:type l(1).
-COUNT(?ans)
+countTriples(entities(2, ?res), lookupAttribute(1+3), ?val).
+optional ?val rdf:type lookupCategory(1).
+
+countTriples(?res, lookupAttribute(1+3), entities(2, ?val)).
+optional ?res rdf:type lookupCategory(1).
+
+sumValues(entities(2, ?res), lookupAttribute(1+3), ?val).
+
 
 %How many employees does IBM have?
 %How many films did Hal Roach produce?

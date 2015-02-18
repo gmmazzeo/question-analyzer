@@ -178,7 +178,15 @@ public class SyntacticTreeNode implements Externalizable {
 
         pairs.put(this, patternNode);
 
-        LinkedList<PennTreebankPatternNode> nodesToBeMatched = new LinkedList(patternNode.children);
+        LinkedList<PennTreebankPatternNode> nodesToBeMatched = new LinkedList();
+        LinkedList<PennTreebankPatternNode> nodesNotToBeMatched = new LinkedList();
+        for (PennTreebankPatternNode c:patternNode.children) {
+            if (c.not) {
+                nodesNotToBeMatched.add(c);
+            } else {
+                nodesToBeMatched.add(c);
+            }
+        }
         LinkedList<SyntacticTreeNode> nodesAvailable = new LinkedList(children);
         while (!nodesToBeMatched.isEmpty()) {
             PennTreebankPatternNode sn = nodesToBeMatched.removeFirst();
@@ -194,6 +202,20 @@ public class SyntacticTreeNode implements Externalizable {
             if (!found) {
                 return false;
             }
+        }
+        while (!nodesNotToBeMatched.isEmpty()) {
+            PennTreebankPatternNode sn = nodesNotToBeMatched.removeFirst();
+            boolean found = false;
+            for (Iterator<SyntacticTreeNode> it = nodesAvailable.iterator(); it.hasNext();) {
+                SyntacticTreeNode n = it.next();
+                if (n.match(sn, pairs)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                return false;
+            }            
         }
         return true;
     }

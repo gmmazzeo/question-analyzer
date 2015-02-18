@@ -6,11 +6,11 @@
       (NP#3))
     ))
 
-entities(3) attributes(2) ?ans.
-?ans rdf:type l(2)
+values(3, lookupAttributes(2), ?ans).
+?ans rdf:type lookupCategory(2)
 
+%In which city was the former Dutch queen Juliana buried?
 %In which country is the Limerick Lake?
 %In which programming language is GIMP written?
-%In which city was the former Dutch queen Juliana buried?
 %In which U.S. state is Fort Knox located?
 %In which UK city are the headquarters of the MI6?

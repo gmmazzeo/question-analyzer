@@ -6,7 +6,7 @@
       (VP#2))
     ))
 
-entities(1) attributes(2) ?ans
+values(1, lookupAttribute(2), ?ans).
 ?ans rdf:type xsd:date
 
 %When did Latvia join the EU?
