@@ -20,7 +20,7 @@ public class PennTreebankPattern {
 
     String name;
     PennTreebankPatternNode root;
-    ArrayList<QueryModel> queryModels = new ArrayList<>();
+    ArrayList<IQueryModel> iQueryModels = new ArrayList<>();
 
     public PennTreebankPattern(String name, String stringPattern) throws Exception {
         this.name = name;
@@ -48,12 +48,12 @@ public class PennTreebankPattern {
                 queryStringPattern += lines[i];
                 i++;
             }
-            queryModels.add(buildQueryModel(queryStringPattern));
+            iQueryModels.add(buildQueryModel(queryStringPattern));
         }
     }
 
-    private QueryModel buildQueryModel(String queryStringPattern) throws Exception {
-        QueryModel qm = new QueryModel();
+    private IQueryModel buildQueryModel(String queryStringPattern) throws Exception {
+        IQueryModel qm = new IQueryModel();
         for (String constraint : queryStringPattern.trim().split("\\.")) {
             constraint = constraint.trim().toLowerCase();
             boolean optional = false;
@@ -63,17 +63,43 @@ public class PennTreebankPattern {
             }
             String[] exprs = constraint.split(" ");
             if (exprs.length > 1) {
-                QueryConstraint qc = new QueryConstraint(exprs[0], exprs[1], exprs[2], optional);
-                qm.getConstraints().add(qc);
+
             } else {
-                QueryConstraint qc = new QueryConstraint(exprs[0], "", "", optional);
-                qm.getConstraints().add(qc);
+                if (exprs[0].startsWith("values(")) {
+                    exprs[0]=exprs[0].replaceAll("values\\(", "");
+                    exprs[0]=exprs[0].substring(0, exprs[0].length()-1);
+                    exprs=exprs[0].split(",");
+                    if (exprs.length==2) {
+                        qm.constraints.add(values(exprs[0].trim(), exprs[1].trim(), optional));
+                    } else if (exprs.length==3) {
+                        qm.constraints.add(values(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), optional));
+                    } else {
+                        throw new Exception("Wrong query model in pattern "+name);
+                    }
+                }
             }
 
         }
         return qm;
     }
 
+    public IValueQueryConstraint values(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {        
+        return new IValueQueryConstraint(entityExpression, attributeExpression, valueVariableName, optional);
+    }
+    
+    public IValueQueryConstraint values(String valueExpression, String valueVariableName, boolean optional) {
+        return new IValueQueryConstraint(valueExpression, valueVariableName, optional);
+    }    
+    
+    public IEntityQueryConstraint entities(String entityVariableName, String attributeExpression, String valueExpression, boolean optional) {        
+        return new IEntityQueryConstraint(entityVariableName, attributeExpression, valueExpression, optional);
+    }
+    
+    public IEntityQueryConstraint entities(String entityExpression, String entityVariableName, boolean optional) {
+        return new IEntityQueryConstraint(entityExpression, entityVariableName, optional);
+    }    
+    
+    
     public void print() {
         root.print(0);
     }

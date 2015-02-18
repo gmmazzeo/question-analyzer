@@ -13,11 +13,20 @@ public class IValueQueryConstraint extends IQueryConstraint {
 
     String valueVariableName;
 
-    SyntacticTreeNode node;
+    String entityExpression, attributeExpression, valueExpression;
+    
+    public IValueQueryConstraint(String valueExpression, String valueVariableName, boolean optional) {
+        super(optional);
+        this.valueExpression = valueExpression;
+        this.valueVariableName = valueVariableName;        
+    }    
 
-    public IValueQueryConstraint(String valueVariableName, SyntacticTreeNode node) {
+    public IValueQueryConstraint(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {
+        super(optional);
+        this.entityExpression = entityExpression;
+        this.attributeExpression = attributeExpression;
         this.valueVariableName = valueVariableName;
-        this.node = node;
+
     }
 
     public String getValueVariableName() {
@@ -28,12 +37,20 @@ public class IValueQueryConstraint extends IQueryConstraint {
         this.valueVariableName = valueVariableName;
     }
 
-    public SyntacticTreeNode getNode() {
-        return node;
+    public String getEntityExpression() {
+        return entityExpression;
     }
 
-    public void setNode(SyntacticTreeNode node) {
-        this.node = node;
+    public void setEntityExpression(String entityExpression) {
+        this.entityExpression = entityExpression;
+    }
+
+    public String getAttributeExpression() {
+        return attributeExpression;
+    }
+
+    public void setAttributeExpression(String attributeExpression) {
+        this.attributeExpression = attributeExpression;
     }
 
 }

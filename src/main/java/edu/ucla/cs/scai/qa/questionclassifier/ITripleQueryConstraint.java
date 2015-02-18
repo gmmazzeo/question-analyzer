@@ -13,7 +13,8 @@ public class ITripleQueryConstraint extends IQueryConstraint {
 
     String entityVariableName, valueVariableName, attributeExpression;
 
-    public ITripleQueryConstraint(String entityVariableName, String attributeExpression, String valueVariableName) {
+    public ITripleQueryConstraint(String entityVariableName, String attributeExpression, String valueVariableName, boolean optional) {
+        super(optional);
         this.entityVariableName = entityVariableName;
         this.attributeExpression = attributeExpression;
         this.valueVariableName = valueVariableName;

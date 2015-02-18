@@ -7,8 +7,11 @@
       (VP (VBN|VBP (*#4))))
     ))
 
-entities(3) attributes(2+4+1) ?ans.
-?ans rdf:type l(2)
+values(entities(3), lookupAttribute(2+4+1), ?ans)
+optional categoryConstraint(?ans, 2)
+
+entities(3) lookupAttribute(2+4+1) ?ans.
+optional ?ans rdf:type lookupCategory(2)
 
 %In which programming language is GIMP written?
 %In which city was the former Dutch queen Juliana buried?

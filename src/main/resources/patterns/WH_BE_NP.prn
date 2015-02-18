@@ -5,9 +5,9 @@
       (NP#1))
     ))
 
-entities(1)
+entities(1, ?ans)
 
-values(1)
+values(1, ?ans)
 
 %Who is the daughter of Ingrid Bergman married to?
 %What is the currency of the Czech Republic?

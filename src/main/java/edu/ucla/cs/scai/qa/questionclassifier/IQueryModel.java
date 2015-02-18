@@ -13,6 +13,6 @@ import java.util.ArrayList;
  */
 public class IQueryModel {
     
-    ArrayList<IQueryConstraint> constraints;
+    ArrayList<IQueryConstraint> constraints=new ArrayList<>();
     
 }

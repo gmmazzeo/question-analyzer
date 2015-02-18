@@ -6,8 +6,8 @@
           (NP#1)))
     ))
 
-entities(1)
+entities(1,?ans)
 
-values(1)
+values(1,?ans)
 
 %Show me all songs from Bruce Springsteen released between 1980 and 1990.

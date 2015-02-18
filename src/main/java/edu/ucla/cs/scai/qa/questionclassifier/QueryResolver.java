@@ -29,6 +29,7 @@ public class QueryResolver {
 
     public ArrayList<QueryModel> resolveQueries(SyntacticTree tree, PennTreebankPattern pattern) {
         ArrayList<QueryModel> res = new ArrayList<>();
+        /*
         for (QueryModel qm : pattern.queryModels) {
             QueryModel mqm = new QueryModel();
             res.add(mqm);
@@ -40,6 +41,7 @@ public class QueryResolver {
                 mqm.getConstraints().add(mqc);
             }
         }
+                */
         return res;
     }
 
@@ -97,7 +99,7 @@ public class QueryResolver {
         }
         return res;
     }
-
+    
     public ArrayList<QueryConstraint> solvePPConstraints(SyntacticTreeNode node, String entityVariableName) {
         ArrayList<QueryConstraint> res = new ArrayList<>();
         return res;

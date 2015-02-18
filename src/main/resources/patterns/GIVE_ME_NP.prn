@@ -5,9 +5,9 @@
       (NP#1))
     ))
 
-entities(1)
+entities(1, ?ans)
 
-values(1)
+values(1,?ans)
 
 %Give me all female Russian astronauts.
 %Give me the birthdays of all actors of the television show Charmed.

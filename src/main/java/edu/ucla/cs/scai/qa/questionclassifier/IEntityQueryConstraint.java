@@ -13,11 +13,20 @@ public class IEntityQueryConstraint extends IQueryConstraint {
 
     String entityVariableName;
 
-    String nodeIdentifier;
+    String entityExpression, attributeExpression, valueExpression;
 
-    public IEntityQueryConstraint(String entityVariableName, String nodeIdentifier) {
+    public IEntityQueryConstraint(String entityExpression, String entityVariableName, boolean optional) {
+        super(optional);
+        this.entityExpression = entityExpression;
         this.entityVariableName = entityVariableName;
-        this.nodeIdentifier = nodeIdentifier;
+    }
+
+    public IEntityQueryConstraint(String entityVariableName, String attributeExpression, String valueExpression, boolean optional) {
+        super(optional);
+        this.entityVariableName = entityVariableName;
+        this.attributeExpression = attributeExpression;
+        this.valueExpression = valueExpression;
+
     }
 
     public String getEntityVariableName() {
@@ -27,13 +36,4 @@ public class IEntityQueryConstraint extends IQueryConstraint {
     public void setEntityVariableName(String entityVariableName) {
         this.entityVariableName = entityVariableName;
     }
-
-    public String getNodeIdentifier() {
-        return nodeIdentifier;
-    }
-
-    public void setNodeIdentifier(String nodeIdentifier) {
-        this.nodeIdentifier = nodeIdentifier;
-    }
-
 }
