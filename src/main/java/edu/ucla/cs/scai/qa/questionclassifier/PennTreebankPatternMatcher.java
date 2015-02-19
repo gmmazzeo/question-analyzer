@@ -170,9 +170,20 @@ public class PennTreebankPatternMatcher {
             System.out.println(t);
             System.out.println("------------------------------------------");
             for (String qs : questions.get(t)) {
-                System.out.println(qs);
+                System.out.print(qs);
+                for (String prn : new TreeSet<String>(questions.keySet())) {
+                    if (prn.equals(t)) {
+                        continue;
+                    }
+                    for (String str : questions.get(prn)) {
+                        if (str.equals(qs)) {
+                            System.out.print(" <DUP>");
+                            break;
+                        }
+                    }
+                }
+                System.out.println();
             }
         }
     }
-
 }
