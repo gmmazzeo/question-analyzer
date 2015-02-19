@@ -1,6 +1,7 @@
 (ROOT
   (SBARQ
-    (WHNP#1)
+    (WHNP#1
+      ^(PP))
     (SQ (VBP (*/be))
       (VP#2))
     ))
@@ -13,5 +14,4 @@ attributesWithConstraints(1,2)
 %Which airports are located in California, USA?
 %Which countries are connected by the Rhine?
 %Which languages are spoken in Estonia?
-%Which states of Germany are governed by the Social Democratic Party?
 %Which telecommunications organizations are located in Belgium?

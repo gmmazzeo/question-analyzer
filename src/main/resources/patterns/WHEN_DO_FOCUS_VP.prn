@@ -10,8 +10,8 @@ values(1, lookupAttribute(2), ?ans).
 ?ans rdf:type xsd:date
 
 %When did Latvia join the EU?
+%When did Michael Jackson die?
+%When was Alberta admitted as province?
 %When was Capcom founded?
 %When was the Statue of Liberty built?
-%When was Alberta admitted as province?
-%When did Michael Jackson die?
 %When were the Hells Angels founded?

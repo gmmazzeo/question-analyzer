@@ -3,14 +3,12 @@
     (WHPP (IN (*#1))
       (WHNP (WDT) (NN (*#2))))
     (SQ (VBZ|VBD|VBP (*/be))
-      (NP#3))
+      (NP#3)
+      ^(*))
     ))
 
 values(3, lookupAttributes(2), ?ans).
 ?ans rdf:type lookupCategory(2)
 
-%In which city was the former Dutch queen Juliana buried?
 %In which country is the Limerick Lake?
-%In which programming language is GIMP written?
-%In which U.S. state is Fort Knox located?
 %In which UK city are the headquarters of the MI6?

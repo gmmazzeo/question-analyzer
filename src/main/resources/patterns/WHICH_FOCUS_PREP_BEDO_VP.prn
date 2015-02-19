@@ -1,0 +1,17 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHNP|NP (WDT))
+      (PP#2))
+    (SQ (VBZ|VBD|VBP (*/be|do))
+      (VP#3))
+    ))
+
+entitiesWithConstraints(1,2) 
+
+attributesWithConstraints(1,2)
+
+%Which books by Kerouac were published by Viking Press?
+%Which films starring Clint Eastwood did he direct himself?
+%Which monarchs of the United Kingdom were married to a German?
+%Which states of Germany are governed by the Social Democratic Party?

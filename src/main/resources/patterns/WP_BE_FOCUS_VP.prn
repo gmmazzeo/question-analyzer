@@ -3,11 +3,8 @@
     (WHNP (WP))
     (SQ (VBZ|VBP|VBN (*/be))
       (NP#1)
-      (VP (VBN (*#2))
-        (S
-          (VP (TO)))))
+      (VP#2))
     ))
 
-entities(1) attributes(2+"to") ?ans
-
+%What is the total amount of men and women serving in the FDNY?
 %Who is the daughter of Ingrid Bergman married to?

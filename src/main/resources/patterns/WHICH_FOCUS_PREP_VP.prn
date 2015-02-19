@@ -1,0 +1,15 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHNP|NP (WDT))
+      (PP#2))
+    (SQ
+      (VP (VB|VBZ|VBD|VBP#2)
+        (NP#3))
+      ^(NP))
+    ))
+
+e(3) l(2)+e(1) ?ans
+
+%Which countries in the European Union adopted the Euro?
+%Which state of the USA has the highest population density?
