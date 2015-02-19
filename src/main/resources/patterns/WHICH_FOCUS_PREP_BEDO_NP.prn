@@ -1,0 +1,15 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHNP|NP (WDT))
+      (PP#2))
+    (SQ (VBZ|VBD|VBP (*/be|do))
+      (NP#3)
+      ^(*))
+    ))
+
+entitiesWithConstraints(1,2) 
+
+attributesWithConstraints(1,2)
+
+%Which capitals in Europe were host cities of the summer olympic games?

@@ -1,0 +1,13 @@
+(ROOT
+  (SBARQ
+    (WHNP#1 (WDT))
+    (SQ (VBD|VBP|VBZ (*/be))
+      (NP#2))
+    ))
+
+entitiesWithConstraints(1,2) 
+
+attributesWithConstraints(1,2)
+
+%Which mountain is the highest after the Annapurna?
+%Which mountains are higher than the Nanga Parbat?

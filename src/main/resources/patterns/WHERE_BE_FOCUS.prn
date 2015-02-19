@@ -1,0 +1,12 @@
+(ROOT
+  (SBARQ
+    (WHADVP (WRB (*/where)))
+    (SQ (VBD|VBZ (*/be))
+      (NP#1))
+    ))
+
+entities(1, ?ans)
+
+values(1, ?ans)
+
+%Where is the residence of the prime minister of Spain?

@@ -1,0 +1,11 @@
+(ROOT
+  (SBARQ
+    (WHADVP (WRB (*/where)))
+    (SQ (VBD|VBZ (*/be))
+      (NP#1)
+      (VP#2))
+    ))
+
+entities(1, ?ans)
+
+values(1, ?ans)

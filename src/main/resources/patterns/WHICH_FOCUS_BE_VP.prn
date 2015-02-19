@@ -1,8 +1,7 @@
 (ROOT
   (SBARQ
-    (WHNP#1
-      ^(PP))
-    (SQ (VBP (*/be))
+    (WHNP#1 (WDT))
+    (SQ (VBD|VBP|VBZ (*/be))
       (VP#2))
     ))
 
@@ -10,8 +9,13 @@ entitiesWithConstraints(1,2)
 
 attributesWithConstraints(1,2)
 
-%How many official languages are spoken on the Seychelles?
+%Which actors were born in Germany?
 %Which airports are located in California, USA?
 %Which countries are connected by the Rhine?
 %Which languages are spoken in Estonia?
+%Which organizations were founded in 1950?
+%Which presidents were born in 1945?
+%Which professional surfers were born on the Philippines?
+%Which ships were called after Benjamin Franklin?
 %Which telecommunications organizations are located in Belgium?
+%Which television shows were created by Walt Disney?

@@ -1,0 +1,13 @@
+(ROOT
+  (SBARQ
+    (WHNP#1 (WDT))
+    (SQ
+      (VP (VB|VBZ|VBD|VBP#2)
+        (PP#3))
+      ^(NP))
+    ))
+
+e(3) l(2)+e(1) ?ans
+
+%Which Greek goddesses dwelt on Mount Olympus?
+%Which museum exhibits The Scream by Munch?

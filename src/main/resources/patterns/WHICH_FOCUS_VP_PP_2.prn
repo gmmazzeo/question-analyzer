@@ -1,0 +1,10 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP (*/which)))
+    (SQ
+      (NP#1)
+      (VP (VB#2)
+        (PP#2)))
+    ))
+
+%Which companies work in the aerospace industry as well as on nuclear reactor technology?

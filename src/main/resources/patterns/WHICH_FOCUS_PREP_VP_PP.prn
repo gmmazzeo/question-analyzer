@@ -1,0 +1,11 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHNP|NP (WDT))
+      (PP#2))
+    (SQ
+      (VP (VB|VBZ|VBD|VBP#2)
+        (PP#3)))
+    ))
+
+%Which daughters of British earls died in the same place they were born in?

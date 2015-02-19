@@ -1,0 +1,15 @@
+(ROOT
+  (SBARQ
+    (WHNP#1)
+    (SQ
+      (VP (VBZ (*/have))
+        (VP (VBN (*/be))
+          (VP#2))))
+    ))
+
+entities(1, ?ans)
+
+values(1, ?ans)
+
+%Which software has been developed by organizations founded in California?
+%Which U.S. state has been admitted latest?

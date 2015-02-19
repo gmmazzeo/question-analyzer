@@ -3,7 +3,8 @@
     (WHNP#1 (WDT))
     (SQ
       (VP (VB|VBZ|VBD|VBP#2)
-        (NP#3)))
+        (NP#3)
+        ^(PP)))
     ))
 
 e(3) l(2)+e(1) ?ans
@@ -15,8 +16,6 @@ e(3) l(2)+e(1) ?ans
 %Which country has the most official languages?
 %Which European countries have a constitutional monarchy?
 %Which German cities have more than 250000 inhabitants?
-%Which Greek goddesses dwelt on Mount Olympus?
-%Which museum exhibits The Scream by Munch?
 %Which music albums contain the song Last Christmas?
 %Which states border Illinois?
 %Which U.S. state has the abbreviation MN?

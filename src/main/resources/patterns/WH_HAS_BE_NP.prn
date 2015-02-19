@@ -1,0 +1,14 @@
+(ROOT
+  (SBARQ
+    (WHNP#1)
+    (SQ
+      (VP (VBZ (*/have))
+        (VP (VBN (*/be))
+          (NP#2))))
+    ))
+
+entities(1, ?ans)
+
+values(1, ?ans)
+
+%Who has been the 5th president of the United States of America?

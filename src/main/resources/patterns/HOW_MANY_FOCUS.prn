@@ -1,0 +1,17 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHADJP (WRB (*/how)) (JJ (*/many)))
+      (NNS#2))
+    (SQ#3 ^(VBD|VBZ (*/do)))
+    ))
+
+
+count(?ans rdf:type lookupCategory(1))
+%constraint on #3
+
+%How many big fires struck Paris during the Middle Ages?
+%How many monarchical countries are there in Europe?
+%How many official languages are spoken on the Seychelles?
+%How many people live in the capital of Australia?
+%How many space missions have there been?

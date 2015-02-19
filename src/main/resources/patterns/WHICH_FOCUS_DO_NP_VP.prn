@@ -9,12 +9,12 @@
 entities(2) attributes(3+1) ?ans
 optional ?ans rdf:type classes(1)
 
-%Which river does the Brooklyn Bridge cross?
-%Which classis do tree frogs belong to?
 %Which awards did WikiLeaks win?
 %Which budget did the first movie of Zdenek Sverak have?
-%Which instruments did John Lennon play?
-%Which other weapons did the designer of the Uzi develop?
-%Which country does the creator of Miffy come from?
-%Which movies did Kurosawa direct after Rashomon?
 %Which cities does the Weser flow through?
+%Which classis do tree frogs belong to?
+%Which country does the creator of Miffy come from?
+%Which instruments did John Lennon play?
+%Which movies did Kurosawa direct after Rashomon?
+%Which other weapons did the designer of the Uzi develop?
+%Which river does the Brooklyn Bridge cross?

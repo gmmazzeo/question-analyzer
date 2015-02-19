@@ -1,7 +1,7 @@
 (ROOT
   (SBARQ
     (WHADVP (WRB (*/when)))
-    (SQ (VBD)
+    (SQ (VBD|VBZ)
       (NP#1)
       (VP#2))
     ))
@@ -11,6 +11,7 @@ values(1, lookupAttribute(2), ?ans).
 
 %When did Latvia join the EU?
 %When did Michael Jackson die?
+%When is the movie Worst Case Scenario going to be in cinemas in the Netherlands?
 %When was Alberta admitted as province?
 %When was Capcom founded?
 %When was the Statue of Liberty built?

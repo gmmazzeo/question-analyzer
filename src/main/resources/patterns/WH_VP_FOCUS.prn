@@ -1,0 +1,27 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ
+      (VP (VBZ|VBD|VBN (*#1))
+        (NP#2)))
+    ))
+
+?ans attributes(1) entities(2)
+
+%Who composed the music for Harold and Maude?
+%Who created Goofy?
+%Who created the comic Captain America?
+%Who created Wikipedia?
+%Who designed the Brooklyn Bridge?
+%Who developed Minecraft?
+%Who developed the video game World of Warcraft?
+%Who founded Intel?
+%Who invented the zipper?
+%Who owns Aldi?
+%Who painted The Storm on the Sea of Galilee?
+%Who produced films starring Natalie Portman?
+%Who produced the most films?
+%Who produces Orangina?
+%Who was called Scarface?
+%Who wrote the book Les Piliers de la terre?
+%Who wrote the lyrics for the Polish national anthem?

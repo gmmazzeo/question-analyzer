@@ -1,10 +1,11 @@
 (ROOT
   (SBARQ
     (WHNP (WP))
-    (SQ (VBZ|VBP|VBN (*/be))
+    (SQ (VBZ|VBP|VBN|VBD (*/be|do))
       (NP#1)
       (VP#2))
     ))
 
+%What did Bruce Carver die from?
 %What is the total amount of men and women serving in the FDNY?
 %Who is the daughter of Ingrid Bergman married to?

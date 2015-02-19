@@ -1,0 +1,14 @@
+(ROOT
+  (S
+    (S
+      (VP (VB (*/give))
+        (NP (PRP))
+        (NP#1)))
+    (VP#2)
+    ))
+
+entities(1,?ans)
+
+values(1,?ans)
+
+%Give me all actors called Baldwin.

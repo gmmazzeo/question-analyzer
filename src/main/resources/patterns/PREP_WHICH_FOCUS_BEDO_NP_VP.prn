@@ -1,6 +1,6 @@
 (ROOT
   (SBARQ
-    (WHPP (IN (*#1))
+    (WHPP (*#1)
       (WHNP#2))
     (SQ (VBZ|VBD|VBP (*/be|do))
       (NP#3)
@@ -19,3 +19,4 @@ values(3, lookupAttributes(2+4+1), ?ans).
 %In which military conflicts did Lawrence of Arabia participate?
 %In which programming language is GIMP written?
 %In which U.S. state is Fort Knox located?
+%To which countries does the Himalayan mountain system extend?

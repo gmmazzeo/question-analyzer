@@ -2,7 +2,7 @@
   (SBARQ
     (WHNP
       (WHADJP (WRB (*/how)) (JJ (*/many)))
-      (NNS (*#1)))
+      (NP|NNS (*#1)))
     (SQ (VBD|VBP|VBZ (*/do))
       (NP#2)
       (VP (VB (*#3))))
@@ -18,11 +18,10 @@ optional ?res rdf:type lookupCategory(1).
 
 sumValues(entities(2, ?res), lookupAttribute(1+3), ?val).
 
-
+%How many children did Benjamin Franklin have?
+%How many employees does Google have?
 %How many employees does IBM have?
 %How many films did Hal Roach produce?
 %How many films did Leonardo DiCaprio star in?
-%How many children did Benjamin Franklin have?
-%How many employees does Google have?
 %How many inhabitants does Maribor have?
 %How many students does the Free University in Amsterdam have?

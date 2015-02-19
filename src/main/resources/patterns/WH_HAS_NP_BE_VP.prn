@@ -1,0 +1,12 @@
+(ROOT
+  (SBARQ
+    (WHNP)
+    (SQ (VBZ (*/have))
+      (NP#1)
+      (VP#2 (VBN (*/be))
+        (VP)))
+    ))
+
+entities(1, ?ans)
+
+values(1, ?ans)
