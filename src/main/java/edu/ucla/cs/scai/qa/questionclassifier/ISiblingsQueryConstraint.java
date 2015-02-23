@@ -9,18 +9,16 @@ package edu.ucla.cs.scai.qa.questionclassifier;
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
-public class IEntityQueryConstraint extends IQueryConstraint {
+public class ISiblingsQueryConstraint extends IQueryConstraint {
 
     String entityVariableName;
 
-    String entityExpression, attributeExpression, valueExpression;
+    String nodeLabel;
 
-    public IEntityQueryConstraint(String entityVariableName, String attributeExpression, String valueExpression, boolean optional) {
+    public ISiblingsQueryConstraint(String nodeLabel, String entityVariableName, boolean optional) {
         super(optional);
+        this.nodeLabel = nodeLabel;
         this.entityVariableName = entityVariableName;
-        this.attributeExpression = attributeExpression;
-        this.valueExpression = valueExpression;
-
     }
 
     public String getEntityVariableName() {
@@ -29,5 +27,13 @@ public class IEntityQueryConstraint extends IQueryConstraint {
 
     public void setEntityVariableName(String entityVariableName) {
         this.entityVariableName = entityVariableName;
+    }
+
+    public String getNodeLabel() {
+        return nodeLabel;
+    }
+
+    public void setNodeLabel(String nodeLabel) {
+        this.nodeLabel = nodeLabel;
     }
 }

@@ -1,14 +1,15 @@
 (ROOT
   (S
-    (S
+    (S#1
       (VP (VB (*/give))
-        (NP (PRP))
-        (NP#1)))
-    (VP#2)
+        (NP (PRP) ^(*))
+        (NP#2)))
     ))
 
-entities(1,?ans)
+entities(2,?ans).
+siblingContraints(1, ?ans).
 
-values(1,?ans)
+values(2, ?ent, ?ans).
+siblingConstraints(1, ?ans)
 
 %Give me all actors called Baldwin.

@@ -9,7 +9,7 @@
 
 entities(1, ?ans)
 
-values(1, ?ans)
+values(1, ?ent, ?ans)
 
 %Which software has been developed by organizations founded in California?
 %Which U.S. state has been admitted latest?

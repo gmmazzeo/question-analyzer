@@ -34,11 +34,12 @@ public class SyntacticTreeNode implements Externalizable {
     boolean isFocus;
     int categoryPriority, attributePriority, entityPriority;
     boolean examplePage;
-    boolean npSimple, npCompound;
+    boolean npSimple, npCompound, whnpSimple, whnpCompound;
 
     ArrayList<SyntacticTreeNode> children;
 
-    public SyntacticTreeNode(Tree t, HashMap<Tree, CoreLabel> map) throws Exception {
+    public SyntacticTreeNode(Tree t, HashMap<Tree, CoreLabel> map, SyntacticTreeNode parent) throws Exception {
+        this.parent=parent;
         value = t.value();
         if (t.isLeaf()) {
             CoreLabel c = map.get(t);
@@ -56,7 +57,7 @@ public class SyntacticTreeNode implements Externalizable {
         children = new ArrayList<>();
         boolean hasNPchildren = false;
         for (Tree c : t.children()) {
-            SyntacticTreeNode child = new SyntacticTreeNode(c, map);
+            SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
             children.add(child);
             if (child.value.equals("NP")) {
                 hasNPchildren = true;
@@ -67,6 +68,12 @@ public class SyntacticTreeNode implements Externalizable {
                 npCompound = true;
             } else {
                 npSimple = true;
+            }
+        } else if (value.equals("WHNP")) {
+            if (hasNPchildren) {
+                whnpCompound = true;
+            } else {
+                whnpSimple = true;
             }
         }
     }
@@ -167,6 +174,9 @@ public class SyntacticTreeNode implements Externalizable {
     }
 
     boolean match(PennTreebankPatternNode patternNode, HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs) {
+        if (patternNode.notValues.contains(value) || patternNode.notLemmas.contains(lemma)) {
+            return false;
+        }
         boolean ok
                 = (patternNode.values.contains("*") || patternNode.values.contains(value))
                 && (patternNode.lemmas.isEmpty() || patternNode.lemmas.contains("*") || patternNode.lemmas.contains(lemma))
@@ -262,7 +272,7 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(value);
         } else {
-            if (value.startsWith("N")) {
+            if (value.startsWith("N") || value.startsWith("WHN")) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafValues(sb);
                 }
@@ -283,7 +293,7 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(lemma);
         } else {
-            if (value.startsWith("N")) {
+            if (value.startsWith("N") || value.startsWith("WHN")) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafLemmas(sb);
                 }

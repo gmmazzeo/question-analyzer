@@ -1,0 +1,17 @@
+(ROOT
+  (S
+    (VP (VB (*/give|tell|show))
+      (NP (PRP) ^(*))
+      (NP
+        (NP (NN (*/set|list)))
+        (PP (IN (*/of))
+          (NP#1))))
+    ))
+
+entities(1, ?ans, 0, 1).
+
+values(1, ?ent, ?ans)
+
+%Give me a list of all American inventions.
+%Give me a list of all lakes in Denmark.
+%Give me a list of all trumpet players that were bandleaders.

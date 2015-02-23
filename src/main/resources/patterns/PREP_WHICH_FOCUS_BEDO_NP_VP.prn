@@ -7,8 +7,9 @@
       (VP#4))
     ))
 
-values(3, lookupAttributes(2+4+1), ?ans).
-?ans rdf:type lookupCategory(2)
+entities(3, ?ent).
+entities(2, ?val).
+boundThroughAttribute(?ent, 2+4+1, ?val).
 
 %For which label did Elvis record his first album?
 %In which city did John F. Kennedy die?

@@ -1,11 +1,12 @@
 (ROOT
   (SBARQ
     (WHADJP (WRB (*/how)) (ADJP|JJ (*#1)))
-    (SQ (VBZ (*/be))
+    (SQ (VBZ|VBP|VBD (*/be))
       (NP#2))
     ))
 
-values(2, lookupAttribute(1), ?ans).
+entities(2, ?ent).
+boundThroughAttribute(?ent,1,?ans).
 
 %How tall is Claudia Schiffer?
 %How tall is Michael Jordan?

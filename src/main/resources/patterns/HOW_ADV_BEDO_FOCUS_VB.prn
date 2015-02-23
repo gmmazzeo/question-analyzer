@@ -1,12 +1,12 @@
 (ROOT
   (SBARQ
     (WHADVP (WRB (*/how)) (RB (*#1)))
-    (SQ (VBD (*/be|do))
+    (SQ (VBD|VBP|VBZ (*/be|do))
       (NP#2)
       (VP#3))
     ))
 
 values(2, lookupAttribute(3), ?ans).
 
-%How often did Nicole Kidman marry?
+%How often did Nicole Kidman marry? -> This is like how many times - probably we need to process this kind of queries with a specific pattern
 %How often was Michael Jordan divorced?

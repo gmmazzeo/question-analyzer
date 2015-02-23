@@ -6,6 +6,7 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -22,18 +23,12 @@ public class Test {
     //http://www.surdeanu.info/mihai/teaching/ista555-fall13/readings/PennTreebankConstituents.html
     //http://nlp.stanford.edu/software/dependencies_manual.pdf
     //They explain the tags used by Stanford Parser
-    StanfordCoreNLP pipeline;
-
-    public Test() {
-        Properties props = new Properties();
-        props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-        pipeline = new StanfordCoreNLP(props);
-    }
 
     public static void main(String args[]) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Parser parser = new Parser();
         PennTreebankPatternMatcher m = new PennTreebankPatternMatcher();
+        QueryResolver qr=new QueryResolver();
         while (true) {
             System.out.print("question> ");
             String qt = in.readLine();
@@ -46,6 +41,10 @@ public class Test {
                     HashMap<PennTreebankPattern, SyntacticTree> ps = m.match(qt);
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
+                        for (QueryModel qm : qr.resolveQueries(ps.get(p), p)) {
+                            System.out.println();
+                            System.out.println(qm);
+                        }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

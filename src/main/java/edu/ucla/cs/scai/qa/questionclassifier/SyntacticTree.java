@@ -45,7 +45,7 @@ public class SyntacticTree {
         if (it1.hasNext() || it2.hasNext()) {
             throw new Exception("Different number of leaves and tokens!");
         }
-        root = new SyntacticTreeNode(tree, map);
+        root = new SyntacticTreeNode(tree, map, null);
     }
 
     public void compactNamedEntities() {

@@ -31,6 +31,12 @@ public class Parser {
     }
     
     public SyntacticTree parse(String text) throws Exception {
+        //char[] c=text.toCharArray();
+        //int j=c.length-1;
+        //while (j>=0 && (c[j]=='.' || c[j]=='!' || c[j]=='?' || c[j]==' ')) {
+        //    j--;
+        //}
+        //text=String.copyValueOf(c, 0, j+1);
         Annotation qaTree = new Annotation(text);
         pipelineTree.annotate(qaTree);
         Annotation qaTokens = new Annotation(text);

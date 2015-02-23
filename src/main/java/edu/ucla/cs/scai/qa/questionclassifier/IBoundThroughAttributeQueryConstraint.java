@@ -9,14 +9,15 @@ package edu.ucla.cs.scai.qa.questionclassifier;
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
-public class ITripleQueryConstraint extends IQueryConstraint {
+public class IBoundThroughAttributeQueryConstraint extends IQueryConstraint {
 
-    String entityVariableName, valueVariableName, attributeExpression;
+    String entityVariableName, valueVariableName;
+    String[] attributeNodes;
 
-    public ITripleQueryConstraint(String entityVariableName, String attributeExpression, String valueVariableName, boolean optional) {
+    public IBoundThroughAttributeQueryConstraint(String entityVariableName, String attributeNode, String valueVariableName, boolean optional) {
         super(optional);
         this.entityVariableName = entityVariableName;
-        this.attributeExpression = attributeExpression;
+        this.attributeNodes = attributeNode.replaceAll(" ", "").split("\\+");
         this.valueVariableName = valueVariableName;
     }
 
@@ -36,12 +37,12 @@ public class ITripleQueryConstraint extends IQueryConstraint {
         this.valueVariableName = valueVariableName;
     }
 
-    public String getAttributeExpression() {
-        return attributeExpression;
+    public String[] getAttributeNodes() {
+        return attributeNodes;
     }
 
-    public void setAttributeExpression(String attributeExpression) {
-        this.attributeExpression = attributeExpression;
+    public void setAttributeNodes(String[] attributeNodes) {
+        this.attributeNodes = attributeNodes;
     }
 
 }

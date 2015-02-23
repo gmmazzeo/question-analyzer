@@ -84,8 +84,8 @@ public class PennTreebankPatternMatcher {
                 String l = in.readLine();
                 String s = "";
                 while (l != null) {
-                    if (s.length()>0) {
-                        s=s+"\n";
+                    if (s.length() > 0) {
+                        s = s + "\n";
                     }
                     s += l;
                     l = in.readLine();
@@ -107,8 +107,11 @@ public class PennTreebankPatternMatcher {
 
     public HashMap<PennTreebankPattern, SyntacticTree> match(String s) throws Exception {
         SyntacticTree st = parser.parse(s);
-        HashMap<PennTreebankPattern, SyntacticTree> res=new HashMap<>();
+        HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         for (PennTreebankPattern pattern : patterns.values()) {
+            if (pattern.name.equals("GIVE_ME_LIST_OF_FOCUS")) {
+                System.out.print("");
+            }
             if (st.match(pattern)) {
                 res.put(pattern, st);
             }
@@ -123,26 +126,28 @@ public class PennTreebankPatternMatcher {
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         HashMap<String, ArrayList<String>> questions = new HashMap<>();
-        QueryResolver qr=new QueryResolver();
+        QueryResolver qr = new QueryResolver();
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 System.out.println();
                 tot++;
                 System.out.println(l);
                 try {
+                    if (l.equals("Give me a list of all American inventions.")) {
+                        System.out.print("");
+                    }
                     HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(l);
-                    for (PennTreebankPattern match:matches.keySet()) {
+                    for (PennTreebankPattern match : matches.keySet()) {
                         ArrayList<String> q = questions.get(match.name);
                         if (q == null) {
                             q = new ArrayList<>();
                             questions.put(match.name, q);
                         }
-                        q.add(l);                        
+                        q.add(l);
                     }
                     if (!matches.isEmpty()) {
                         ok++;
-                    }
-                    else {
+                    } else {
                         ArrayList<String> q = questions.get("> No match");
                         if (q == null) {
                             q = new ArrayList<>();
@@ -150,12 +155,15 @@ public class PennTreebankPatternMatcher {
                         }
                         q.add(l);
                     }
-                    for (PennTreebankPattern pattern:matches.keySet()) {
+                    for (PennTreebankPattern pattern : matches.keySet()) {
                         System.out.println(pattern.name);
-                        for (QueryModel qm:qr.resolveQueries(matches.get(pattern), pattern)) {
+                        if (pattern.name.equals("GIVE_ME_FOCUS")) {
+                            System.out.print("");
+                        }
+                        for (QueryModel qm : qr.resolveQueries(matches.get(pattern), pattern)) {
                             System.out.println();
-                            System.out.println(qm);                            
-                        }                        
+                            System.out.println(qm);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

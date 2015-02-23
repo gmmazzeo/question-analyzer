@@ -34,9 +34,10 @@ public class PennTreebankPattern {
             i++;
         }
 
-        if (name.equals("WH_BE_NP")) {
+        if (name.equals("GIVE_ME_FOCUS")) {
             System.out.print("");
         }
+
         String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
@@ -60,49 +61,91 @@ public class PennTreebankPattern {
         for (String constraint : queryStringPattern.trim().split("\\.")) {
             constraint = constraint.trim().toLowerCase();
             boolean optional = false;
-            if (constraint.startsWith("optional")) {
+            if (constraint.startsWith("optional ")) {
                 optional = true;
-                constraint = constraint.replaceFirst("optional", "").trim();
+                constraint = constraint.replaceFirst("optional ", "").trim();
             }
-            String[] exprs = constraint.split(" ");
-            if (exprs.length > 1) {
-
-            } else {
-                if (exprs[0].startsWith("values(")) {
-                    exprs[0]=exprs[0].replaceAll("values\\(", "");
-                    exprs[0]=exprs[0].substring(0, exprs[0].length()-1);
-                    exprs=exprs[0].split(",");
-                    if (exprs.length==2) {
-                        qm.constraints.add(values(exprs[0].trim(), exprs[1].trim(), optional));
-                    } else if (exprs.length==3) {
-                        qm.constraints.add(values(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), optional));
-                    } else {
-                        throw new Exception("Wrong query model in pattern "+name);
-                    }
+            if (constraint.startsWith("values(")) {
+                constraint = constraint.replaceAll("values\\(", "");
+                constraint = constraint.substring(0, constraint.length() - 1);
+                String[] exprs = constraint.split(",");
+                if (exprs.length == 3) {
+                    qm.constraints.add(nodeValues(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), "", optional));
+                } else if (exprs.length == 4) {
+                    qm.constraints.add(nodeValues(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), exprs[3].trim(), optional));
+                } else {
+                    throw new Exception("Wrong query model in pattern " + name);
                 }
+            } else if (constraint.startsWith("entities(")) {
+                constraint = constraint.replaceAll("entities\\(", "");
+                constraint = constraint.substring(0, constraint.length() - 1);
+                String[] exprs = constraint.split(",");
+                if (exprs.length == 2) {
+                    qm.constraints.add(nodeEntities(exprs[0].trim(), exprs[1].trim(), true, true, optional));
+                } else if (exprs.length == 4) {
+                    qm.constraints.add(nodeEntities(exprs[0].trim(), exprs[1].trim(), exprs[2].trim().equals("1"), exprs[3].trim().equals("1"), optional));
+                } else {
+                    throw new Exception("Wrong query model in pattern " + name);
+                }
+            } else if (constraint.startsWith("siblingconstraints(")) {
+                constraint = constraint.replaceAll("siblingconstraints\\(", "");
+                constraint = constraint.substring(0, constraint.length() - 1);
+                String[] exprs = constraint.split(",");
+                if (exprs.length == 2) {
+                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional));
+                } else {
+                    throw new Exception("Wrong query model in pattern " + name);
+                }
+            } else if (constraint.startsWith("boundthroughattribute(")) {
+                constraint = constraint.replaceAll("boundthroughattribute\\(", "");
+                constraint = constraint.substring(0, constraint.length() - 1);
+                String[] exprs = constraint.split(",");
+                if (exprs.length == 3) {
+                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim()));
+                } else {
+                    throw new Exception("Wrong query model in pattern " + name);
+                }
+            } else if (constraint.startsWith("optionalcategory(")) {
+                constraint = constraint.replaceAll("optionalcategory\\(", "");
+                constraint = constraint.substring(0, constraint.length() - 1);
+                String[] exprs = constraint.split(",");
+                if (exprs.length == 2) {
+                    qm.constraints.add(optionalCategory(exprs[0].trim(), exprs[1].trim()));
+                } else {
+                    throw new Exception("Wrong query model in pattern " + name);
+                }
+            } else {
+                throw new Exception("Wrong query model in pattern " + name);
             }
 
         }
         return qm;
     }
 
-    public IValueQueryConstraint values(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {        
+    public IValueQueryConstraint values(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {
         return new IValueQueryConstraint(entityExpression, attributeExpression, valueVariableName, optional);
     }
-    
-    public IValueQueryConstraint values(String valueExpression, String valueVariableName, boolean optional) {
-        return new IValueQueryConstraint(valueExpression, valueVariableName, optional);
-    }    
-    
-    public IEntityQueryConstraint entities(String entityVariableName, String attributeExpression, String valueExpression, boolean optional) {        
-        return new IEntityQueryConstraint(entityVariableName, attributeExpression, valueExpression, optional);
+
+    public IValueNodeQueryConstraint nodeValues(String nodeLabel, String entityVariableName, String valueVariableName, String attributePrefix, boolean optional) {
+        return new IValueNodeQueryConstraint(nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
     }
-    
-    public IEntityQueryConstraint entities(String entityExpression, String entityVariableName, boolean optional) {
-        return new IEntityQueryConstraint(entityExpression, entityVariableName, optional);
-    }    
-    
-    
+
+    public IEntityNodeQueryConstraint nodeEntities(String nodeLabel, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, boolean optional) {
+        return new IEntityNodeQueryConstraint(nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
+    }
+
+    public ISiblingsQueryConstraint siblingConstraints(String nodeLabel, String entityVariableName, boolean optional) {
+        return new ISiblingsQueryConstraint(nodeLabel, entityVariableName, optional);
+    }
+
+    public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName) {
+        return new IBoundThroughAttributeQueryConstraint(entityVariableName, nodeLabel, valueVariableName, false);
+    }
+
+    public IOptionalCategoryQueryConstraint optionalCategory(String entityVariableName, String nodeLabel) {
+        return new IOptionalCategoryQueryConstraint(entityVariableName, nodeLabel);
+    }
+
     public void print() {
         root.print(0);
     }

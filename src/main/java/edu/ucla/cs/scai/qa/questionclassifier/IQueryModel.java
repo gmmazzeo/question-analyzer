@@ -12,7 +12,15 @@ import java.util.ArrayList;
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
 public class IQueryModel {
-    
-    ArrayList<IQueryConstraint> constraints=new ArrayList<>();
-    
+
+    ArrayList<IQueryConstraint> constraints = new ArrayList<>();
+
+    public ArrayList<IQueryConstraint> getConstraints() {
+        return constraints;
+    }
+
+    public void setConstraints(ArrayList<IQueryConstraint> constraints) {
+        this.constraints = constraints;
+    }
+
 }

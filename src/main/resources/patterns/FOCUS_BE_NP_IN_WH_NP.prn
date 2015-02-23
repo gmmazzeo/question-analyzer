@@ -8,10 +8,8 @@
           (WHNP#4))))
     ))
 
-entities(?ans, lookupAttribute(2), 1).
-optional ?ans rdf:type lookupCategory(4)
-
-values(1, lookupAttribute(2), ?ans).
-optional ?ans rdf:type lookupCategory(4)
+entities(1, ?ent).
+boundThroughAttribute(?ent, 2, ?ans).
+optionalCategory(?ans, 4)
 
 %Sean Parnell is the governor of which U.S. state?

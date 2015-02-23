@@ -10,11 +10,19 @@ package edu.ucla.cs.scai.qa.questionclassifier;
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
 public class IQueryConstraint {
-    
+
     boolean optional;
 
     public IQueryConstraint(boolean optional) {
-        this.optional=optional;
+        this.optional = optional;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
     }
 
 }

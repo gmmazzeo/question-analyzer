@@ -1,17 +1,14 @@
 (ROOT
   (S
     (VP (VB (*/give|tell|show))
-      (NP (PRP))
-      (NP#1))
+      (NP (PRP) ^(*))
+      (NP#1 ^(NP (NN (*/list)))))
     ))
 
-entities(1, ?ans)
+entities(1, ?ans).
 
-values(1,?ans)
+values(1, ?ent, ?ans)
 
-%Give me a list of all American inventions.
-%Give me a list of all lakes in Denmark.
-%Give me a list of all trumpet players that were bandleaders.
 %Give me all actors starring in Last Action Hero.
 %Give me all actors starring in movies directed by and starring William Shatner.
 %Give me all animal species that live in the Teutoburg Forest.
