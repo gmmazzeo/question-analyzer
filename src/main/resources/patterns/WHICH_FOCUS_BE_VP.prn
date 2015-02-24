@@ -5,9 +5,9 @@
       (VP#2))
     ))
 
-entitiesWithConstraints(1,2) 
+%entitiesWithConstraints(1,2) 
 
-attributesWithConstraints(1,2)
+%attributesWithConstraints(1,2)
 
 %Which actors were born in Germany?
 %Which airports are located in California, USA?

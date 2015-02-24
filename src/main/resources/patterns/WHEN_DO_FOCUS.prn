@@ -6,7 +6,7 @@
       ^(VP))
     ))
 
-values(1, date, ?ans).
-?ans rdf:type xsd:date
+values(1, ?ent, ?ans).
+%?ans rdf:type xsd:date
 
 %When was the Battle of Gettysburg?

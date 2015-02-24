@@ -1,6 +1,6 @@
 (ROOT
   (SBARQ
-    (WHPP (*#1)
+    (WHPP (IN|TO#1)
       (WHNP#2))
     (SQ (VBZ|VBD|VBP (*/be|do))
       (NP#3)
@@ -8,8 +8,12 @@
     ))
 
 entities(3, ?ent).
-entities(2, ?val).
-boundThroughAttribute(?ent, 2+4+1, ?val).
+boundThroughAttribute(?ent, 2+4+1, ?ans).
+optionalCategory(?ans, 2)
+
+values(3, ?ent, ?val).
+boundThroughAttribute(?val, 2+4+1, ?ans).
+optionalCategory(?ans, 2)
 
 %For which label did Elvis record his first album?
 %In which city did John F. Kennedy die?

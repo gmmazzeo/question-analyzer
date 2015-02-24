@@ -7,7 +7,7 @@
     ))
 
 
-count(?ans rdf:type lookupCategory(1))
+%count(?ans rdf:type lookupCategory(1))
 %constraint on #3
 
 %How many big fires struck Paris during the Middle Ages?

@@ -6,8 +6,8 @@
       (VP#3))
     ))
 
-entities(2) attributes(3+1) ?ans
-optional ?ans rdf:type classes(1)
+%entities(2) attributes(3+1) ?ans
+%optional ?ans rdf:type classes(1)
 
 %Which awards did WikiLeaks win?
 %Which budget did the first movie of Zdenek Sverak have?

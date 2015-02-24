@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class IQueryModel {
 
     ArrayList<IQueryConstraint> constraints = new ArrayList<>();
+    ArrayList<IQueryConstraint> postoponedConstraints = new ArrayList<>();
 
     public ArrayList<IQueryConstraint> getConstraints() {
         return constraints;
@@ -21,6 +22,14 @@ public class IQueryModel {
 
     public void setConstraints(ArrayList<IQueryConstraint> constraints) {
         this.constraints = constraints;
+    }
+
+    public ArrayList<IQueryConstraint> getPostoponedConstraints() {
+        return postoponedConstraints;
+    }
+
+    public void setPostoponedConstraints(ArrayList<IQueryConstraint> postoponedConstraints) {
+        this.postoponedConstraints = postoponedConstraints;
     }
 
 }

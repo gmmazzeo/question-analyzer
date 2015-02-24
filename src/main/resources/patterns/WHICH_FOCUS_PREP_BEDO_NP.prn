@@ -8,8 +8,8 @@
       ^(*))
     ))
 
-entitiesWithConstraints(1,2) 
+%entitiesWithConstraints(1,2) 
 
-attributesWithConstraints(1,2)
+%attributesWithConstraints(1,2)
 
 %Which capitals in Europe were host cities of the summer olympic games?

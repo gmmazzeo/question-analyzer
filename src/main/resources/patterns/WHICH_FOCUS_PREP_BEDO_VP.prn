@@ -7,9 +7,9 @@
       (VP#3))
     ))
 
-entitiesWithConstraints(1,2) 
+%entitiesWithConstraints(1,2) 
 
-attributesWithConstraints(1,2)
+%attributesWithConstraints(1,2)
 
 %Which books by Kerouac were published by Viking Press?
 %Which films starring Clint Eastwood did he direct himself?

@@ -25,25 +25,29 @@ public class PennTreebankPattern {
     public PennTreebankPattern(String name, String stringPattern) throws Exception {
         this.name = name;
         String treeStringPattern = "";
+
         String[] lines = stringPattern.split("\n");
+        ArrayList<String> nonCommentLines = new ArrayList<>();
+        for (String l : lines) {
+            if (!l.startsWith("%")) {
+                nonCommentLines.add(l);
+            }
+        }
+        lines = new String[nonCommentLines.size()];
+        for (int i = 0; i < lines.length; i++) {
+            lines[i] = nonCommentLines.get(i);
+        }
         int i = 0;
         while (i < lines.length && !lines[i].equals("")) {
-            if (!lines[i].startsWith("%")) {
-                treeStringPattern += lines[i];
-            }
+            treeStringPattern += lines[i];
             i++;
-        }
-
-        if (name.equals("GIVE_ME_FOCUS")) {
-            System.out.print("");
         }
 
         String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
-
         while (i < lines.length) {
-            if (lines[i].equals("") || lines[i].startsWith("%")) {
+            if (lines[i].equals("")) {
                 i++;
                 continue;
             }
@@ -52,7 +56,11 @@ public class PennTreebankPattern {
                 queryStringPattern += lines[i];
                 i++;
             }
-            iQueryModels.add(buildQueryModel(queryStringPattern));
+            try {
+                iQueryModels.add(buildQueryModel(queryStringPattern));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

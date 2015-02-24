@@ -6,8 +6,8 @@
       (VP#2))
     ))
 
-values(1, lookupAttribute(2), ?ans).
-?ans rdf:type xsd:date
+%values(1, lookupAttribute(2), ?ans).
+%?ans rdf:type xsd:date
 
 %When did Latvia join the EU?
 %When did Michael Jackson die?

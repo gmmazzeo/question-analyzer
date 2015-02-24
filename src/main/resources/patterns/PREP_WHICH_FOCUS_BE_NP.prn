@@ -1,14 +1,19 @@
 (ROOT
   (SBARQ
-    (WHPP (IN (*#1))
-      (WHNP (WDT) (NN (*#2))))
+    (WHPP (IN#1)
+      (WHNP#2))
     (SQ (VBZ|VBD|VBP (*/be))
       (NP#3)
       ^(*))
     ))
 
-values(3, lookupAttributes(2), ?ans).
-?ans rdf:type lookupCategory(2)
+entities(3, ?ent).
+boundThroughAttribute(?ent, 1+2, ?ans).
+optionalCategory(?ans, 2)
+
+values(3, ?ent, ?val).
+boundThroughAttribute(?val, 1+2, ?ans).
+optionalCategory(?ans, 2)
 
 %In which country is the Limerick Lake?
 %In which UK city are the headquarters of the MI6?

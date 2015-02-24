@@ -9,7 +9,11 @@
     ))
 
 entities(1, ?ent).
-boundThroughAttribute(?ent, 2, ?ans).
+boundThroughAttribute(?ent, 2+3, ?ans).
+optionalCategory(?ans, 4)
+
+entities(1, ?ent).
+boundThroughAttribute(?ans, 2, ?ent).
 optionalCategory(?ans, 4)
 
 %Sean Parnell is the governor of which U.S. state?

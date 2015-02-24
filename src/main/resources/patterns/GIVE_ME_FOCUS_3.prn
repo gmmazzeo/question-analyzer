@@ -7,7 +7,7 @@
     ))
 
 entities(2,?ans).
-siblingContraints(1, ?ans).
+siblingConstraints(1, ?ans).
 
 values(2, ?ent, ?ans).
 siblingConstraints(1, ?ans)

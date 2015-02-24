@@ -5,9 +5,9 @@
       (PP#2))
     ))
 
-entitiesWithConstraints(1,2) 
+%entitiesWithConstraints(1,2) 
 
-attributesWithConstraints(1,2)
+%attributesWithConstraints(1,2)
 
 %Which bridges are of the same type as the Manhattan Bridge?
 %Which U.S. states are in the same timezone as Utah?

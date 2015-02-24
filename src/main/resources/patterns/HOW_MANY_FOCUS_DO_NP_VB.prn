@@ -8,15 +8,15 @@
       (VP (VB (*#3))))
     ))
 
-values(2, lookupAttribute(1+3), ?ans).
+%values(2, lookupAttribute(1+3), ?ans).
 
-countTriples(entities(2, ?res), lookupAttribute(1+3), ?val).
-optional ?val rdf:type lookupCategory(1).
+%countTriples(entities(2, ?res), lookupAttribute(1+3), ?val).
+%optional ?val rdf:type lookupCategory(1).
 
-countTriples(?res, lookupAttribute(1+3), entities(2, ?val)).
-optional ?res rdf:type lookupCategory(1).
+%countTriples(?res, lookupAttribute(1+3), entities(2, ?val)).
+%optional ?res rdf:type lookupCategory(1).
 
-sumValues(entities(2, ?res), lookupAttribute(1+3), ?val).
+%sumValues(entities(2, ?res), lookupAttribute(1+3), ?val).
 
 %How many children did Benjamin Franklin have?
 %How many employees does Google have?

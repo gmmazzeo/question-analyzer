@@ -33,81 +33,88 @@ public class QueryResolver {
     public ArrayList<QueryModel> resolveQueries(SyntacticTree tree, ArrayList<PennTreebankPattern> patterns) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         for (PennTreebankPattern pattern : patterns) {
-            res.addAll(resolveQueries(tree, pattern));
+            res.addAll(resolveIQueryModels(tree, pattern));
         }
         return res;
     }
 
-    public ArrayList<QueryModel> resolveQueries(SyntacticTree tree, PennTreebankPattern pattern) throws Exception {
+    private ArrayList<QueryModel> combineQueryConstraints(ArrayList<QueryModel> qms1, ArrayList<QueryModel> qms2, boolean includeQms1IfQms2isEmpty) {
         ArrayList<QueryModel> res = new ArrayList<>();
-        for (IQueryModel qm : pattern.iQueryModels) {
-            for (IQueryConstraint qc : qm.getConstraints()) {
-                if (qc instanceof IEntityNodeQueryConstraint) {
-                    IEntityNodeQueryConstraint c = (IEntityNodeQueryConstraint) qc;
-                    for (QueryModel sqm : resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getIncludeSpecificEntity(), c.getIncludeCategorieEntities())) {
-                        res.add(sqm);
-                    }
-                } else if (qc instanceof IValueNodeQueryConstraint) {
-                    IValueNodeQueryConstraint c = (IValueNodeQueryConstraint) qc;
-                    for (QueryModel sqm : resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getValueVariableName(), c.getAttributePrefix())) {
-                        res.add(sqm);
-                    }
-                } else if (qc instanceof ISiblingsQueryConstraint) {
-                    ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
-                    if (res.isEmpty()) {
-                        throw new Exception("Cannot extend conditions with siblings of " + c.nodeLabel + ". Current constraint set is empty");
-                    }
-                    ArrayList<QueryModel> extRes = new ArrayList<>();
-                    for (QueryModel sqm : resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName)) {
-                        for (QueryModel qmt : res) {
-                            QueryModel extQm = new QueryModel();
-                            extQm.getConstraints().addAll(qmt.getConstraints());
-                            extQm.getConstraints().addAll(sqm.getConstraints());
-                            extRes.add(extQm);
-                        }
-                    }
-                    res = extRes;
-                } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
-                    IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
-                    if (res.isEmpty()) {
-                        throw new Exception("Cannot extend conditions with bounds of " + Arrays.toString(c.attributeNodes) + ". Current constraint set is empty");
-                    }
-                    ArrayList<QueryModel> extRes = new ArrayList<>();
-                    String attributeName = "";
-                    for (String a : c.attributeNodes) {
-                        if (attributeName.length() > 0) {
-                            attributeName += " ";
-                        }
-                        attributeName += tree.labelledNodes.get(a).getLeafLemmas();
-                    }
-                    for (QueryModel qmt : res) {
-                        QueryModel extQm = new QueryModel();
-                        extQm.getConstraints().addAll(qmt.getConstraints());
-                        extQm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + ")", c.valueVariableName, c.optional));
-                        extRes.add(extQm);
-                    }
-                    res = extRes;
-                } else if (qc instanceof IOptionalCategoryQueryConstraint) {
-                    IOptionalCategoryQueryConstraint c = (IOptionalCategoryQueryConstraint) qc;
-                    if (res.isEmpty()) {
-                        throw new Exception("Cannot extend conditions with category of " + c.entityVariableName + ". Current constraint set is empty");
-                    }
-                    ArrayList<QueryModel> extRes = new ArrayList<>();
-                    for (QueryModel qmt : res) {
-                        String evn = getNextEntityVariableName();
-                        String cvn = getNextEntityVariableName();
-                        for (QueryModel eqm : resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), evn, false, true)) {
-                            QueryModel extQm = new QueryModel();
-                            extQm.getConstraints().addAll(qmt.getConstraints());
-                            extQm.getConstraints().addAll(eqm.getConstraints());
-                            extQm.getConstraints().add(new QueryConstraint(c.entityVariableName, "rdf:type", cvn, true));
-                            extQm.getConstraints().add(new QueryConstraint(evn, "rdf:type", cvn, false));
-                            extRes.add(extQm);
-                        }
-                    }
-                    res = extRes;
+        if (qms2.isEmpty()) {
+            if (includeQms1IfQms2isEmpty) {
+                res.addAll(qms1);
+            }
+        } else {
+            for (QueryModel qm1 : qms1) {
+                for (QueryModel qm2 : qms2) {
+                    QueryModel qmc = new QueryModel();
+                    qmc.getConstraints().addAll(qm1.getConstraints());
+                    qmc.getConstraints().addAll(qm2.getConstraints());
+                    res.add(qmc);
                 }
             }
+        }
+        return res;
+    }
+
+    public ArrayList<QueryModel> resolveIQueryModel(SyntacticTree tree, IQueryModel qm) throws Exception {
+        ArrayList<QueryModel> res = new ArrayList<>();
+        for (IQueryConstraint qc : qm.getConstraints()) {
+            if (qc instanceof IEntityNodeQueryConstraint) {
+                IEntityNodeQueryConstraint c = (IEntityNodeQueryConstraint) qc;
+                for (QueryModel sqm : resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getIncludeSpecificEntity(), c.getIncludeCategorieEntities())) {
+                    res.add(sqm);
+                }
+            } else if (qc instanceof IValueNodeQueryConstraint) {
+                IValueNodeQueryConstraint c = (IValueNodeQueryConstraint) qc;
+                for (QueryModel sqm : resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getValueVariableName(), c.getAttributePrefix())) {
+                    res.add(sqm);
+                }
+            } else if (qc instanceof ISiblingsQueryConstraint) {
+                ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
+                if (res.isEmpty()) {
+                    throw new Exception("Cannot extend conditions with siblings of " + c.nodeLabel + ". Current constraint set is empty");
+                }
+                res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName), true);
+            } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
+                IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
+                if (res.isEmpty()) {
+                    throw new Exception("Cannot extend conditions with bounds of " + Arrays.toString(c.attributeNodes) + ". Current constraint set is empty");
+                }
+
+                String attributeName = "";
+                for (String a : c.attributeNodes) {
+                    if (attributeName.length() > 0) {
+                        attributeName += " ";
+                    }
+                    attributeName += tree.labelledNodes.get(a).getLeafLemmas();
+                }
+                QueryModel qmc = new QueryModel();
+                qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + ")", c.valueVariableName, c.optional));
+                ArrayList<QueryModel> qml = new ArrayList<>();
+                qml.add(qmc);
+                res = combineQueryConstraints(res, qml, false);
+            } else if (qc instanceof IOptionalCategoryQueryConstraint) {
+                IOptionalCategoryQueryConstraint c = (IOptionalCategoryQueryConstraint) qc;
+                if (res.isEmpty()) {
+                    throw new Exception("Cannot extend conditions with category of " + c.entityVariableName + ". Current constraint set is empty");
+                }
+                ArrayList<QueryModel> eqms = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true);
+                for (QueryModel eqm : eqms) {
+                    for (QueryConstraint qc2 : eqm.getConstraints()) {
+                        qc2.setOptional(true);
+                    }
+                }
+                res = combineQueryConstraints(res, eqms, true);
+            }
+        }
+        return res;
+    }
+
+    public ArrayList<QueryModel> resolveIQueryModels(SyntacticTree tree, PennTreebankPattern pattern) throws Exception {
+        ArrayList<QueryModel> res = new ArrayList<>();
+        for (IQueryModel qm : pattern.iQueryModels) {
+            res.addAll(resolveIQueryModel(tree, qm));
         }
         return res;
     }
@@ -143,7 +150,6 @@ public class QueryResolver {
             if (includeCategoryEntities) {
                 String categoryName = root.getLeafLemmas();
                 QueryModel qm = new QueryModel();
-                qm = new QueryModel();
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", "lookupCategory(" + categoryName + ")", false));
                 res.add(qm);
             }
@@ -155,7 +161,7 @@ public class QueryResolver {
 
     ArrayList<QueryModel> resolveValueNode(SyntacticTreeNode root, String entityVariableName, String valueVariableName, String attributePrefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
-        res.addAll(resolveValueNPPP(root, entityVariableName, valueVariableName));
+        res.addAll(resolveValueNPPPVP(root, entityVariableName, valueVariableName));
         return res;
     }
 
@@ -241,7 +247,7 @@ public class QueryResolver {
     }
 
     //construct the query model from a NP node containing a NP node representing an attribute and a set of PP and VP nodes representing the domain of entityVariableName
-    ArrayList<QueryModel> resolveValueNPPP(SyntacticTreeNode node, String entityVariableName, String valueVariableName) throws Exception {
+    ArrayList<QueryModel> resolveValueNPPPVP(SyntacticTreeNode node, String entityVariableName, String valueVariableName) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npCompound) {
             //get the first simple NP child - TODO: what if the node has more NP children?
@@ -276,7 +282,27 @@ public class QueryResolver {
                             qm1.getConstraints().addAll(qm.getConstraints());
                             res.add(qm1);
                         }
+                    }
+                } else if (c.value.equals("VP")) { //TODO: check whether this possibility makes sense
+                    SyntacticTreeNode[] verbPP = extractVerbPP(c);
+                    if (verbPP != null) {
+                        SyntacticTreeNode[] prepNp = extractPPprepNP(verbPP[1]);
+                        if (prepNp != null) {
+                            for (QueryModel qm : resolveEntityNode(prepNp[1], entityVariableName, true, true)) {
+                                QueryModel qm1 = new QueryModel();
+                                qm1.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + " " + verbPP[0].lemma + " " + prepNp[0].lemma + ")", valueVariableName, false));
+                                qm1.getConstraints().addAll(qm.getConstraints());
+                                res.add(qm1);
+                            }
 
+                            String newEntityName = getNextEntityVariableName();
+                            for (QueryModel qm : resolveValueNode(prepNp[1], newEntityName, entityVariableName, "")) {
+                                QueryModel qm1 = new QueryModel();
+                                qm1.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + " " + verbPP[0].lemma + " " + prepNp[0].lemma + ")", valueVariableName, false));
+                                qm1.getConstraints().addAll(qm.getConstraints());
+                                res.add(qm1);
+                            }
+                        }
                     }
                 }
             }
@@ -337,42 +363,6 @@ public class QueryResolver {
             }
         }
         return res;
-    }
-
-    private String reduceGeneralExpression(String expr, SyntacticTree tree) {
-        String[] exprs = expr.trim().split("\\+");
-        String res = "";
-        for (String s : exprs) {
-            if (res.length() > 0) {
-                res += " ";
-            }
-            res += reduceSingleExpression(s, tree);
-        }
-        return res;
-    }
-
-    private String reduceSingleExpression(String expr, SyntacticTree tree) {
-        expr = expr.trim();
-        if (expr.startsWith("w(")) {
-            expr = expr.replaceFirst("w\\(", "");
-            expr = expr.substring(0, expr.length() - 1);
-            return tree.labelledNodes.get(expr).getLeafValues();
-        } else if (expr.startsWith("l(")) {
-            expr = expr.replaceFirst("l\\(", "");
-            expr = expr.substring(0, expr.length() - 1);
-            return tree.labelledNodes.get(expr).getLeafLemmas();
-        }
-        if (expr.startsWith("entities(")) {
-            expr = expr.replaceFirst("entities\\(", "");
-            expr = expr.substring(0, expr.length() - 1);
-            return "entities(\n" + tree.labelledNodes.get(expr).toString() + "\n)";
-        }
-        if (expr.startsWith("values(")) {
-            expr = expr.replaceFirst("values\\(", "");
-            expr = expr.substring(0, expr.length() - 1);
-            return "values(\n" + tree.labelledNodes.get(expr).toString() + "\n)";
-        }
-        return expr;
     }
 
     public ArrayList<QueryConstraint> solvePPConstraints(SyntacticTreeNode node, String entityVariableName) {

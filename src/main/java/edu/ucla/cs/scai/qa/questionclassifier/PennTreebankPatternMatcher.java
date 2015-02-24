@@ -160,7 +160,7 @@ public class PennTreebankPatternMatcher {
                         if (pattern.name.equals("GIVE_ME_FOCUS")) {
                             System.out.print("");
                         }
-                        for (QueryModel qm : qr.resolveQueries(matches.get(pattern), pattern)) {
+                        for (QueryModel qm : qr.resolveIQueryModels(matches.get(pattern), pattern)) {
                             System.out.println();
                             System.out.println(qm);
                         }

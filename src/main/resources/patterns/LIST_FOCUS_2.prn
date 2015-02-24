@@ -7,6 +7,6 @@
 
 entities(1, ?res)
 
-values(1, ?res)
+values(1, ?ent, ?res)
 
 %List all episodes of the first season of the HBO television series The Sopranos!

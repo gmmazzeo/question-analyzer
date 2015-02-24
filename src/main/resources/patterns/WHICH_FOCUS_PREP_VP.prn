@@ -9,7 +9,7 @@
       ^(NP))
     ))
 
-e(3) l(2)+e(1) ?ans
+%e(3) l(2)+e(1) ?ans
 
 %Which countries in the European Union adopted the Euro?
 %Which state of the USA has the highest population density?

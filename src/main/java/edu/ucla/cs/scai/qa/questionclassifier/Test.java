@@ -41,7 +41,7 @@ public class Test {
                     HashMap<PennTreebankPattern, SyntacticTree> ps = m.match(qt);
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
-                        for (QueryModel qm : qr.resolveQueries(ps.get(p), p)) {
+                        for (QueryModel qm : qr.resolveIQueryModels(ps.get(p), p)) {
                             System.out.println();
                             System.out.println(qm);
                         }

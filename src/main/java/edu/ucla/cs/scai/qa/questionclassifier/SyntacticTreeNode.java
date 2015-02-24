@@ -272,7 +272,8 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(value);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN")) {
+            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
+                    || value.equals("CD") || value.equals("CC") ) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafValues(sb);
                 }
@@ -293,7 +294,8 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(lemma);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN")) {
+            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V") 
+                    || value.equals("CD") || value.equals("CC") ) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafLemmas(sb);
                 }
