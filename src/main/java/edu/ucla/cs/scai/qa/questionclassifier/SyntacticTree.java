@@ -61,7 +61,7 @@ public class SyntacticTree {
         HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs = new HashMap<>();
         if (root.match(pattern.root, pairs)) {
             for (SyntacticTreeNode k : pairs.keySet()) {
-                PennTreebankPatternNode v=pairs.get(k);
+                PennTreebankPatternNode v = pairs.get(k);
                 if (v.label != null) {
                     labelledNodes.put(v.label, k);
                     //System.out.println(k.value + " -> " + v.label);

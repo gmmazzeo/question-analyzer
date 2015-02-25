@@ -20,7 +20,7 @@ public class IBoundThroughAttributeQueryConstraint extends IQueryConstraint {
         this.entityVariableName = entityVariableName;
         this.attributeNodes = attributeNode.replaceAll(" ", "").split("\\+");
         this.valueVariableName = valueVariableName;
-        this.typeName=typeName;
+        this.typeName = typeName;
     }
 
     public String getEntityVariableName() {

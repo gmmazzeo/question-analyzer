@@ -125,8 +125,7 @@ public class PennTreebankPatternMatcher {
         int tot = 0;
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
-        HashMap<String, ArrayList<String>> questions = new HashMap<>();
-        QueryResolver qr = new QueryResolver();
+        HashMap<String, ArrayList<String>> questions = new HashMap<>();        
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 System.out.println();
@@ -160,7 +159,8 @@ public class PennTreebankPatternMatcher {
                         if (pattern.name.equals("GIVE_ME_FOCUS")) {
                             System.out.print("");
                         }
-                        for (QueryModel qm : qr.resolveIQueryModels(matches.get(pattern), pattern)) {
+                        QueryResolver qr = new QueryResolver(matches.get(pattern));
+                        for (QueryModel qm : qr.resolveIQueryModels(pattern)) {
                             System.out.println();
                             System.out.println(qm);
                         }

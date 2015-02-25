@@ -132,10 +132,6 @@ public class PennTreebankPattern {
         return qm;
     }
 
-    public IValueQueryConstraint values(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {
-        return new IValueQueryConstraint(entityExpression, attributeExpression, valueVariableName, optional);
-    }
-
     public IValueNodeQueryConstraint nodeValues(String nodeLabel, String entityVariableName, String valueVariableName, String attributePrefix, boolean optional) {
         return new IValueNodeQueryConstraint(nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
     }
