@@ -77,35 +77,32 @@ public class QueryResolver {
                 }
                 res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName), true);
             } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
-                IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
-                if (res.isEmpty()) {
-                    throw new Exception("Cannot extend conditions with bounds of " + Arrays.toString(c.attributeNodes) + ". Current constraint set is empty");
-                }
-
-                String attributeName = "";
-                for (String a : c.attributeNodes) {
-                    if (attributeName.length() > 0) {
-                        attributeName += " ";
+                if (!res.isEmpty()) {
+                    IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
+                    String attributeName = "";
+                    for (String a : c.attributeNodes) {
+                        if (attributeName.length() > 0) {
+                            attributeName += " ";
+                        }
+                        attributeName += tree.labelledNodes.get(a).getLeafLemmas();
                     }
-                    attributeName += tree.labelledNodes.get(a).getLeafLemmas();
+                    QueryModel qmc = new QueryModel();
+                    qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + ")", c.valueVariableName, c.optional));
+                    ArrayList<QueryModel> qml = new ArrayList<>();
+                    qml.add(qmc);
+                    res = combineQueryConstraints(res, qml, false);
                 }
-                QueryModel qmc = new QueryModel();
-                qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + ")", c.valueVariableName, c.optional));
-                ArrayList<QueryModel> qml = new ArrayList<>();
-                qml.add(qmc);
-                res = combineQueryConstraints(res, qml, false);
             } else if (qc instanceof IOptionalCategoryQueryConstraint) {
-                IOptionalCategoryQueryConstraint c = (IOptionalCategoryQueryConstraint) qc;
-                if (res.isEmpty()) {
-                    throw new Exception("Cannot extend conditions with category of " + c.entityVariableName + ". Current constraint set is empty");
-                }
-                ArrayList<QueryModel> eqms = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true);
-                for (QueryModel eqm : eqms) {
-                    for (QueryConstraint qc2 : eqm.getConstraints()) {
-                        qc2.setOptional(true);
+                if (!res.isEmpty()) {
+                    IOptionalCategoryQueryConstraint c = (IOptionalCategoryQueryConstraint) qc;
+                    ArrayList<QueryModel> eqms = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true);
+                    for (QueryModel eqm : eqms) {
+                        for (QueryConstraint qc2 : eqm.getConstraints()) {
+                            qc2.setOptional(true);
+                        }
                     }
+                    res = combineQueryConstraints(res, eqms, true);
                 }
-                res = combineQueryConstraints(res, eqms, true);
             }
         }
         return res;
@@ -114,7 +111,11 @@ public class QueryResolver {
     public ArrayList<QueryModel> resolveIQueryModels(SyntacticTree tree, PennTreebankPattern pattern) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         for (IQueryModel qm : pattern.iQueryModels) {
-            res.addAll(resolveIQueryModel(tree, qm));
+            try {
+                res.addAll(resolveIQueryModel(tree, qm));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return res;
     }
