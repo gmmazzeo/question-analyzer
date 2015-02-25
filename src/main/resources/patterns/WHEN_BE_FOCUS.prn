@@ -1,12 +1,12 @@
 (ROOT
   (SBARQ
     (WHADVP (WRB (*/when)))
-    (SQ (VBD|VBZ)
+    (SQ (VBD|VBZ (*/be))
       (NP#1)
       ^(VP))
     ))
 
-values(1, ?ent, ?ans).
-%?ans rdf:type xsd:date
+entities(1, ?ent).
+boundThroughAttribute(?ent, date, ?ans).
 
 %When was the Battle of Gettysburg?

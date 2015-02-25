@@ -13,12 +13,14 @@ public class IBoundThroughAttributeQueryConstraint extends IQueryConstraint {
 
     String entityVariableName, valueVariableName;
     String[] attributeNodes;
+    String typeName;
 
-    public IBoundThroughAttributeQueryConstraint(String entityVariableName, String attributeNode, String valueVariableName, boolean optional) {
+    public IBoundThroughAttributeQueryConstraint(String entityVariableName, String attributeNode, String valueVariableName, String typeName, boolean optional) {
         super(optional);
         this.entityVariableName = entityVariableName;
         this.attributeNodes = attributeNode.replaceAll(" ", "").split("\\+");
         this.valueVariableName = valueVariableName;
+        this.typeName=typeName;
     }
 
     public String getEntityVariableName() {
@@ -43,6 +45,14 @@ public class IBoundThroughAttributeQueryConstraint extends IQueryConstraint {
 
     public void setAttributeNodes(String[] attributeNodes) {
         this.attributeNodes = attributeNodes;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
     }
 
 }

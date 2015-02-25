@@ -109,7 +109,9 @@ public class PennTreebankPattern {
                 constraint = constraint.substring(0, constraint.length() - 1);
                 String[] exprs = constraint.split(",");
                 if (exprs.length == 3) {
-                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim()));
+                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), null));
+                } else if (exprs.length == 4) {
+                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), exprs[3].trim()));
                 } else {
                     throw new Exception("Wrong query model in pattern " + name);
                 }
@@ -146,8 +148,8 @@ public class PennTreebankPattern {
         return new ISiblingsQueryConstraint(nodeLabel, entityVariableName, optional);
     }
 
-    public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName) {
-        return new IBoundThroughAttributeQueryConstraint(entityVariableName, nodeLabel, valueVariableName, false);
+    public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName, String typeName) {
+        return new IBoundThroughAttributeQueryConstraint(entityVariableName, nodeLabel, valueVariableName, typeName, false);
     }
 
     public IOptionalCategoryQueryConstraint optionalCategory(String entityVariableName, String nodeLabel) {
