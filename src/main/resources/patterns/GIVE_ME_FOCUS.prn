@@ -5,7 +5,7 @@
       (NP#1 ^(NP (NN (*/list)))))
     ))
 
-entities(1, ?ans).
+entities(1, ?ans)
 
 values(1, ?ent, ?ans)
 

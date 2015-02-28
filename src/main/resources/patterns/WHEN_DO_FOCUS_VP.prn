@@ -7,7 +7,7 @@
     ))
 
 entities(1, ?ent).
-boundThroughAttribute(?ent, 2, ?ans, date).
+boundThroughAttribute(?ent, 2, ?ans, date)
 
 %When did Latvia join the EU?
 %When did Michael Jackson die?

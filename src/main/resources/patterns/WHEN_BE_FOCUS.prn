@@ -7,6 +7,6 @@
     ))
 
 entities(1, ?ent).
-boundThroughAttribute(?ent, date, ?ans).
+boundThroughAttribute(?ent, date, ?ans)
 
 %When was the Battle of Gettysburg?

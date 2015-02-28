@@ -7,7 +7,9 @@
         ^(PP)))
     ))
 
-%e(3) l(2)+e(1) ?ans
+entities(3, ?ent).
+boundThroughAttribute(?ans, 2, ?ent).
+optionalCategory(?ans, 1)
 
 %Through which countries does the Yenisei river flow?
 %Which caves have more than 3 entrances?

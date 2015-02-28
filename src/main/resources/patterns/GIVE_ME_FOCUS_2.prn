@@ -6,7 +6,7 @@
           (NP#1)))
     ))
 
-entities(1, ?ans).
+entities(1, ?ans)
 
 values(1,?ent, ?ans)
 

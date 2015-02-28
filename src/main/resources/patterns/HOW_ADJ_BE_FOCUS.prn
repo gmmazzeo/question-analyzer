@@ -6,8 +6,8 @@
     ))
 
 entities(2, ?ent).
-boundThroughAttribute(?ent,1,?ans).
-siblingConstraints(1, ?ent).
+boundThroughAttribute(?ent, 1, ?ans).
+siblingConstraints(1, ?ent)
 
 %How tall is Claudia Schiffer?
 %How tall is Michael Jordan?

@@ -1,9 +1,12 @@
 (ROOT
   (SBARQ
     (WHNP#1 (WDT))
-    (SQ (VBD|VBP|VBZ (*/be))
-      (VP#2))
+    (SQ (VBD|VBP|VBZ#2 (*/be))
+      (VP))
     ))
+
+entities(1, ?ans).
+siblingConstraints(2, ?ans)
 
 %entitiesWithConstraints(1,2) 
 

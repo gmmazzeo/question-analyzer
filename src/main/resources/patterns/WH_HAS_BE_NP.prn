@@ -7,8 +7,8 @@
           (NP#2))))
     ))
 
-entities(1, ?ans)
+entities(2, ?ans)
 
-values(1, ?ent, ?ans)
+values(2, ?ent, ?ans)
 
 %Who has been the 5th president of the United States of America?
