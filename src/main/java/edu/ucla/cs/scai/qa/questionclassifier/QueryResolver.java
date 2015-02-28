@@ -195,7 +195,7 @@ public class QueryResolver {
             } else if (qc instanceof ISiblingsQueryConstraint) {
                 ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
                 if (!res.isEmpty()) {
-                    res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, null), true, false);
+                    res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, ""), true, false);
                 }
             } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
                 if (!res.isEmpty()) {
@@ -213,7 +213,28 @@ public class QueryResolver {
                             }
                             attributeName += tree.labelledNodes.get(a).getLeafLemmas();
                         }
-                        qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + ")", c.valueVariableName, c.optional));
+
+                        SyntacticTreeNode ppEntityNode = null;
+                        for (String a : c.attributeNodes) {
+                            if (tree.labelledNodes.get(a).value.equals("PP")) {
+                                if (ppEntityNode != null) {
+                                    System.out.println("Warning: node with two or more PP children");
+                                }
+                                ppEntityNode = tree.labelledNodes.get(a);
+                            }
+                        }
+
+                        String prep = "";
+
+                        if (ppEntityNode != null) {
+                            SyntacticTreeNode[] prepNP = extractPPprepNP(ppEntityNode);
+
+                            if (prepNP != null) {
+                                prep = prepNP[0].lemma;
+                            }   
+                        }
+
+                        qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + ")", c.valueVariableName, c.optional));
                     }
                     res = combineQueryConstraints(res, qml, false, false);
                 }
@@ -367,9 +388,9 @@ public class QueryResolver {
         return res;
     }
 
-    //receive a node (root) and constructs a set of contraints with the entity called entityVariableName as subject of the constraints
+    //receive a node and constructs a set of constraints with the entity called entityVariableName as subject of the constraints
     //using the PP and VP siblings of the node
-    ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode root, String entityVariableName, String baseAttributeName) throws Exception {
+    ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode node, String entityVariableName, String baseAttributeName) throws Exception {
         if (baseAttributeName == null) {
             baseAttributeName = "";
         } else {
@@ -379,8 +400,8 @@ public class QueryResolver {
             }
         }
         ArrayList<QueryModel> res = new ArrayList<>();
-        for (SyntacticTreeNode c : root.parent.children) {
-            if (c == root) {
+        for (SyntacticTreeNode c : node.parent.children) {
+            if (c == node) {
                 continue;
             }
 
@@ -457,7 +478,7 @@ public class QueryResolver {
         ArrayList<QueryModel> res = new ArrayList<>();
         SyntacticTreeNode[] prepNp = extractPPprepNP(node);
         if (prepNp != null) {
-            //create costraints with attributes, assuming that the values of the constraints are entities
+            //create constraints with attributes, assuming that the values of the constraints are entities
             String newEntityName = getNextEntityVariableName();
             ArrayList<QueryModel> qmsE = resolveEntityNode(prepNp[1], newEntityName, true, true);
             for (QueryModel qm : qmsE) {
@@ -480,6 +501,8 @@ public class QueryResolver {
         return res;
     }
 
+    //receive a node and constructs a set of contraints with the entity called entityVariableName as subject of the constraints
+    //using the VB, PP, and NP children of the node
     public ArrayList<QueryModel> resolveVPConstraint(SyntacticTreeNode node, String entityVariableName, String baseAttribute) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
 
@@ -503,7 +526,7 @@ public class QueryResolver {
                     }
                     res.addAll(qmsV);
 
-                    String newValName = getNextValueVariableName();
+                    // String newValName = getNextValueVariableName();
                     ArrayList<QueryModel> qmsL1 = resolveLiteralConstraintNode(node, entityVariableName);
                     res.addAll(qmsL1);
                 }
