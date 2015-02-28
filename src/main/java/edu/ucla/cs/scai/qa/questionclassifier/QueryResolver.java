@@ -128,8 +128,6 @@ public class QueryResolver {
     }
 
     private boolean reduceIsAttributes(QueryModel qm) {
-
-        //System.out.println("Reducing isAttributes for\n" + qm);
         HashMap<String, String> isEntity = new HashMap<>();
         HashMap<String, String> isVal = new HashMap<>();
 
@@ -143,26 +141,12 @@ public class QueryResolver {
         for (Iterator<QueryConstraint> it = qm.getConstraints().iterator(); it.hasNext();) {
             QueryConstraint qc = it.next();
             if (qc.getAttrExpr().startsWith("isEntity")) {
-                if (isEntity.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned a query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
-                    return false;
-                }
-                if (isVal.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned a query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
                     return false;
                 }
                 isEntity.put(qc.getSubjExpr(), qc.getValueExpr());
             } else if (qc.getAttrExpr().startsWith("isVal")) {
-                if (isEntity.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned a query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
-                    return false;
-                }
-                if (isVal.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned a query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
                     return false;
                 }
                 isVal.put(qc.getSubjExpr(), qc.getValueExpr());
@@ -176,18 +160,7 @@ public class QueryResolver {
         for (QueryConstraint qc : newConstraints) {
             if (boundVariables.contains(qc.getValueExpr())) { //the value is bounded
                 //therefore, the subject cannot be a specific entity or value
-                if (isEntity.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
-                    if (unboundAncestors.containsKey(qc.getSubjExpr())) {
-                        qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
-                    } else {
-                        return false;
-                    }
-                }
-                if (isVal.containsKey(qc.getSubjExpr())) {
-                    //System.out.println("Pruned query model");
-                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
                     if (unboundAncestors.containsKey(qc.getSubjExpr())) {
                         qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
                     } else {
@@ -203,8 +176,6 @@ public class QueryResolver {
             if (isEntity.containsKey(qc.getSubjExpr())) {
                 qc.setSubjExpr(isEntity.get(qc.getSubjExpr()));
             } else if (isVal.containsKey(qc.getSubjExpr())) {
-                //System.out.println("Pruned query model");
-                //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));                
                 return false;
             }
         }
@@ -383,9 +354,9 @@ public class QueryResolver {
                 res.add(qm);
             }
             
-            String newEntityVariable=getNextEntityVariableName();
+            String newEntityVariable = getNextEntityVariableName();
             ArrayList<QueryModel> qms2 = resolveValueNode(prepNP[1], entityVariableName, newEntityVariable, "");
-            qc = new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributeName + " " + prepNP[0].lemma + ")", valueVariableName, false);
+            qc = new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false);
             for (QueryModel qm : qms2) {
                 qm.getConstraints().add(qc);
                 res.add(qm);

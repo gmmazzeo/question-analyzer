@@ -39,7 +39,7 @@ public class SyntacticTreeNode implements Externalizable {
     ArrayList<SyntacticTreeNode> children;
 
     public SyntacticTreeNode(Tree t, HashMap<Tree, CoreLabel> map, SyntacticTreeNode parent) throws Exception {
-        this.parent=parent;
+        this.parent = parent;
         value = t.value();
         if (t.isLeaf()) {
             CoreLabel c = map.get(t);
@@ -190,7 +190,7 @@ public class SyntacticTreeNode implements Externalizable {
 
         LinkedList<PennTreebankPatternNode> nodesToBeMatched = new LinkedList();
         LinkedList<PennTreebankPatternNode> nodesNotToBeMatched = new LinkedList();
-        for (PennTreebankPatternNode c:patternNode.children) {
+        for (PennTreebankPatternNode c : patternNode.children) {
             if (c.not) {
                 nodesNotToBeMatched.add(c);
             } else {

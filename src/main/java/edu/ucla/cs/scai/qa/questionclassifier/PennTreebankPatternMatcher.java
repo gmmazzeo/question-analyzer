@@ -126,7 +126,7 @@ public class PennTreebankPatternMatcher {
             if (!l.startsWith("%")) {
                 System.out.println();
                 tot++;
-                System.out.println(l);
+                System.out.println("\n" + l);
                 try {
                     if (l.equals("Give me a list of all American inventions.")) {
                         System.out.print("");
