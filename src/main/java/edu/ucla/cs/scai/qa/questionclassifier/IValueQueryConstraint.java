@@ -14,12 +14,12 @@ public class IValueQueryConstraint extends IQueryConstraint {
     String valueVariableName;
 
     String entityExpression, attributeExpression, valueExpression;
-    
+
     public IValueQueryConstraint(String valueExpression, String valueVariableName, boolean optional) {
         super(optional);
         this.valueExpression = valueExpression;
-        this.valueVariableName = valueVariableName;        
-    }    
+        this.valueVariableName = valueVariableName;
+    }
 
     public IValueQueryConstraint(String entityExpression, String attributeExpression, String valueVariableName, boolean optional) {
         super(optional);

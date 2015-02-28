@@ -17,7 +17,7 @@ import java.util.Properties;
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
 public class Parser {
-    
+
     StanfordCoreNLP pipelineTree;
     StanfordCoreNLP pipelineTokens;
 
@@ -29,7 +29,7 @@ public class Parser {
         pipelineTree = new StanfordCoreNLP(propsTree);
         pipelineTokens = new StanfordCoreNLP(propsTokens);
     }
-    
+
     public SyntacticTree parse(String text) throws Exception {
         //char[] c=text.toCharArray();
         //int j=c.length-1;
@@ -43,7 +43,7 @@ public class Parser {
         pipelineTokens.annotate(qaTokens);
         List<CoreMap> qssTree = qaTree.get(CoreAnnotations.SentencesAnnotation.class);
         List<CoreMap> qssTokens = qaTokens.get(CoreAnnotations.SentencesAnnotation.class);
-        
+
         if (qssTree.isEmpty()) {
             throw new Exception("Empty question");
         }
@@ -52,11 +52,11 @@ public class Parser {
         }
         CoreMap qsTree = qssTree.get(0);
         CoreMap qsTokens = qssTokens.get(0);
-        
+
         SyntacticTree qt = new SyntacticTree(qsTree, qsTokens);
-        
+
         //qt.compactNamedEntities();
         return qt;
     }
-        
+
 }

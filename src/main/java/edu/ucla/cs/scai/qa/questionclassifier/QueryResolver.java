@@ -66,7 +66,7 @@ public class QueryResolver {
         return res;
     }
 
-    //this can be optimized by pre-grouping the constraints by value valiable name
+    //this can be optimized by pre-grouping the constraints by value variable name
     private void updateAncestors(String v, HashMap<String, String> currentAncestors, Set<String> eBound, Set<String> vBound, ArrayList<QueryConstraint> constraints) {
         if (currentAncestors.containsKey(v)) {
             return;
@@ -234,7 +234,6 @@ public class QueryResolver {
             QueryModel qm = it.next();
             if (!reduceIsAttributes(qm)) {
                 it.remove();
-                //System.out.println("Pruned");
             }
         }
         return res;
@@ -353,7 +352,7 @@ public class QueryResolver {
                 qm.getConstraints().add(qc);
                 res.add(qm);
             }
-            
+
             String newEntityVariable = getNextEntityVariableName();
             ArrayList<QueryModel> qms2 = resolveValueNode(prepNP[1], entityVariableName, newEntityVariable, "");
             qc = new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false);
@@ -361,7 +360,7 @@ public class QueryResolver {
                 qm.getConstraints().add(qc);
                 res.add(qm);
             }
-            
+
         } else {
             //node can not be a value node
         }
@@ -421,7 +420,7 @@ public class QueryResolver {
                     if (vbConstraintNode != null) {
                         System.out.println("Warning: node with two or more VB? children");
                     }
-                    vbConstraintNode = c;                    
+                    vbConstraintNode = c;
                 }
             }
             if ((npAttributeNode == null && vbConstraintNode == null) || ppConstraintNode == null) {

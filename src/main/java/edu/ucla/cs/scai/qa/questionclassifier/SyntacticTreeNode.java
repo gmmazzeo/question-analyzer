@@ -225,7 +225,7 @@ public class SyntacticTreeNode implements Externalizable {
             }
             if (found) {
                 return false;
-            }            
+            }
         }
         return true;
     }
@@ -294,7 +294,7 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(lemma);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V") 
+            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
                     || value.equals("CD") || value.equals("CC") ) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafLemmas(sb);

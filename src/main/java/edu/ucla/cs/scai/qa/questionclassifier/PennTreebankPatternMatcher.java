@@ -105,9 +105,6 @@ public class PennTreebankPatternMatcher {
         SyntacticTree st = parser.parse(s);
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         for (PennTreebankPattern pattern : patterns.values()) {
-            if (pattern.name.equals("GIVE_ME_LIST_OF_FOCUS")) {
-                System.out.print("");
-            }
             if (st.match(pattern)) {
                 res.put(pattern, st);
             }
@@ -121,16 +118,12 @@ public class PennTreebankPatternMatcher {
         int tot = 0;
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
-        HashMap<String, ArrayList<String>> questions = new HashMap<>();        
+        HashMap<String, ArrayList<String>> questions = new HashMap<>();
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
-                System.out.println();
+                System.out.println("\n\n" + l);
                 tot++;
-                System.out.println("\n" + l);
                 try {
-                    if (l.equals("Give me a list of all American inventions.")) {
-                        System.out.print("");
-                    }
                     HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(l);
                     for (PennTreebankPattern match : matches.keySet()) {
                         ArrayList<String> q = questions.get(match.name);
@@ -152,13 +145,9 @@ public class PennTreebankPatternMatcher {
                     }
                     for (PennTreebankPattern pattern : matches.keySet()) {
                         System.out.println(pattern.name);
-                        if (pattern.name.equals("GIVE_ME_FOCUS")) {
-                            System.out.print("");
-                        }
                         QueryResolver qr = new QueryResolver(matches.get(pattern));
                         for (QueryModel qm : qr.resolveIQueryModels(pattern)) {
-                            System.out.println();
-                            System.out.println(qm);
+                            System.out.println("\n" + qm);
                         }
                     }
                 } catch (Exception e) {
