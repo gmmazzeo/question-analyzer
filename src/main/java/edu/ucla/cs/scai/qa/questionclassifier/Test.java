@@ -23,11 +23,10 @@ public class Test {
     //http://www.surdeanu.info/mihai/teaching/ista555-fall13/readings/PennTreebankConstituents.html
     //http://nlp.stanford.edu/software/dependencies_manual.pdf
     //They explain the tags used by Stanford Parser
-
     public static void main(String args[]) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Parser parser = new Parser();
-        PennTreebankPatternMatcher m = new PennTreebankPatternMatcher();        
+        PennTreebankPatternMatcher m = new PennTreebankPatternMatcher();
         while (true) {
             System.out.print("question> ");
             String qt = in.readLine();
@@ -35,12 +34,12 @@ public class Test {
                 break;
             } else {
                 try {
-                    SyntacticTree t = parser.parse(qt);                    
+                    SyntacticTree t = parser.parse(qt);
                     System.out.println(t.toString());
                     HashMap<PennTreebankPattern, SyntacticTree> ps = m.match(qt);
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
-                        QueryResolver qr=new QueryResolver(ps.get(p));
+                        QueryResolver qr = new QueryResolver(ps.get(p));
                         for (QueryModel qm : qr.resolveIQueryModels(p)) {
                             System.out.println();
                             System.out.println(qm);

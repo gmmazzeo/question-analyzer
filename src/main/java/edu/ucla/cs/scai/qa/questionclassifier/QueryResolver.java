@@ -12,6 +12,9 @@ import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  *
@@ -20,14 +23,9 @@ import java.util.HashMap;
 public class QueryResolver {
 
     private int entityCounter;
+    private int valueCounter;
 
     SyntacticTree tree;
-
-    static final Ontology ontology;
-
-    static {
-        ontology = DBpediaOntology.getInstance();
-    }
 
     HashMap<SyntacticTreeNode, ArrayList<QueryModel>> ppCache = new HashMap<>();
     HashMap<SyntacticTreeNode, String> ppCacheLabel = new HashMap<>();
@@ -50,28 +48,173 @@ public class QueryResolver {
             if (includeQms1IfQms2isEmpty) {
                 res.addAll(qms1);
             }
+        } else if (qms1.isEmpty()) {
+            if (includeQms2IfQms1isEmpty) {
+                res.addAll(qms2);
+            }
         } else {
-            if (qms1.isEmpty()) {
-                if (includeQms2IfQms1isEmpty) {
-                    res.addAll(qms2);
-                }
-            } else {
-                for (QueryModel qm1 : qms1) {
-                    for (QueryModel qm2 : qms2) {
-                        QueryModel qmc = new QueryModel();
-                        qmc.getConstraints().addAll(qm1.getConstraints());
-                        qmc.getConstraints().addAll(qm2.getConstraints());
-                        res.add(qmc);
-                    }
+            for (QueryModel qm1 : qms1) {
+                for (QueryModel qm2 : qms2) {
+                    QueryModel qmc = new QueryModel();
+                    qmc.getConstraints().addAll(qm1.getConstraints());
+                    qmc.getConstraints().addAll(qm2.getConstraints());
+                    res.add(qmc);
                 }
             }
+        }
+
+        return res;
+    }
+
+    //this can be optimized by pre-grouping the constraints by value valiable name
+    private void updateAncestors(String v, HashMap<String, String> currentAncestors, Set<String> eBound, Set<String> vBound, ArrayList<QueryConstraint> constraints) {
+        if (currentAncestors.containsKey(v)) {
+            return;
+        }
+
+        String a = null;
+        for (QueryConstraint qc : constraints) {
+            if (qc.getValueExpr().equals(v)) {
+                if (a != null) {
+                    return; //I don't know how to cope with this case
+                }
+                a = qc.getSubjExpr();
+            }
+        }
+        if (a != null) {
+            if (!eBound.contains(a) && !vBound.contains(a)) {
+                currentAncestors.put(v, a);
+            } else {
+                updateAncestors(a, currentAncestors, eBound, vBound, constraints);
+                if (currentAncestors.containsKey(a)) {
+                    currentAncestors.put(v, currentAncestors.get(a));
+                }
+            }
+        }
+
+    }
+
+    private HashMap<String, String> computeUnboundAncestor(Set<String> eBound, Set<String> vBound, ArrayList<QueryConstraint> constraints) {
+        HashMap<String, String> res = new HashMap<>();
+        for (String v : eBound) {
+            updateAncestors(v, res, eBound, vBound, constraints);
+        }
+        for (String v : vBound) {
+            updateAncestors(v, res, eBound, vBound, constraints);
         }
         return res;
     }
 
-    private ArrayList<QueryModel> resolveIQueryModel(IQueryModel qm) throws Exception {
+    private void updateBoundVariables(String var, HashSet<String> boundVariables, ArrayList<QueryConstraint> constraints) {
+        if (boundVariables.contains(var)) {
+            return;
+        }
+        for (QueryConstraint qc : constraints) {
+            if (qc.getSubjExpr().equals(var)) {
+                if (qc.getAttrExpr().equals("isEntity") && qc.getValueExpr().startsWith("lookupEntity")
+                        || qc.getAttrExpr().equals("isVal") && qc.getValueExpr().startsWith("literalVal")) {
+                    boundVariables.add(var);
+                    return;
+                } else {
+                    String var2 = qc.getValueExpr();
+                    updateBoundVariables(var2, boundVariables, constraints);
+                    if (boundVariables.contains(var2)) {
+                        boundVariables.add(var);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean reduceIsAttributes(QueryModel qm) {
+
+        //System.out.println("Reducing isAttributes for\n" + qm);
+        HashMap<String, String> isEntity = new HashMap<>();
+        HashMap<String, String> isVal = new HashMap<>();
+
+        HashSet<String> boundVariables = new HashSet<>();
+        for (QueryConstraint qc : qm.getConstraints()) {
+            updateBoundVariables(qc.getSubjExpr(), boundVariables, qm.getConstraints());
+        }
+
+        ArrayList<QueryConstraint> newConstraints = new ArrayList<>();
+
+        for (Iterator<QueryConstraint> it = qm.getConstraints().iterator(); it.hasNext();) {
+            QueryConstraint qc = it.next();
+            if (qc.getAttrExpr().startsWith("isEntity")) {
+                if (isEntity.containsKey(qc.getSubjExpr())) {
+                    //System.out.println("Pruned a query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
+                    return false;
+                }
+                if (isVal.containsKey(qc.getSubjExpr())) {
+                    //System.out.println("Pruned a query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                    return false;
+                }
+                isEntity.put(qc.getSubjExpr(), qc.getValueExpr());
+            } else if (qc.getAttrExpr().startsWith("isVal")) {
+                if (isEntity.containsKey(qc.getSubjExpr())) {
+                    //System.out.println("Pruned a query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
+                    return false;
+                }
+                if (isVal.containsKey(qc.getSubjExpr())) {
+                    //System.out.println("Pruned a query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                    return false;
+                }
+                isVal.put(qc.getSubjExpr(), qc.getValueExpr());
+            } else {
+                newConstraints.add(new QueryConstraint(qc.getSubjExpr(), qc.getAttrExpr(), qc.getValueExpr(), qc.isOptional()));
+            }
+        }
+
+        HashMap<String, String> unboundAncestors = computeUnboundAncestor(isEntity.keySet(), isVal.keySet(), newConstraints);
+
+        for (QueryConstraint qc : newConstraints) {
+            if (boundVariables.contains(qc.getValueExpr())) { //the value is bounded
+                //therefore, the subject cannot be a specific entity or value
+                if (isEntity.containsKey(qc.getSubjExpr())) {
+                //System.out.println("Pruned query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
+                    if (unboundAncestors.containsKey(qc.getSubjExpr())) {
+                        qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
+                    } else {
+                        return false;
+                    }
+                }
+                if (isVal.containsKey(qc.getSubjExpr())) {
+                //System.out.println("Pruned query model");
+                    //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
+                    if (unboundAncestors.containsKey(qc.getSubjExpr())) {
+                        qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
+                    } else {
+                        return false;
+                    }
+                }
+            }
+            if (isEntity.containsKey(qc.getValueExpr())) {
+                qc.setValueExpr(isEntity.get(qc.getValueExpr()));
+            } else if (isVal.containsKey(qc.getValueExpr())) {
+                qc.setValueExpr(isVal.get(qc.getValueExpr()));
+            }
+            if (isEntity.containsKey(qc.getSubjExpr())) {
+                qc.setSubjExpr(isEntity.get(qc.getSubjExpr()));
+            } else if (isVal.containsKey(qc.getSubjExpr())) {
+                //System.out.println("Pruned query model");
+                //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));                
+                return false;
+            }
+        }
+        qm.setConstraints(newConstraints);
+        return true;
+    }
+
+    private ArrayList<QueryModel> resolveIQueryModel(IQueryModel iqm) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
-        for (IQueryConstraint qc : qm.getConstraints()) {
+        for (IQueryConstraint qc : iqm.getConstraints()) {
             if (qc instanceof IEntityNodeQueryConstraint) {
                 IEntityNodeQueryConstraint c = (IEntityNodeQueryConstraint) qc;
                 res.addAll(resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getIncludeSpecificEntity(), c.getIncludeCategorieEntities()));
@@ -116,6 +259,13 @@ public class QueryResolver {
                 }
             }
         }
+        for (Iterator<QueryModel> it = res.iterator(); it.hasNext();) {
+            QueryModel qm = it.next();
+            if (!reduceIsAttributes(qm)) {
+                it.remove();
+                //System.out.println("Pruned");
+            }
+        }
         return res;
     }
 
@@ -136,20 +286,21 @@ public class QueryResolver {
 
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npSimple || node.whnpSimple) {
-            String entityName = node.getLeafValues();
 
             if (includeSpecificEntity) {
                 QueryModel qm = new QueryModel();
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "is", "lookupEntity(" + entityName + ")", false));
+                String entityName = node.getLeafValues();
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + entityName + ")", false));
                 res.add(qm);
             }
 
             if (includeCategoryEntities) {
-                String categoryName = node.getLeafLemmas();
                 QueryModel qm = new QueryModel();
+                String categoryName = node.getLeafLemmas();
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", "lookupCategory(" + categoryName + ")", false));
                 res.add(qm);
             }
+
         } else if (node.npCompound || node.whnpCompound) {
             //get the first NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode np1 = null;
@@ -173,7 +324,26 @@ public class QueryResolver {
         return res;
     }
 
-    //construct the query model from a NP node containing a simple NP nod,e representing an attribute, and a PP node where the preposition is of and the NP child represents the entity
+    private ArrayList<QueryModel> resolveLiteralNode(SyntacticTreeNode node, String valueVariableName) throws Exception {
+
+        ArrayList<QueryModel> res = new ArrayList<>();
+        if (node.npSimple || node.whnpSimple) {
+
+            QueryModel qm = new QueryModel();
+            String literalValue = node.getLeafValues();
+            qm.getConstraints().add(new QueryConstraint(valueVariableName, "isVal", "literalValue(" + literalValue + ")", false));
+            res.add(qm);
+
+        } else if (node.npCompound || node.whnpCompound) {
+
+            String entityVariableName = getNextEntityVariableName();
+            res = resolveValueNode(node, entityVariableName, valueVariableName, "");
+
+        }
+        return res;
+    }
+
+    //construct the query model from a NP node containing a simple NP node representing an attribute, and a PP node where the preposition is part of the attribute and the NP child represents the entity
     ArrayList<QueryModel> resolveValueNode(SyntacticTreeNode node, String entityVariableName, String valueVariableName, String attributePrefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npCompound) {
@@ -262,10 +432,62 @@ public class QueryResolver {
         return res;
     }
 
+    //construct the query model from a NP node containing a simple NP node representing an attribute, and a PP node where the preposition is the operator and the NP child represents the literal
+    private ArrayList<QueryModel> resolveLiteralConstraintNode(SyntacticTreeNode node, String entityVariableName) throws Exception {
+
+        ArrayList<QueryModel> res = new ArrayList<>();
+        if (node.npCompound) {
+            //get the first simple NP child - TODO: what if the node has more NP children?
+            SyntacticTreeNode npAttributeNode = null;
+            SyntacticTreeNode ppConstraintNode = null;
+            for (SyntacticTreeNode c : node.children) {
+                if (c.npSimple) {
+                    if (npAttributeNode != null) {
+                        System.out.println("Warning: NP node with two or more simple NP children");
+                    }
+                    npAttributeNode = c;
+                } else if (c.value.equals("PP")) {
+                    if (ppConstraintNode != null) {
+                        System.out.println("Warning: NP node with two or more PP children");
+                    }
+                    ppConstraintNode = c;
+                }
+            }
+            if (npAttributeNode == null || ppConstraintNode == null) {
+                return res; //node has not the structure we are looking for
+            }
+
+            SyntacticTreeNode[] prepNP = extractPPprepNP(ppConstraintNode);
+
+            if (prepNP == null) {
+                return res;
+            }
+
+            String attributeName = npAttributeNode.getLeafLemmas();
+
+            String valueVariableName1 = getNextValueVariableName();
+            QueryConstraint qc1 = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false);
+
+            String valueVariableName2 = getNextValueVariableName();
+            QueryConstraint qc2 = new QueryConstraint(valueVariableName1, "lookupOperator(" + prepNP[0].lemma + ")", valueVariableName2, false);
+            ArrayList<QueryModel> qms = resolveLiteralNode(prepNP[1], valueVariableName2);
+
+            for (QueryModel qm : qms) {
+                qm.getConstraints().add(qc1);
+                qm.getConstraints().add(qc2);
+                res.add(qm);
+            }
+        } else {
+            //node can not be a value node
+        }
+        return res;
+    }
+
     public ArrayList<QueryModel> resolvePPConstraint(SyntacticTreeNode node, String entityVariableName, String baseAttributeName) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         SyntacticTreeNode[] prepNp = extractPPprepNP(node);
         if (prepNp != null) {
+            //create costraints with attributes, assuming that the values of the constraints are entities
             String newEntityName = getNextEntityVariableName();
             ArrayList<QueryModel> qmsE = resolveEntityNode(prepNp[1], newEntityName, true, true);
             for (QueryModel qm : qmsE) {
@@ -278,10 +500,12 @@ public class QueryResolver {
             for (QueryModel qm : qmsV) {
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttributeName + prepNp[0].lemma + ")", newEntityName, false));
             }
-
             res.addAll(qmsV);
 
-            //TODO: check if it makes sense to combine the baseAttribute name with the revolveValueNode (e.g., "in the state of New York")
+            //create costraints with attributes, assuming that the values of the constraints are literals
+            ArrayList<QueryModel> qmsL = resolveLiteralConstraintNode(prepNp[1], entityVariableName);
+            res.addAll(qmsL);
+
         }
         return res;
     }
@@ -308,6 +532,9 @@ public class QueryResolver {
                         qm.getConstraints().add(qc);
                     }
                     res.addAll(qmsV);
+
+                    ArrayList<QueryModel> qmsL = resolveLiteralConstraintNode(prepNp[1], entityVariableName);
+                    res.addAll(qmsL);
                 }
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();
@@ -323,8 +550,18 @@ public class QueryResolver {
                 for (QueryModel qm : qmsV) {
                     qm.getConstraints().add(qc);
                 }
-
                 res.addAll(qmsV);
+                
+                String newValName=getNextValueVariableName();
+                ArrayList<QueryModel> qmsL1=resolveLiteralNode(verbPPNP[2], newValName);
+                QueryConstraint qc1=new QueryConstraint(entityVariableName, "lookupAttribute("+verbPPNP[0].lemma+")", newValName, false);
+                for (QueryModel qm:qmsL1) {
+                    qm.getConstraints().add(qc1);
+                }
+                res.addAll(qmsL1);
+
+                ArrayList<QueryModel> qmsL2 = resolveLiteralConstraintNode(verbPPNP[2], entityVariableName);
+                res.addAll(qmsL2);
             }
         }
 
@@ -332,8 +569,14 @@ public class QueryResolver {
     }
 
     private String getNextEntityVariableName() {
-        String res = "e" + entityCounter;
+        String res = "ent" + entityCounter;
         entityCounter++;
+        return res;
+    }
+
+    private String getNextValueVariableName() {
+        String res = "val" + valueCounter;
+        valueCounter++;
         return res;
     }
 
@@ -341,17 +584,17 @@ public class QueryResolver {
         SyntacticTreeNode inNode = null;
         SyntacticTreeNode[] res = new SyntacticTreeNode[2];
         for (SyntacticTreeNode c : node.children) {
-            if (c.value.equals("IN")) {
+            if (c.value.equals("IN") || c.value.equals("TO")) {
                 inNode = c;
                 break;
             }
         }
         if (inNode == null) {
-            System.out.println("IN node not found");
+            System.out.println("IN/TO node not found");
             return null;
         } else {
             if (inNode.children.size() != 1) {
-                System.out.println("IN node with " + inNode.children.size() + " children");
+                System.out.println("IN/TO node with " + inNode.children.size() + " children");
                 return null;
             } else {
                 res[0] = inNode.children.get(0);
@@ -399,11 +642,6 @@ public class QueryResolver {
                         break;
                     }
                 }
-                if (ppNode == null) {
-                    System.out.println("PP node not found");
-                } else {
-                    res[1] = ppNode;
-                }
 
                 SyntacticTreeNode npNode = null;
                 for (SyntacticTreeNode c : node.children) {
@@ -412,15 +650,15 @@ public class QueryResolver {
                         break;
                     }
                 }
-                if (npNode == null) {
-                    System.out.println("NP node not found");
-                } else {
+
+                if (ppNode == null && npNode == null) {
+                    System.out.println("PP/NP node not found");
+                    return null;
+                } else { //TODO: what if both pp and np are not null? is it possible?
+                    res[1] = ppNode;
                     res[2] = npNode;
                 }
 
-                if (npNode == null && ppNode == null) {
-                    return null;
-                }
             }
         }
         return res;
