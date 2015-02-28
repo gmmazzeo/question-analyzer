@@ -177,7 +177,7 @@ public class QueryResolver {
             if (boundVariables.contains(qc.getValueExpr())) { //the value is bounded
                 //therefore, the subject cannot be a specific entity or value
                 if (isEntity.containsKey(qc.getSubjExpr())) {
-                //System.out.println("Pruned query model");
+                    //System.out.println("Pruned query model");
                     //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isEntity " + isEntity.get(qc.getSubjExpr()));
                     if (unboundAncestors.containsKey(qc.getSubjExpr())) {
                         qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
@@ -186,7 +186,7 @@ public class QueryResolver {
                     }
                 }
                 if (isVal.containsKey(qc.getSubjExpr())) {
-                //System.out.println("Pruned query model");
+                    //System.out.println("Pruned query model");
                     //System.out.println("for the bound " + qc + " since " + qc.getSubjExpr() + " isVal " + isVal.get(qc.getSubjExpr()));
                     if (unboundAncestors.containsKey(qc.getSubjExpr())) {
                         qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
@@ -324,6 +324,7 @@ public class QueryResolver {
         return res;
     }
 
+    //return the literal value represented by a node
     private ArrayList<QueryModel> resolveLiteralNode(SyntacticTreeNode node, String valueVariableName) throws Exception {
 
         ArrayList<QueryModel> res = new ArrayList<>();
@@ -389,20 +390,6 @@ public class QueryResolver {
         return res;
     }
 
-    ArrayList<QueryModel> copyAndReplaceEntityVariableName(ArrayList<QueryModel> qms, String oldName, String newName) {
-        ArrayList<QueryModel> qms2 = new ArrayList<>();
-        for (QueryModel qm : qms) {
-            QueryModel qm2 = new QueryModel();
-            qms2.add(qm2);
-            for (QueryConstraint qc : qm.getConstraints()) {
-                String eName = qc.getValueExpr();
-                QueryConstraint qc2 = new QueryConstraint(eName.equals(oldName) ? newName : eName, qc.getAttrExpr(), qc.getValueExpr(), qc.isOptional());
-                qm2.getConstraints().add(qc2);
-            }
-        }
-        return qms2;
-    }
-
     //receive a node (root) and constructs a set of contraints with the entity called entityVariableName as subject of the constraints
     //using the PP and VP siblings of the node
     ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode root, String entityVariableName, String baseAttributeName) throws Exception {
@@ -436,24 +423,30 @@ public class QueryResolver {
     private ArrayList<QueryModel> resolveLiteralConstraintNode(SyntacticTreeNode node, String entityVariableName) throws Exception {
 
         ArrayList<QueryModel> res = new ArrayList<>();
-        if (node.npCompound) {
+        if (node.npCompound || node.value.equals("VP")) {
             //get the first simple NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode npAttributeNode = null;
             SyntacticTreeNode ppConstraintNode = null;
+            SyntacticTreeNode vbConstraintNode = null;
             for (SyntacticTreeNode c : node.children) {
                 if (c.npSimple) {
                     if (npAttributeNode != null) {
-                        System.out.println("Warning: NP node with two or more simple NP children");
+                        System.out.println("Warning: node with two or more simple NP children");
                     }
                     npAttributeNode = c;
                 } else if (c.value.equals("PP")) {
                     if (ppConstraintNode != null) {
-                        System.out.println("Warning: NP node with two or more PP children");
+                        System.out.println("Warning: node with two or more PP children");
                     }
                     ppConstraintNode = c;
+                } else if (c.value.startsWith("VB")) {
+                    if (vbConstraintNode != null) {
+                        System.out.println("Warning: node with two or more VB? children");
+                    }
+                    vbConstraintNode = c;                    
                 }
             }
-            if (npAttributeNode == null || ppConstraintNode == null) {
+            if ((npAttributeNode == null && vbConstraintNode == null) || ppConstraintNode == null) {
                 return res; //node has not the structure we are looking for
             }
 
@@ -463,7 +456,7 @@ public class QueryResolver {
                 return res;
             }
 
-            String attributeName = npAttributeNode.getLeafLemmas();
+            String attributeName = npAttributeNode!=null?npAttributeNode.getLeafLemmas():vbConstraintNode.children.get(0).lemma;
 
             String valueVariableName1 = getNextValueVariableName();
             QueryConstraint qc1 = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false);
@@ -533,8 +526,9 @@ public class QueryResolver {
                     }
                     res.addAll(qmsV);
 
-                    ArrayList<QueryModel> qmsL = resolveLiteralConstraintNode(prepNp[1], entityVariableName);
-                    res.addAll(qmsL);
+                    String newValName = getNextValueVariableName();
+                    ArrayList<QueryModel> qmsL1 = resolveLiteralConstraintNode(node, entityVariableName);
+                    res.addAll(qmsL1);
                 }
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();
@@ -551,11 +545,11 @@ public class QueryResolver {
                     qm.getConstraints().add(qc);
                 }
                 res.addAll(qmsV);
-                
-                String newValName=getNextValueVariableName();
-                ArrayList<QueryModel> qmsL1=resolveLiteralNode(verbPPNP[2], newValName);
-                QueryConstraint qc1=new QueryConstraint(entityVariableName, "lookupAttribute("+verbPPNP[0].lemma+")", newValName, false);
-                for (QueryModel qm:qmsL1) {
+
+                String newValName = getNextValueVariableName();
+                ArrayList<QueryModel> qmsL1 = resolveLiteralNode(verbPPNP[2], newValName);
+                QueryConstraint qc1 = new QueryConstraint(entityVariableName, "lookupAttribute(" + verbPPNP[0].lemma + ")", newValName, false);
+                for (QueryModel qm : qmsL1) {
                     qm.getConstraints().add(qc1);
                 }
                 res.addAll(qmsL1);
