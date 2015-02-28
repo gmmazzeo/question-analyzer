@@ -377,7 +377,7 @@ public class QueryResolver {
             String attributeName = npAttributeNode.getLeafLemmas();
 
             ArrayList<QueryModel> qms1 = resolveEntityNode(prepNP[1], entityVariableName, true, true);
-            QueryConstraint qc = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + " " + prepNP[0].lemma + ")", valueVariableName, false);
+            QueryConstraint qc = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false);
             for (QueryModel qm : qms1) {
                 qm.getConstraints().add(qc);
                 res.add(qm);

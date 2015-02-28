@@ -32,6 +32,8 @@ public class Test {
             String qt = in.readLine();
             if (qt.equals("exit")) {
                 break;
+            } else if(qt.equals("reload")) {
+                m = new PennTreebankPatternMatcher();
             } else {
                 try {
                     SyntacticTree t = parser.parse(qt);

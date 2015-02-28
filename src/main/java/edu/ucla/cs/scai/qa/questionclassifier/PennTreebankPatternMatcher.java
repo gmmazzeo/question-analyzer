@@ -74,7 +74,7 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-    static {
+    public PennTreebankPatternMatcher() {
         Pattern pattern = Pattern.compile(".*\\.prn");
         final Collection<String> list = getResources(pattern);
         for (final String fileName : list) {
@@ -99,10 +99,6 @@ public class PennTreebankPatternMatcher {
                 e.printStackTrace();
             }
         }
-    }
-
-    public PennTreebankPatternMatcher() {
-
     }
 
     public HashMap<PennTreebankPattern, SyntacticTree> match(String s) throws Exception {
