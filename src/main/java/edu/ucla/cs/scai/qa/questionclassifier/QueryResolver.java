@@ -234,7 +234,7 @@ public class QueryResolver {
                             }   
                         }
 
-                        qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + ")", c.valueVariableName, c.optional));
+                        qmc.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.equals("") ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
                     }
                     res = combineQueryConstraints(res, qml, false, false);
                 }
@@ -253,7 +253,7 @@ public class QueryResolver {
         }
         for (Iterator<QueryModel> it = res.iterator(); it.hasNext();) {
             QueryModel qm = it.next();
-            if (!reduceIsAttributes(qm)) {
+            if (!reduceIsAttributes(qm) || qm.getConstraints().size() == 0) {
                 it.remove();
             }
         }
@@ -307,7 +307,7 @@ public class QueryResolver {
 
             ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities);
 
-            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, "");
+            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, np1.getLeafLemmas());
 
             res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
 
@@ -503,6 +503,8 @@ public class QueryResolver {
 
     //receive a node and constructs a set of contraints with the entity called entityVariableName as subject of the constraints
     //using the VB, PP, and NP children of the node
+    //TODO
+    //add resolveVP with VP CC VP children
     public ArrayList<QueryModel> resolveVPConstraint(SyntacticTreeNode node, String entityVariableName, String baseAttribute) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
 

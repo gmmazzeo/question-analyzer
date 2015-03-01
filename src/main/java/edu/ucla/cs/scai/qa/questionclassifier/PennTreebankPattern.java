@@ -109,7 +109,7 @@ public class PennTreebankPattern {
                 constraint = constraint.substring(0, constraint.length() - 1);
                 String[] exprs = constraint.split(",");
                 if (exprs.length == 3) {
-                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), null));
+                    qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), ""));
                 } else if (exprs.length == 4) {
                     qm.constraints.add(boundThroughAttribute(exprs[0].trim(), exprs[1].trim(), exprs[2].trim(), exprs[3].trim()));
                 } else {
