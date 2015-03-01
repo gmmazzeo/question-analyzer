@@ -6,6 +6,12 @@
       (VP#2))
     ))
 
+entities(1, ?ent).
+boundThroughAttribute(?ent, 2, ?ans)
+
+values(1, ?ent, ?val).
+boundThroughAttribute(?val, 2, ?ans)
+
 %What did Bruce Carver die from?
 %What is the total amount of men and women serving in the FDNY?
 %Who is the daughter of Ingrid Bergman married to?

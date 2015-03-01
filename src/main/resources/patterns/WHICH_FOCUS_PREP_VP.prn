@@ -1,13 +1,18 @@
 (ROOT
   (SBARQ
     (WHNP#1
-      (WHNP|NP (WDT))
-      (PP#2))
+      (WHNP|NP#2 (WDT))
+      (PP))
     (SQ
-      (VP (VB|VBZ|VBD|VBP#2)
-        (NP#3))
+      (VP (VB|VBZ|VBD|VBP#3)
+        (NP#4))
       ^(NP))
     ))
+
+entities(4, ?ent).
+boundThroughAttribute(?ans, 3, ?ent).
+siblingConstraints(2, ?ans).
+optionalCategory(?ans, 1)
 
 %e(3) l(2)+e(1) ?ans
 

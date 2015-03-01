@@ -5,8 +5,8 @@
         (NP#1)))
     ))
 
-entities(1, ?res)
+entities(1, ?ans)
 
-values(1, ?ent, ?res)
+values(1, ?ent, ?ans)
 
 %List all episodes of the first season of the HBO television series The Sopranos!

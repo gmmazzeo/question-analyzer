@@ -8,11 +8,11 @@
     ))
 
 entities(3, ?ent).
-boundThroughAttribute(?ent, 1+2, ?ans).
+boundThroughAttribute(?ent, 2, ?ans).
 optionalCategory(?ans, 2)
 
 values(3, ?ent, ?val).
-boundThroughAttribute(?val, 1+2, ?ans).
+boundThroughAttribute(?val, 2, ?ans).
 optionalCategory(?ans, 2)
 
 %In which country is the Limerick Lake?
