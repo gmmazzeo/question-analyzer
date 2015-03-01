@@ -2,10 +2,13 @@
   (SBARQ
     (WHNP#1
       (WHNP|NP (WDT))
-      (PP#2))
+      (PP))
     (SQ
-      (VP (VB|VBZ|VBD|VBP#2)
-        (PP#3)))
+      (VP#2 (VB|VBZ|VBD|VBP)
+        (PP)))
     ))
+
+entities(1, ?ans).
+siblingConstraints(2, ?ans, 1)
 
 %Which daughters of British earls died in the same place they were born in?

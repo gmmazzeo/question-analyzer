@@ -9,8 +9,8 @@
       ^(NP))
     ))
 
-entities(4, ?ent).
-boundThroughAttribute(?ans, 3, ?ent).
+entities(4, ?en).
+boundThroughAttribute(?ans, 3, ?en).
 siblingConstraints(2, ?ans).
 optionalCategory(?ans, 1)
 

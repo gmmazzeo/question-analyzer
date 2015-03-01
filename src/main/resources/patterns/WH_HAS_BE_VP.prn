@@ -3,13 +3,16 @@
     (WHNP#1)
     (SQ
       (VP (VBZ (*/have))
-        (VP (VBN (*/be))
-          (VP#2))))
+        (VP (VBN#2 (*/be))
+          (VP#3))))
     ))
 
-entities(1, ?ans)
+entities(1, ?ans).
+siblingConstraints(2, ?ans)
 
-values(1, ?ent, ?ans)
+
+values(1, ?en, ?ans).
+boundThroughAttribute(?en, 3, ?ans)
 
 %Which software has been developed by organizations founded in California?
 %Which U.S. state has been admitted latest?

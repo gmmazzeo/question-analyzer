@@ -9,7 +9,7 @@
 entities(2,?ans).
 siblingConstraints(1, ?ans)
 
-values(2, ?ent, ?ans).
+values(2, ?en, ?ans).
 siblingConstraints(1, ?ans)
 
 %Give me all actors called Baldwin.

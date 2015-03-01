@@ -6,8 +6,8 @@
         (NP#2)))
     ))
 
-entities(2, ?ent).
-boundThroughAttribute(?ans, 1, ?ent)
+entities(2, ?en).
+boundThroughAttribute(?ans, 1, ?en)
 
 %?ans attributes(1) entities(2)
 

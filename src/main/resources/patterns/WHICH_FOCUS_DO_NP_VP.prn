@@ -6,8 +6,8 @@
       (VP#3))
     ))
 
-entities(2, ?ent).
-boundThroughAttribute(?ent, 1+3, ?ans).
+entities(2, ?en).
+boundThroughAttribute(?en, 1+3, ?ans).
 optionalCategory(?ans, 1)
 
 %entities(2) attributes(3+1) ?ans

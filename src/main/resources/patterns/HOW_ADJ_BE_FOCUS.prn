@@ -5,9 +5,9 @@
       (NP#2))
     ))
 
-entities(2, ?ent).
-boundThroughAttribute(?ent, 1, ?ans).
-siblingConstraints(1, ?ent)
+entities(2, ?en).
+boundThroughAttribute(?en, 1, ?ans).
+siblingConstraints(1, ?en)
 
 %How tall is Claudia Schiffer?
 %How tall is Michael Jordan?

@@ -7,7 +7,7 @@
 entities(1, ?ans).
 siblingConstraints(1, ?ans)
 
-values(1, ?ent, ?ans)
+values(1, ?en, ?ans)
 
 %List all games by GMT.
 %List the children of Margaret Thatcher.

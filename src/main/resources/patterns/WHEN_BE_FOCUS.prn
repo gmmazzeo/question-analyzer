@@ -6,7 +6,7 @@
       ^(VP))
     ))
 
-entities(1, ?ent).
-boundThroughAttribute(?ent, date, ?ans)
+entities(1, ?en).
+boundThroughAttribute(?en, date, ?ans)
 
 %When was the Battle of Gettysburg?

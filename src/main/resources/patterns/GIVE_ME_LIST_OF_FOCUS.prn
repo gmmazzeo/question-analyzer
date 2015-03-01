@@ -10,7 +10,7 @@
 
 entities(1, ?ans, 0, 1)
 
-values(1, ?ent, ?ans)
+values(1, ?en, ?ans)
 
 %Give me a list of all American inventions.
 %Give me a list of all lakes in Denmark.

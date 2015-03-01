@@ -8,7 +8,7 @@
 entities(1, ?ans).
 siblingConstraints(1, ?ans)
 
-values(1, ?ent, ?ans).
+values(1, ?en, ?ans).
 siblingConstraints(1, ?ans)
 
 %Give me all actors starring in Last Action Hero.

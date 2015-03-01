@@ -6,10 +6,10 @@
       (VP#2))
     ))
 
-entities(1, ?ent).
+entities(1, ?en).
 boundThroughAttribute(?ent, 2, ?ans)
 
-values(1, ?ent, ?val).
+values(1, ?en, ?val).
 boundThroughAttribute(?val, 2, ?ans)
 
 %What did Bruce Carver die from?

@@ -6,7 +6,7 @@
       (VP#2))
     ))
 
-entities(1, ?ent).
+entities(1, ?en).
 boundThroughAttribute(?ent, 2, ?ans, date)
 
 %When did Latvia join the EU?

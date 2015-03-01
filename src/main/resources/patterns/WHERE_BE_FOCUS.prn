@@ -5,6 +5,6 @@
       (NP#1))
     ))
 
-values(1, ?ent, ?ans)
+values(1, ?en, ?ans)
 
 %Where is the residence of the prime minister of Spain?

@@ -3,8 +3,11 @@
     (WHNP (WP (*/which)))
     (SQ
       (NP#1)
-      (VP (VB#2)
-        (PP#2)))
+      (VP (VB)
+        (PP)))
     ))
+
+entities(1, ?ans).
+siblingConstraints(1, ?ans)
 
 %Which companies work in the aerospace industry as well as on nuclear reactor technology?

@@ -8,12 +8,12 @@
           (WHNP#4))))
     ))
 
-entities(1, ?ent).
-boundThroughAttribute(?ent, 2+3, ?ans).
+entities(1, ?en).
+boundThroughAttribute(?en, 2+3, ?ans).
 optionalCategory(?ans, 4)
 
-entities(1, ?ent).
-boundThroughAttribute(?ans, 2, ?ent).
+entities(1, ?en).
+boundThroughAttribute(?ans, 2, ?en).
 optionalCategory(?ans, 4)
 
 %Sean Parnell is the governor of which U.S. state?

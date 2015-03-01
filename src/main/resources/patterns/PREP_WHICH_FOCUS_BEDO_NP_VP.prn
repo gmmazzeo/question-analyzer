@@ -7,11 +7,11 @@
       (VP#4))
     ))
 
-entities(3, ?ent).
-boundThroughAttribute(?ent, 2+4+1, ?ans).
+entities(3, ?en).
+boundThroughAttribute(?en, 2+4+1, ?ans).
 optionalCategory(?ans, 2)
 
-values(3, ?ent, ?val).
+values(3, ?en, ?val).
 boundThroughAttribute(?val, 2+4+1, ?ans).
 optionalCategory(?ans, 2)
 

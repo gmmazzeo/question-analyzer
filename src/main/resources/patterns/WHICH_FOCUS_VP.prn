@@ -7,8 +7,8 @@
         ^(PP)))
     ))
 
-entities(3, ?ent).
-boundThroughAttribute(?ans, 2, ?ent).
+entities(3, ?en).
+boundThroughAttribute(?ans, 2, ?en).
 optionalCategory(?ans, 1)
 
 %Through which countries does the Yenisei river flow?
