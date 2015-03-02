@@ -8,12 +8,9 @@
       ^(*))
     ))
 
-entities(4, ?ans).
-values(3, ?en, ?ans)
-
-%values(3, ?en, ?ans).
-%boundThroughAttribute(?en, 1, ?ans).
-%siblingConstraints(1, ?ans)
+values(3, ?en, ?ans).
+siblingConstraints(1, ?ans, 1).
+optionalCategory(?ans, 1)
 
 %attributesWithConstraints(1,2)
 
