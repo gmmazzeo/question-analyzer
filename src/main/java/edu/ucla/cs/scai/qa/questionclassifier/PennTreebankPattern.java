@@ -38,7 +38,7 @@ public class PennTreebankPattern {
             lines[i] = nonCommentLines.get(i);
         }
         int i = 0;
-        while (i < lines.length && !lines[i].equals("")) {
+        while (i < lines.length && !lines[i].isEmpty()) {
             treeStringPattern += lines[i];
             i++;
         }
@@ -47,12 +47,12 @@ public class PennTreebankPattern {
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
         while (i < lines.length) {
-            if (lines[i].equals("")) {
+            if (lines[i].isEmpty()) {
                 i++;
                 continue;
             }
             String queryStringPattern = "";
-            while (i < lines.length && !lines[i].equals("")) {
+            while (i < lines.length && !lines[i].isEmpty()) {
                 queryStringPattern += lines[i];
                 i++;
             }
@@ -174,10 +174,7 @@ public class PennTreebankPattern {
             return false;
         }
         final PennTreebankPattern other = (PennTreebankPattern) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.name, other.name);
     }
 
     @Override

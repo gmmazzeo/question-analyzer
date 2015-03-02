@@ -216,8 +216,7 @@ public class SyntacticTreeNode implements Externalizable {
         while (!nodesNotToBeMatched.isEmpty()) {
             PennTreebankPatternNode sn = nodesNotToBeMatched.removeFirst();
             boolean found = false;
-            for (Iterator<SyntacticTreeNode> it = nodesAvailable.iterator(); it.hasNext();) {
-                SyntacticTreeNode n = it.next();
+            for (SyntacticTreeNode n : nodesAvailable) {
                 if (n.match(sn, pairs)) {
                     found = true;
                     break;

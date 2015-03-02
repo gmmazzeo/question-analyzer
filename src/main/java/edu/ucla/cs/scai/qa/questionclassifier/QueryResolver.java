@@ -76,7 +76,7 @@ public class QueryResolver {
         for (QueryConstraint qc : constraints) {
             if (qc.getValueExpr().equals(v)) {
                 if (a != null) {
-                    return; //I don't know how to cope with this case
+                    return; //I don't know how to cope with this case, multiple ancestors?
                 }
                 a = qc.getSubjExpr();
             }
@@ -138,8 +138,7 @@ public class QueryResolver {
 
         ArrayList<QueryConstraint> newConstraints = new ArrayList<>();
 
-        for (Iterator<QueryConstraint> it = qm.getConstraints().iterator(); it.hasNext();) {
-            QueryConstraint qc = it.next();
+        for (QueryConstraint qc : qm.getConstraints()) {
             if (qc.getAttrExpr().startsWith("isEntity")) {
                 if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
                     return false;
@@ -278,17 +277,13 @@ public class QueryResolver {
 
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npSimple || node.whnpSimple) {
-
             QueryModel qm = new QueryModel();
             String literalValue = node.getLeafValues();
             qm.getConstraints().add(new QueryConstraint(valueVariableName, "isVal", "literalValue(" + literalValue + ")", false));
             res.add(qm);
-
         } else if (node.npCompound || node.whnpCompound) {
-
             String entityVariableName = getNextEntityVariableName();
             res = resolveValueNode(node, entityVariableName, valueVariableName, "");
-
         }
         return res;
     }
@@ -410,7 +405,7 @@ public class QueryResolver {
                 }   
             }
 
-            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.equals("") ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.isEmpty() ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
         }
         return res;
     }
@@ -462,7 +457,7 @@ public class QueryResolver {
                 return res;
             }
 
-            String attributeName = npAttributeNode!=null?npAttributeNode.getLeafLemmas():vbConstraintNode.children.get(0).lemma;
+            String attributeName = npAttributeNode != null ? npAttributeNode.getLeafLemmas() : vbConstraintNode.children.get(0).lemma;
 
             String valueVariableName1 = getNextValueVariableName();
             QueryConstraint qc1 = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false);
@@ -537,8 +532,8 @@ public class QueryResolver {
                     res.addAll(qmsV);
 
                     // String newValName = getNextValueVariableName();
-                    ArrayList<QueryModel> qmsL1 = resolveLiteralConstraintNode(node, entityVariableName);
-                    res.addAll(qmsL1);
+                    ArrayList<QueryModel> qmsL = resolveLiteralConstraintNode(node, entityVariableName);
+                    res.addAll(qmsL);
                 }
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();

@@ -85,7 +85,7 @@ public class PennTreebankPatternMatcher {
                 String s = "";
                 while (l != null) {
                     if (s.length() > 0) {
-                        s = s + "\n";
+                        s += "\n";
                     }
                     s += l;
                     l = in.readLine();
