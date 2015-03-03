@@ -34,7 +34,7 @@ public class SyntacticTreeNode implements Externalizable {
     boolean isFocus;
     int categoryPriority, attributePriority, entityPriority;
     boolean examplePage;
-    boolean npSimple, npCompound, whnpSimple, whnpCompound;
+    boolean npSimple, npCompound, whnpSimple, whnpCompound, npQp;
 
     ArrayList<SyntacticTreeNode> children;
 
@@ -56,23 +56,28 @@ public class SyntacticTreeNode implements Externalizable {
         }
         children = new ArrayList<>();
         boolean hasNPchildren = false;
+        boolean hasQPchildren = false;
         for (Tree c : t.children()) {
             SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
             children.add(child);
             if (child.value.equals("NP")) {
                 hasNPchildren = true;
+            } else if (child.value.equals("QP")) {
+                hasQPchildren = true;
             }
         }
         if (value.equals("NP")) {
             if (hasNPchildren) {
                 npCompound = true;
+            } else if (hasQPchildren) {
+                npQp = true;
             } else {
                 npSimple = true;
             }
-        } else if (value.equals("WHNP")) {
+        } else if (value.equals("WHNP")) { //can a WHNP node have QP children?
             if (hasNPchildren) {
                 whnpCompound = true;
-            } else {
+            } else if (!hasQPchildren) {
                 whnpSimple = true;
             }
         }
@@ -272,7 +277,7 @@ public class SyntacticTreeNode implements Externalizable {
             sb.append(value);
         } else {
             if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
-                    || value.equals("CD") || value.equals("CC") ) {
+                    || value.equals("CD") || value.equals("CC")) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafValues(sb);
                 }
