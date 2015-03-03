@@ -562,9 +562,12 @@ public class QueryResolver {
 
                     String valueVariableName1 = getNextValueVariableName();
                     QueryConstraint qc1 = new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false);
-                    QueryConstraint qc2 = new QueryConstraint(valueVariableName1, "lookupOperator(" + operator + ")", "literalValue(" + literalValue + ")", false);
+                    String valueVariableName2 = getNextValueVariableName();
+                    QueryConstraint qc2 = new QueryConstraint(valueVariableName1, "lookupOperator(" + operator + ")", valueVariableName2, false);
+                    QueryConstraint qc3 = new QueryConstraint(valueVariableName2, "isVal", "literalValue(" + literalValue + ")", false);
                     qm.getConstraints().add(qc1);
                     qm.getConstraints().add(qc2);
+                    qm.getConstraints().add(qc3);
                     res.add(qm);
                 }
             }
