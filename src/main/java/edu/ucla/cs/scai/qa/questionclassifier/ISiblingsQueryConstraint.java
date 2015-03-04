@@ -12,16 +12,14 @@ package edu.ucla.cs.scai.qa.questionclassifier;
 public class ISiblingsQueryConstraint extends IQueryConstraint {
 
     String entityVariableName;
-
     String nodeLabel;
-    
     boolean includeSelf;
 
     public ISiblingsQueryConstraint(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf) {
         super(optional);
         this.nodeLabel = nodeLabel;
         this.entityVariableName = entityVariableName;
-        this.includeSelf = includeSelf;        
+        this.includeSelf = includeSelf;
     }
 
     public String getEntityVariableName() {
