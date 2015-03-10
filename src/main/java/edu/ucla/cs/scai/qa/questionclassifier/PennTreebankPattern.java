@@ -100,9 +100,11 @@ public class PennTreebankPattern {
                 constraint = constraint.substring(0, constraint.length() - 1);
                 String[] exprs = constraint.split(",");
                 if (exprs.length == 2) {
-                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional, false));
+                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional, false, false));
                 } else if (exprs.length == 3) {
-                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional, exprs[2].trim().equals("1")));
+                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional, exprs[2].trim().equals("1"), false));
+                } else if (exprs.length == 4) {
+                    qm.constraints.add(siblingConstraints(exprs[0].trim(), exprs[1].trim(), optional, exprs[2].trim().equals("1"), exprs[3].trim().equals("1")));
                 } else {
                     throw new Exception("Wrong query model in pattern " + name);
                 }
@@ -142,8 +144,8 @@ public class PennTreebankPattern {
         return new IEntityNodeQueryConstraint(nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
     }
 
-    public ISiblingsQueryConstraint siblingConstraints(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf) {
-        return new ISiblingsQueryConstraint(nodeLabel, entityVariableName, optional, includeSelf);
+    public ISiblingsQueryConstraint siblingConstraints(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf, boolean independent) {
+        return new ISiblingsQueryConstraint(nodeLabel, entityVariableName, optional, includeSelf, independent);
     }
 
     public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName, String typeName) {

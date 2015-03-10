@@ -105,22 +105,25 @@ public class QueryResolver {
         return res;
     }
 
-    private void updateBoundVariables(String var, HashSet<String> boundVariables, ArrayList<QueryConstraint> constraints) {
+    private void updateBoundVariables(String var, HashSet<String> boundVariables, HashSet<String> resultVariables, ArrayList<QueryConstraint> constraints) {
         if (boundVariables.contains(var)) {
             return;
         }
         for (QueryConstraint qc : constraints) {
             if (qc.getSubjExpr().equals(var)) {
                 if (qc.getAttrExpr().equals("isEntity") && qc.getValueExpr().startsWith("lookupEntity")
-                        || qc.getAttrExpr().equals("isVal") && qc.getValueExpr().startsWith("literalValue")) {
+                        || qc.getAttrExpr().equals("isVal") && qc.getValueExpr().startsWith("literalValue")
+                        || qc.getAttrExpr().equals("rdf:type") && qc.getValueExpr().startsWith("lookupCategory") && !resultVariables.contains(var)) {
                     boundVariables.add(var);
                     return;
-                } else {
+                } else if (!resultVariables.contains(var)) {
                     String var2 = qc.getValueExpr();
-                    updateBoundVariables(var2, boundVariables, constraints);
-                    if (boundVariables.contains(var2)) {
-                        boundVariables.add(var);
-                        return;
+                    if (!var2.startsWith("lookup")) {
+                        updateBoundVariables(var2, boundVariables, resultVariables, constraints);
+                        if (boundVariables.contains(var2)) {
+                            boundVariables.add(var);
+                            return;
+                        }
                     }
                 }
             }
@@ -128,19 +131,28 @@ public class QueryResolver {
     }
 
     private boolean reduceIsAttributes(QueryModel qm) {
+
+        HashSet<String> resultVariables = new HashSet<>();
+        if (qm.getEntityVariableName() != null) {
+            resultVariables.add(qm.getEntityVariableName());
+        }
+        if (qm.getAttributeVariableName() != null) {
+            resultVariables.add(qm.getAttributeVariableName());
+        }
+
         HashMap<String, String> isEntity = new HashMap<>();
         HashMap<String, String> isVal = new HashMap<>();
 
         HashSet<String> boundVariables = new HashSet<>();
         for (QueryConstraint qc : qm.getConstraints()) {
-            updateBoundVariables(qc.getSubjExpr(), boundVariables, qm.getConstraints());
+            updateBoundVariables(qc.getSubjExpr(), boundVariables, resultVariables, qm.getConstraints());
         }
 
         ArrayList<QueryConstraint> newConstraints = new ArrayList<>();
 
         for (QueryConstraint qc : qm.getConstraints()) {
             if (qc.getAttrExpr().startsWith("isEntity")) {
-                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
+                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
                     return false;
                 }
                 isEntity.put(qc.getSubjExpr(), qc.getValueExpr());
@@ -148,7 +160,7 @@ public class QueryResolver {
                     qm.setExampleEntity(qc.getValueExpr());
                 }
             } else if (qc.getAttrExpr().startsWith("isVal")) {
-                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
+                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
                     return false;
                 }
                 isVal.put(qc.getSubjExpr(), qc.getValueExpr());
@@ -181,8 +193,19 @@ public class QueryResolver {
                 return false;
             }
         }
-        qm.setConstraints(newConstraints);
-        return true;
+        for (QueryConstraint qc : newConstraints) {
+            if (resultVariables.contains(qc.getSubjExpr()) || resultVariables.contains(qc.getValueExpr())) {
+                qm.setConstraints(newConstraints);
+                return true;
+            }
+        }
+
+        if (qm.getExampleEntity() != null) {
+            qm.setConstraints(newConstraints);
+            return true;
+        }
+
+        return false;
     }
 
     private ArrayList<QueryModel> resolveIQueryModel(IQueryModel iqm) throws Exception {
@@ -196,27 +219,25 @@ public class QueryResolver {
                 res = combineQueryConstraints(res, resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.getValueVariableName(), c.getAttributePrefix()), true, true);
             } else if (qc instanceof ISiblingsQueryConstraint) {
                 ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
-                if (!res.isEmpty()) {
-                    res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, "", c.includeSelf), true, false);
-                }
+                res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, "", c.includeSelf), true, c.independent);
             } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
                 IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
-                if (!res.isEmpty()) {
-                    res = combineQueryConstraints(res, resolveBoundThroughAttributeConstraint(c), false, false);
-                }
+                res = combineQueryConstraints(res, resolveBoundThroughAttributeConstraint(c), true, true);
             } else if (qc instanceof IOptionalCategoryQueryConstraint) {
                 IOptionalCategoryQueryConstraint c = (IOptionalCategoryQueryConstraint) qc;
-                if (!res.isEmpty()) {
-                    res = combineQueryConstraints(res, resolveOptionalCategoryConstraint(c), true, false);
-                }
+                res = combineQueryConstraints(res, resolveOptionalCategoryConstraint(c), true, false);
             }
         }
+        System.out.println("Inital query models: " + res.size());
         for (Iterator<QueryModel> it = res.iterator(); it.hasNext();) {
             QueryModel qm = it.next();
             if (!reduceIsAttributes(qm) || qm.getConstraints().isEmpty() && qm.getExampleEntity() == null) {
                 it.remove();
+                System.out.println("Dropped:\n" + qm);
+
             }
         }
+        System.out.println("Final query models: " + res.size());
         return res;
     }
 
@@ -224,6 +245,7 @@ public class QueryResolver {
         ArrayList<QueryModel> res = new ArrayList<>();
         for (IQueryModel qm : pattern.iQueryModels) {
             try {
+
                 res.addAll(resolveIQueryModel(qm));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -255,6 +277,10 @@ public class QueryResolver {
             }
 
             SyntacticTreeNode[] prepNP = extractPPprepNP(ppNode);
+
+            if (!prepNP[0].lemma.equals("of")) {
+                return null; //this was added to limit the possibile combination - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
+            }
 
             return prepNP;
 
@@ -298,11 +324,11 @@ public class QueryResolver {
                 res.add(qm);
             }
 
-        } else if (node.npCompound || node.whnpCompound) {
+        } else if (node.npCompound || node.whnpCompound || node.value.equals("WHPP")) {
             //get the first NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode np1 = null;
             for (SyntacticTreeNode c : node.children) {
-                if (c.value.equals("NP")) {
+                if (c.value.equals("NP") || c.value.equals("WHNP")) {
                     np1 = c;
                     break;
                 }
@@ -549,11 +575,11 @@ public class QueryResolver {
                     } else if (c.value.equals("IN")) {
                         inNode = c;
                     } else {
-                        String v=c.getLeafValues();
-                        if (literalValue.length()>0) {
-                            literalValue+=" ";
+                        String v = c.getLeafValues();
+                        if (literalValue.length() > 0) {
+                            literalValue += " ";
                         }
-                        literalValue+=v;
+                        literalValue += v;
                     }
                 }
                 if (jjrNode != null && inNode != null) {

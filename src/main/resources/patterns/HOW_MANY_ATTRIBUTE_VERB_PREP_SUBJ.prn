@@ -1,16 +1,16 @@
 (ROOT
   (SBARQ
-    (WHNP#1
-      (WHADJP (WRB (*/how)) (JJ (*/many)))
-      (NNS#2))
-    (SQ#3 ^(VBD|VBZ (*/do)))
+    (WHNP
+      (WHADJP (WRB (*/how)) (JJ (*/many|much)))
+      (NNS|NN#1))
+    (SQ (VP (VBP|VBZ|VBD|VBD#3) (PP (IN#4) (NP#2))))
     ))
 
+boundThroughAttribute(?en, 1+3+4, ?ans).
+entities(2, ?en)
 
-%count(?ans rdf:type lookupCategory(1))
-%constraint on #3
-
-
+boundThroughAttribute(?en, 1+3+4, ?ans).
+values(2, ?en2, ?en)
 
 %How many big fires struck Paris during the Middle Ages?
 %How many monarchical countries are there in Europe?

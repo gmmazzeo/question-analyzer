@@ -6,8 +6,14 @@
         (NP#2)))
     ))
 
+
+boundThroughAttribute(?ans, 1, ?en).
 entities(2, ?en).
-boundThroughAttribute(?ans, 1, ?en)
+siblingConstraints(2, ?en)
+
+boundThroughAttribute(?en, 1, ?ans).
+entities(2, ?en).
+siblingConstraints(2, ?en)
 
 %?ans attributes(1) entities(2)
 

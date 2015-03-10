@@ -8,12 +8,16 @@
           (WHNP#4))))
     ))
 
-entities(1, ?en).
-boundThroughAttribute(?en, 2+3, ?ans).
-optionalCategory(?ans, 4)
+%entities(1, ?en).
+%boundThroughAttribute(?en, 2+3, ?ans).
+%optionalCategory(?ans, 4)
 
-entities(1, ?en).
-boundThroughAttribute(?ans, 2, ?en).
-optionalCategory(?ans, 4)
+%entities(1, ?en).
+%boundThroughAttribute(?ans, 2, ?en).
+%optionalCategory(?ans, 4)
+
+entities(4, ?ans, 0, 1).
+entities(1, ?subj).
+boundThroughAttribute(?subj, 2+3, ?ans).
 
 %Sean Parnell is the governor of which U.S. state?

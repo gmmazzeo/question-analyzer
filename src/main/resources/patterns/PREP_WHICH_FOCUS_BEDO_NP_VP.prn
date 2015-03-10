@@ -1,19 +1,34 @@
 (ROOT
   (SBARQ
-    (WHPP (IN|TO#1)
-      (WHNP#2))
+    (WHPP#2 (IN|TO#1))
     (SQ (VBZ|VBD|VBP (*/be|do))
       (NP#3)
       (VP#4))
     ))
 
-entities(3, ?en).
-boundThroughAttribute(?en, 2+4+1, ?ans).
-optionalCategory(?ans, 2)
+%entities(3, ?en).
+%boundThroughAttribute(?en, 2+4+1, ?ans).
+%optionalCategory(?ans, 2)
 
-values(3, ?en, ?val).
-boundThroughAttribute(?val, 2+4+1, ?ans).
-optionalCategory(?ans, 2)
+%values(3, ?en, ?val).
+%boundThroughAttribute(?val, 2+4+1, ?ans).
+%optionalCategory(?ans, 2)
+
+entities(2, ?ans).
+entities(3, ?subj).
+boundThroughAttribute(?subj, 4+1, ?ans).
+
+values(2, ?en, ?ans).
+entities(3, ?subj).
+boundThroughAttribute(?subj, 4+1, ?ans).
+
+entities(2, ?ans).
+values(3, ?en1, ?subj).
+boundThroughAttribute(?subj, 4+1, ?ans).
+
+values(2, ?en, ?ans).
+values(3, ?en1, ?subj).
+boundThroughAttribute(?subj, 4+1, ?ans).
 
 %For which label did Elvis record his first album?
 %In which city did John F. Kennedy die?

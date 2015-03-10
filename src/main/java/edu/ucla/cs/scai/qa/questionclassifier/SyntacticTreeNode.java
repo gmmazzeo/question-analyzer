@@ -56,6 +56,7 @@ public class SyntacticTreeNode implements Externalizable {
         }
         children = new ArrayList<>();
         boolean hasNPchildren = false;
+        boolean hasWHNPchildren = false;
         boolean hasQPchildren = false;
         for (Tree c : t.children()) {
             SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
@@ -64,6 +65,8 @@ public class SyntacticTreeNode implements Externalizable {
                 hasNPchildren = true;
             } else if (child.value.equals("QP")) {
                 hasQPchildren = true;
+            } else if (child.value.equals("WHNP")) {
+                hasWHNPchildren = true;
             }
         }
         if (value.equals("NP")) {
@@ -75,7 +78,7 @@ public class SyntacticTreeNode implements Externalizable {
                 npSimple = true;
             }
         } else if (value.equals("WHNP")) { //can a WHNP node have QP children?
-            if (hasNPchildren) {
+            if (hasNPchildren || hasWHNPchildren) {
                 whnpCompound = true;
             } else if (!hasQPchildren) {
                 whnpSimple = true;

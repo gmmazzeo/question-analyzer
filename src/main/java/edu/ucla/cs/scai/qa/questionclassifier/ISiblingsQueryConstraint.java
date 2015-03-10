@@ -16,12 +16,15 @@ public class ISiblingsQueryConstraint extends IQueryConstraint {
     String nodeLabel;
     
     boolean includeSelf;
+    boolean independent; //if independent is false, then new constraints are not computed if the current constraints are empty
+    
 
-    public ISiblingsQueryConstraint(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf) {
+    public ISiblingsQueryConstraint(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf, boolean independent) {
         super(optional);
         this.nodeLabel = nodeLabel;
         this.entityVariableName = entityVariableName;
-        this.includeSelf = includeSelf;        
+        this.includeSelf = includeSelf;
+        this.independent = independent;
     }
 
     public String getEntityVariableName() {

@@ -119,12 +119,19 @@ public class PennTreebankPatternMatcher {
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         HashMap<String, ArrayList<String>> questions = new HashMap<>();
+        long time1=0;
+        long time2=0;
+        int n=0;
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 System.out.println("\n\n" + l);
                 tot++;
                 try {
+                    long start=System.currentTimeMillis();
                     HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(l);
+                    long stop=System.currentTimeMillis();
+                    time1+=stop-start;
+                    n++;
                     for (PennTreebankPattern match : matches.keySet()) {
                         ArrayList<String> q = questions.get(match.name);
                         if (q == null) {
@@ -144,9 +151,13 @@ public class PennTreebankPatternMatcher {
                         q.add(l);
                     }
                     for (PennTreebankPattern pattern : matches.keySet()) {
-                        System.out.println(pattern.name);
+                        System.out.println(pattern.name);                        
+                        start=System.currentTimeMillis();
                         QueryResolver qr = new QueryResolver(matches.get(pattern));
-                        for (QueryModel qm : qr.resolveIQueryModels(pattern)) {
+                        ArrayList<QueryModel> qms=qr.resolveIQueryModels(pattern);
+                        stop=System.currentTimeMillis();
+                        time2+=stop-start;
+                        for (QueryModel qm : qms) {
                             System.out.println("\n" + qm);
                         }
                     }
@@ -157,14 +168,13 @@ public class PennTreebankPatternMatcher {
             }
             l = in.readLine();
         }
-        System.out.println(ok + "/" + tot);
-        for (String t : new TreeSet<String>(questions.keySet())) {
+        for (String t : new TreeSet<>(questions.keySet())) {
             System.out.println("==========================================");
             System.out.println(t);
             System.out.println("------------------------------------------");
             for (String qs : questions.get(t)) {
                 System.out.print(qs);
-                for (String prn : new TreeSet<String>(questions.keySet())) {
+                for (String prn : new TreeSet<>(questions.keySet())) {
                     if (prn.equals(t)) {
                         continue;
                     }
@@ -178,5 +188,9 @@ public class PennTreebankPatternMatcher {
                 System.out.println();
             }
         }
+        System.out.println(ok + "/" + tot);
+        System.out.println(time1+" msec");
+        System.out.println(time2+" msec");
+
     }
 }

@@ -6,8 +6,8 @@
       (VP#3))
     ))
 
-entities(2, ?en).
-boundThroughAttribute(?en, 3, ?ans)
+boundThroughAttribute(?en, 3, ?ans).
+entities(2, ?en)
 
 %How often did Nicole Kidman marry? -> This is like how many times - probably we need to process this kind of queries with a specific pattern
 %How often was Michael Jordan divorced?
