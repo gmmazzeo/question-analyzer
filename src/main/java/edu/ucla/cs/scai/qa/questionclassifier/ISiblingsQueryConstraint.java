@@ -12,9 +12,7 @@ package edu.ucla.cs.scai.qa.questionclassifier;
 public class ISiblingsQueryConstraint extends IQueryConstraint {
 
     String entityVariableName;
-
     String nodeLabel;
-    
     boolean includeSelf;
     boolean independent; //if independent is false, then new constraints are not computed if the current constraints are empty
     
