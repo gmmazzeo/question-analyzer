@@ -5,6 +5,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations.TreeAnnotation;
 import edu.stanford.nlp.util.CoreMap;
+import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +32,8 @@ public class SyntacticTree {
     HashMap<String, SyntacticTreeNode> labelledNodes = new HashMap<>();
 
     String focusPossibilities; //c=category, a=attribute, e=entity
+
+    ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations;
 
     public SyntacticTree(CoreMap sentenceTree, CoreMap sentenceTokens) throws Exception {
         Tree tree = sentenceTree.get(TreeAnnotation.class);
@@ -71,5 +74,13 @@ public class SyntacticTree {
         } else {
             return false;
         }
+    }
+
+    public void setNamedEntityAnnotations(ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations) {
+        this.namedEntityAnnotations = namedEntityAnnotations;
+    }
+
+    public ArrayList<NamedEntityAnnotationResult> getNamedEntityAnnotations() {
+        return namedEntityAnnotations;
     }
 }

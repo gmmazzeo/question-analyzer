@@ -9,6 +9,9 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
+import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -20,8 +23,11 @@ public class Parser {
 
     StanfordCoreNLP pipelineTree;
     StanfordCoreNLP pipelineTokens;
+    Ontology ontology;
+    ArrayList<NamedEntityAnnotationResult> entityAnnotations;
 
-    public Parser() {
+    public Parser(Ontology ontology) {
+        this.ontology = ontology;
         Properties propsTokens = new Properties();
         propsTokens.put("annotators", "tokenize, ssplit, pos, lemma, ner, regexner, parse, dcoref");
         Properties propsTree = new Properties();
@@ -31,6 +37,7 @@ public class Parser {
     }
 
     public SyntacticTree parse(String text) throws Exception {
+        entityAnnotations=(ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
         //char[] c=text.toCharArray();
         //int j=c.length-1;
         //while (j>=0 && (c[j]=='.' || c[j]=='!' || c[j]=='?' || c[j]==' ')) {
@@ -54,6 +61,8 @@ public class Parser {
         CoreMap qsTokens = qssTokens.get(0);
 
         SyntacticTree qt = new SyntacticTree(qsTree, qsTokens);
+        
+        qt.setNamedEntityAnnotations(entityAnnotations);
 
         //qt.compactNamedEntities();
         return qt;

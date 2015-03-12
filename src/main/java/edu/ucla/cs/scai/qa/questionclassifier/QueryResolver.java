@@ -5,6 +5,7 @@
  */
 package edu.ucla.cs.scai.qa.questionclassifier;
 
+import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
 import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
@@ -30,8 +31,13 @@ public class QueryResolver {
     HashMap<SyntacticTreeNode, ArrayList<QueryModel>> ppCache = new HashMap<>();
     HashMap<SyntacticTreeNode, String> ppCacheLabel = new HashMap<>();
 
+    HashMap<String, String> namedEntitiesAnnotationMap = new HashMap<>();
+
     public QueryResolver(SyntacticTree tree) {
         this.tree = tree;
+        for (NamedEntityAnnotationResult nar : tree.namedEntityAnnotations) {
+            namedEntitiesAnnotationMap.put(nar.getSpot().replaceAll(" ", ""), nar.getNamedEntity().getUri());
+        }
     }
 
     public ArrayList<QueryModel> resolveQueries(ArrayList<PennTreebankPattern> patterns) throws Exception {
@@ -129,7 +135,7 @@ public class QueryResolver {
             if (npNode == null || ppNode == null) {
                 return null; //node has not the structure we are looking for
             }
-            
+
             SyntacticTreeNode[] prepNP = extractPPprepNP(ppNode);
 
             if (!prepNP[0].lemma.equals("of")) {
@@ -165,7 +171,12 @@ public class QueryResolver {
             if (includeSpecificEntity) {
                 QueryModel qm = new QueryModel(entityVariableName, null);
                 String entityName = node.getLeafValues();
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
+                String possibileSpot = (valuePrefix + entityName).replaceAll(" ", "");
+                if (namedEntitiesAnnotationMap.containsKey(possibileSpot)) {
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + namedEntitiesAnnotationMap.get(possibileSpot) + ")", false));
+                } else {
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
+                }
                 res.add(qm);
             }
             if (includeCategoryEntities) {
@@ -680,14 +691,14 @@ public class QueryResolver {
         }
         for (QueryConstraint qc : constraints) {
             if (qc.getSubjExpr().equals(var)) {
-                if (qc.getAttrExpr().equals("isEntity") && qc.getValueExpr().startsWith("lookupEntity")
-                        || qc.getAttrExpr().equals("isVal") && qc.getValueExpr().startsWith("literalValue")
-                        || qc.getAttrExpr().equals("rdf:type") && qc.getValueExpr().startsWith("lookupCategory") && !resultVariables.contains(var)) {
+                if (qc.getAttrExpr().equals("isEntity")
+                        || qc.getAttrExpr().equals("isVal")
+                        || qc.getAttrExpr().equals("rdf:type") && !resultVariables.contains(var)) {
                     boundVariables.add(var);
                     return;
                 } else if (!resultVariables.contains(var)) {
                     String var2 = qc.getValueExpr();
-                    if (!var2.startsWith("lookup")) {
+                    if (var2.startsWith("?")) {
                         updateBoundVariables(var2, boundVariables, resultVariables, constraints);
                         if (boundVariables.contains(var2)) {
                             boundVariables.add(var);

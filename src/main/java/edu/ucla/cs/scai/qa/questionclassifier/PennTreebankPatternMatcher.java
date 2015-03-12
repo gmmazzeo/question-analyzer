@@ -6,8 +6,10 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,9 +27,9 @@ import java.util.regex.Pattern;
  */
 public class PennTreebankPatternMatcher {
 
-    private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();
+    private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();       
 
-    private Parser parser = new Parser();
+    private Parser parser = new Parser(DBpediaOntology.getInstance());        
 
     private static ArrayList<String> getResources(
             final Pattern pattern) {
