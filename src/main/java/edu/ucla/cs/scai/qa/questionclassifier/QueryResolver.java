@@ -173,7 +173,7 @@ public class QueryResolver {
                 String entityName = node.getLeafValues();
                 String possibileSpot = (valuePrefix + entityName).replaceAll(" ", "");
                 if (namedEntitiesAnnotationMap.containsKey(possibileSpot)) {
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + namedEntitiesAnnotationMap.get(possibileSpot) + ")", false));
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", namedEntitiesAnnotationMap.get(possibileSpot), false));
                 } else {
                     qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
                 }
