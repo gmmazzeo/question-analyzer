@@ -8,6 +8,6 @@
 
 entities(1, ?ans)
 
-values(1,?en, ?ans)
+values(1, ?en, ?ans)
 
 %Show me all songs from Bruce Springsteen released between 1980 and 1990.
