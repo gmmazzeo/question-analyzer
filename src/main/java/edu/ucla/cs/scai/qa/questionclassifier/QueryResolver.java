@@ -136,7 +136,7 @@ public class QueryResolver {
                 return null; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPprepNP(ppNode);
+            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppNode);
 
             if (!prepNP[0].lemma.equals("of")) {
                 return null; //this was added to limit the possibile combination - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
@@ -251,7 +251,7 @@ public class QueryResolver {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPprepNP(ppEntityNode);
+            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppEntityNode);
 
             if (prepNP == null) {
                 return res;
@@ -338,7 +338,7 @@ public class QueryResolver {
             String prep = "";
 
             if (ppEntityNode != null) {
-                SyntacticTreeNode[] prepNP = extractPPprepNP(ppEntityNode);
+                SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppEntityNode);
 
                 if (prepNP != null) {
                     prep = prepNP[0].lemma;
@@ -390,7 +390,7 @@ public class QueryResolver {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPprepNP(ppConstraintNode);
+            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppConstraintNode);
 
             if (prepNP == null) {
                 return res;
@@ -459,25 +459,33 @@ public class QueryResolver {
             return res;
         }
 
-        SyntacticTreeNode[] prepNp = extractPPprepNP(node);
-        if (prepNp != null) {
+        SyntacticTreeNode[] prepNP = extractPPADVPprepNP(node);
+        String prep = "";
+        if (prepNP != null) {
+            prep = prepNP[0].lemma;
+            if (prepNP[2] != null) {
+                prep = prepNP[2].getLeafLemmas() + " " + prep;
+            }
+        }
+        
+        if (prepNP != null) {
             //create constraints with attributes, assuming that the values of the constraints are entities
             String newEntityName = getNextEntityVariableName();
-            ArrayList<QueryModel> qmsE = resolveEntityNode(prepNp[1], newEntityName, true, true, null, null);
+            ArrayList<QueryModel> qmsE = resolveEntityNode(prepNP[1], newEntityName, true, true, null, null);
             for (QueryModel qm : qmsE) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prepNp[0].lemma + ")", newEntityName, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prep + ")", newEntityName, false));
             }
             res.addAll(qmsE);
 
             String newEntityName2 = getNextEntityVariableName();
-            ArrayList<QueryModel> qmsV = resolveValueNode(prepNp[1], newEntityName2, newEntityName, "");
+            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, "");
             for (QueryModel qm : qmsV) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prepNp[0].lemma + ")", newEntityName, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prep + ")", newEntityName, false));
             }
             res.addAll(qmsV);
 
             //create constraints with attributes, assuming that the values of the constraints are literals
-            ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNp[1], entityVariableName);
+            ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNP[1], entityVariableName);
             res.addAll(qmsL);
         } else {
             for (SyntacticTreeNode c : node.children) {
@@ -564,9 +572,9 @@ public class QueryResolver {
         return res;
     }
 
-    SyntacticTreeNode[] extractPPprepNP(SyntacticTreeNode node) {
+    SyntacticTreeNode[] extractPPADVPprepNP(SyntacticTreeNode node) {
         SyntacticTreeNode prepNode = null;
-        SyntacticTreeNode[] res = new SyntacticTreeNode[2];
+        SyntacticTreeNode[] res = new SyntacticTreeNode[3];
         for (SyntacticTreeNode c : node.children) {
             if (c.value.equals("IN") || c.value.equals("TO")) {
                 prepNode = c;
@@ -582,18 +590,23 @@ public class QueryResolver {
                 return null;
             } else {
                 SyntacticTreeNode npNode = null;
+                SyntacticTreeNode advpNode = null;
                 for (SyntacticTreeNode c : node.children) {
+                    if (c.value.equals("ADVP")) {
+                        advpNode = c;
+                    }
                     if (c.value.equals("NP")) {
                         npNode = c;
-                        break;
                     }
                 }
+                
                 if (npNode == null) {
                     System.out.println("PP node without NP child");
                     return null;
                 } else {
                     res[0] = prepNode.children.get(0);
                     res[1] = npNode;
+                    res[2] = advpNode;
                 }
             }
         }

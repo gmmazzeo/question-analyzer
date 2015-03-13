@@ -302,7 +302,7 @@ public class SyntacticTreeNode implements Externalizable {
             sb.append(lemma);
         } else {
             if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
-                    || value.equals("CD") || value.equals("CC") ) {
+                    || value.equals("CD") || value.equals("CC") || value.equals("ADVP") || value.equals("RB") ) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafLemmas(sb);
                 }
