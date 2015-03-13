@@ -109,6 +109,7 @@ public class SyntacticTreeNode implements Externalizable {
         if (identifier != null) {
             sb.append("#" + identifier);
         }
+        sb.append(" [").append(begin).append("..").append(end).append("]");
         for (SyntacticTreeNode c : children) {
             sb.append("\n");
             c.fillStringBuilder(sb, level + 1);
