@@ -65,10 +65,18 @@ public class QueryResolver {
         for (IQueryConstraint qc : iqm.getConstraints()) {
             if (qc instanceof IEntityNodeQueryConstraint) {
                 IEntityNodeQueryConstraint c = (IEntityNodeQueryConstraint) qc;
-                res = combineQueryConstraints(res, resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.includeSpecificEntity, c.includeCategoryEntities, null, null), true, true);
+                ArrayList<QueryModel> entity = resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.includeSpecificEntity, c.includeCategoryEntities, null, null);
+                if (entity.isEmpty()) {
+                    return new ArrayList<>();
+                }
+                res = combineQueryConstraints(res, entity, true, true);
             } else if (qc instanceof IValueNodeQueryConstraint) {
                 IValueNodeQueryConstraint c = (IValueNodeQueryConstraint) qc;
-                res = combineQueryConstraints(res, resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.valueVariableName, c.attributePrefix), true, true);
+                ArrayList<QueryModel> values = resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.valueVariableName, c.attributePrefix);
+                if (values.isEmpty()) {
+                    return new ArrayList<>();
+                }
+                res = combineQueryConstraints(res, values, true, true);
             } else if (qc instanceof ISiblingsQueryConstraint && !res.isEmpty()) {
                 ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
                 res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, "", c.includeSelf), true, c.independent);
