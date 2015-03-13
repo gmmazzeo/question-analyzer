@@ -5,6 +5,7 @@ import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.util.IntPair;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -35,14 +36,17 @@ public class SyntacticTreeNode implements Externalizable {
     int categoryPriority, attributePriority, entityPriority;
     boolean examplePage;
     boolean npSimple, npCompound, whnpSimple, whnpCompound, npQp;
+    int begin, end;
 
-    ArrayList<SyntacticTreeNode> children;
+    ArrayList<SyntacticTreeNode> children = new ArrayList<>();
 
     public SyntacticTreeNode(Tree t, HashMap<Tree, CoreLabel> map, SyntacticTreeNode parent) throws Exception {
         this.parent = parent;
         value = t.value();
         if (t.isLeaf()) {
             CoreLabel c = map.get(t);
+            begin = c.beginPosition();
+            end = c.endPosition();
             if (c == null) {
                 throw new Exception("Mapping between TreeNode and CoreLabel not found");
             } else {
@@ -53,35 +57,39 @@ public class SyntacticTreeNode implements Externalizable {
                     throw new Exception("Different words have been matched!");
                 }
             }
-        }
-        children = new ArrayList<>();
-        boolean hasNPchildren = false;
-        boolean hasWHNPchildren = false;
-        boolean hasQPchildren = false;
-        for (Tree c : t.children()) {
-            SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
-            children.add(child);
-            if (child.value.equals("NP")) {
-                hasNPchildren = true;
-            } else if (child.value.equals("QP")) {
-                hasQPchildren = true;
-            } else if (child.value.equals("WHNP")) {
-                hasWHNPchildren = true;
+        } else {
+            boolean hasNPchildren = false;
+            boolean hasWHNPchildren = false;
+            boolean hasQPchildren = false;
+            begin = Integer.MAX_VALUE;
+            end = Integer.MIN_VALUE;
+            for (Tree c : t.children()) {
+                SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
+                children.add(child);
+                if (child.value.equals("NP")) {
+                    hasNPchildren = true;
+                } else if (child.value.equals("QP")) {
+                    hasQPchildren = true;
+                } else if (child.value.equals("WHNP")) {
+                    hasWHNPchildren = true;
+                }
+                begin = Math.min(begin, child.begin);
+                end = Math.max(end, child.end);
             }
-        }
-        if (value.equals("NP")) {
-            if (hasNPchildren) {
-                npCompound = true;
-            } else if (hasQPchildren) {
-                npQp = true;
-            } else {
-                npSimple = true;
-            }
-        } else if (value.equals("WHNP")) { //can a WHNP node have QP children?
-            if (hasNPchildren || hasWHNPchildren) {
-                whnpCompound = true;
-            } else if (!hasQPchildren) {
-                whnpSimple = true;
+            if (value.equals("NP")) {
+                if (hasNPchildren) {
+                    npCompound = true;
+                } else if (hasQPchildren) {
+                    npQp = true;
+                } else {
+                    npSimple = true;
+                }
+            } else if (value.equals("WHNP")) { //can a WHNP node have QP children?
+                if (hasNPchildren || hasWHNPchildren) {
+                    whnpCompound = true;
+                } else if (!hasQPchildren) {
+                    whnpSimple = true;
+                }
             }
         }
     }
@@ -279,7 +287,7 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(value);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
+            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN") || value.startsWith("V")
                     || value.equals("CD") || value.equals("CC")) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafValues(sb);
@@ -301,8 +309,8 @@ public class SyntacticTreeNode implements Externalizable {
             }
             sb.append(lemma);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN")  || value.startsWith("V")
-                    || value.equals("CD") || value.equals("CC") ) {
+            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN") || value.startsWith("V")
+                    || value.equals("CD") || value.equals("CC")) {
                 for (SyntacticTreeNode c : children) {
                     c.fillLeafLemmas(sb);
                 }

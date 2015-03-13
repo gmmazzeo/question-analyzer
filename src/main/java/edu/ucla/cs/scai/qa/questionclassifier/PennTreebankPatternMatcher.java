@@ -9,7 +9,9 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaEntityAnnotationResult;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.TagMeClient;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -115,6 +117,7 @@ public class PennTreebankPatternMatcher {
     }
 
     public static void main(String[] args) throws Exception {
+        TagMeClient tm=new TagMeClient();
         BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald3")));
         String l = in.readLine();
         int tot = 0;
@@ -127,6 +130,9 @@ public class PennTreebankPatternMatcher {
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 System.out.println("\n\n" + l);
+                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
+                    System.out.println(r);
+                }
                 tot++;
                 try {
                     long start=System.currentTimeMillis();
