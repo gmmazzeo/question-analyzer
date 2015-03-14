@@ -40,11 +40,11 @@ public class SyntacticTreeNode implements Externalizable {
 
     ArrayList<SyntacticTreeNode> children = new ArrayList<>();
 
-    public SyntacticTreeNode(Tree t, HashMap<Tree, CoreLabel> map, SyntacticTreeNode parent) throws Exception {
+    public SyntacticTreeNode(Tree t, HashMap<Integer, CoreLabel> map, SyntacticTreeNode parent, Tree root) throws Exception {
         this.parent = parent;
         value = t.value();
         if (t.isLeaf()) {
-            CoreLabel c = map.get(t);
+            CoreLabel c = map.get(t.nodeNumber(root));
             begin = c.beginPosition();
             end = c.endPosition();
             if (c == null) {
@@ -64,7 +64,7 @@ public class SyntacticTreeNode implements Externalizable {
             begin = Integer.MAX_VALUE;
             end = Integer.MIN_VALUE;
             for (Tree c : t.children()) {
-                SyntacticTreeNode child = new SyntacticTreeNode(c, map, this);
+                SyntacticTreeNode child = new SyntacticTreeNode(c, map, this, root);
                 children.add(child);
                 if (child.value.equals("NP")) {
                     hasNPchildren = true;

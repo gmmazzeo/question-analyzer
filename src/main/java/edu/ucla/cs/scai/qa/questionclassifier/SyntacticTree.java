@@ -1,5 +1,6 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
+import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -41,14 +42,14 @@ public class SyntacticTree {
         tokens = (ArrayList<CoreLabel>) sentenceTokens.get(TokensAnnotation.class);
         Iterator<CoreLabel> it2 = tokens.iterator();
         Iterator<Tree> it1 = leaves.iterator();
-        HashMap<Tree, CoreLabel> map = new HashMap<>();
+        HashMap<Integer, CoreLabel> map = new HashMap<>();
         while (it1.hasNext() && it2.hasNext()) {
-            map.put(it1.next(), it2.next());
+            map.put(it1.next().nodeNumber(tree), it2.next());
         }
         if (it1.hasNext() || it2.hasNext()) {
             throw new Exception("Different number of leaves and tokens!");
         }
-        root = new SyntacticTreeNode(tree, map, null);
+        root = new SyntacticTreeNode(tree, map, null, tree);
     }
 
     public void compactNamedEntities() {
