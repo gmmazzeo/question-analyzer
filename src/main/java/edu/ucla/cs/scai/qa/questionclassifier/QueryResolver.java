@@ -317,7 +317,7 @@ public class QueryResolver {
             ArrayList<QueryModel> qms1 = resolveEntityNode(prepNP[1], entityVariableName, true, true, null, null);
             for (QueryModel qm : qms1) {
                 qm.setAttributeVariableName(valueVariableName);
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributePrefix + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributePrefix + attributeName + "(s))", valueVariableName, false));
             }
             res.addAll(qms1);
 
@@ -325,7 +325,7 @@ public class QueryResolver {
             ArrayList<QueryModel> qms2 = resolveValueNode(prepNP[1], entityVariableName, newEntityVariable, "");
             for (QueryModel qm : qms2) {
                 qm.setAttributeVariableName(valueVariableName);
-                qm.getConstraints().add(new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributePrefix + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false));
+                qm.getConstraints().add(new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributePrefix + attributeName + "(s))", valueVariableName, false));
             }
             res.addAll(qms2);
 
