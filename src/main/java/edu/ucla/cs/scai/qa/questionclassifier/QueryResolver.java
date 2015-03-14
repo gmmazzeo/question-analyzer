@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,12 +34,46 @@ public class QueryResolver {
     HashMap<SyntacticTreeNode, String> ppCacheLabel = new HashMap<>();
 
     HashMap<String, String> namedEntitiesAnnotationMap = new HashMap<>();
+    HashMap<NamedEntityAnnotationResult, SyntacticTreeNode> bestCoveringNode = new HashMap<>();
 
     public QueryResolver(SyntacticTree tree) {
         this.tree = tree;
         for (NamedEntityAnnotationResult nar : tree.namedEntityAnnotations) {
             namedEntitiesAnnotationMap.put(nar.getSpot().replaceAll(" ", ""), nar.getNamedEntity().getUri());
         }
+
+        LinkedList<SyntacticTreeNode> queue = new LinkedList<>();
+        queue.addLast(tree.root);
+
+        while (!queue.isEmpty()) {
+            SyntacticTreeNode n = queue.removeFirst();
+            if (n.value.equals("NP")) {
+                for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
+                    if (n.begin>ar.getBegin() || n.end<ar.getEnd()) {
+                        continue;
+                    }
+                    SyntacticTreeNode currentBestNode=bestCoveringNode.get(ar);
+                    if (currentBestNode==null) {
+                        bestCoveringNode.put(ar, n);
+                    } else {
+                        double currentOverlapping=1.0*(ar.getEnd()-ar.getBegin())/(currentBestNode.end-currentBestNode.begin);
+                        double newOverlapping=1.0*(ar.getEnd()-ar.getBegin())/(n.end-n.begin);
+                        if (newOverlapping>currentOverlapping) {
+                            bestCoveringNode.put(ar, n);
+                        }
+                    }
+                }
+            }
+            for (SyntacticTreeNode c:n.children) {
+                queue.addLast(c);
+            }
+        }
+        
+        System.out.println("Best overlappings:");
+        for (Map.Entry<NamedEntityAnnotationResult, SyntacticTreeNode> e:bestCoveringNode.entrySet()) {
+            System.out.println(e.getKey()+":\n"+e.getValue());
+        }
+
     }
 
     public ArrayList<QueryModel> resolveQueries(ArrayList<PennTreebankPattern> patterns) throws Exception {
@@ -146,8 +182,8 @@ public class QueryResolver {
 
             SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppNode);
 
-            if (!prepNP[0].lemma.equals("of")) {
-                return null; //this was added to limit the possibile combination - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
+            if (!prepNP[0].lemma.equals("of") || prepNP[2] != null) {
+                return null; //this was added to limit the possibile combinations - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
             }
 
             return prepNP;
@@ -169,12 +205,23 @@ public class QueryResolver {
         return prefix;
     }
 
+    private boolean overlap(SyntacticTreeNode node, NamedEntityAnnotationResult annotation) {
+        int inf = Math.max(node.begin, annotation.getBegin());
+        int sup = Math.min(node.end, annotation.getEnd());
+        return sup > inf;
+    }
+
     //resolves a NP/WHNP node, which can be either simple or compound
     private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, String valuePrefix, String lemmaPrefix) throws Exception {
         valuePrefix = normalizePrefix(valuePrefix);
         lemmaPrefix = normalizePrefix(lemmaPrefix);
 
         ArrayList<QueryModel> res = new ArrayList<>();
+        //for (NamedEntityAnnotationResult r : tree.namedEntityAnnotations) {
+        //    if (overlap(node, r)) {
+        //        System.out.println();
+        //    }
+        //}
         if (node.npSimple || node.whnpSimple) {
             if (includeSpecificEntity) {
                 QueryModel qm = new QueryModel(entityVariableName, null);
@@ -225,7 +272,7 @@ public class QueryResolver {
         if (node.npSimple || node.whnpSimple) {
             QueryModel qm = new QueryModel(valueVariableName, null);
             String literalValue = node.getLeafValues();
-            qm.getConstraints().add(new QueryConstraint(valueVariableName, "isVal", "literalValue(" + literalValue + ")", false));
+            qm.getConstraints().add(new QueryConstraint(valueVariableName, "isLiteral", "literalValue(" + literalValue + ")", false));
             res.add(qm);
         } else if (node.npCompound || node.whnpCompound) {
             String entityVariableName = getNextEntityVariableName();
@@ -269,6 +316,7 @@ public class QueryResolver {
 
             ArrayList<QueryModel> qms1 = resolveEntityNode(prepNP[1], entityVariableName, true, true, null, null);
             for (QueryModel qm : qms1) {
+                qm.setAttributeVariableName(valueVariableName);
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributePrefix + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false));
             }
             res.addAll(qms1);
@@ -276,6 +324,7 @@ public class QueryResolver {
             String newEntityVariable = getNextEntityVariableName();
             ArrayList<QueryModel> qms2 = resolveValueNode(prepNP[1], entityVariableName, newEntityVariable, "");
             for (QueryModel qm : qms2) {
+                qm.setAttributeVariableName(valueVariableName);
                 qm.getConstraints().add(new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributePrefix + attributeName + "(s) [" + prepNP[0].lemma + "])", valueVariableName, false));
             }
             res.addAll(qms2);
@@ -448,7 +497,7 @@ public class QueryResolver {
                     String valueVariableName2 = getNextValueVariableName();
                     qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false));
                     qm.getConstraints().add(new QueryConstraint(valueVariableName1, "lookupOperator(" + operator + ")", valueVariableName2, false));
-                    qm.getConstraints().add(new QueryConstraint(valueVariableName2, "isVal", "literalValue(" + literalValue + ")", false));
+                    qm.getConstraints().add(new QueryConstraint(valueVariableName2, "isLiteral", "literalValue(" + literalValue + ")", false));
                     res.add(qm);
                 }
             }
@@ -475,7 +524,7 @@ public class QueryResolver {
                 prep = prepNP[2].getLeafLemmas() + " " + prep;
             }
         }
-        
+
         if (prepNP != null) {
             //create constraints with attributes, assuming that the values of the constraints are entities
             String newEntityName = getNextEntityVariableName();
@@ -607,7 +656,7 @@ public class QueryResolver {
                         npNode = c;
                     }
                 }
-                
+
                 if (npNode == null) {
                     System.out.println("PP node without NP child");
                     return null;
@@ -677,6 +726,7 @@ public class QueryResolver {
         for (QueryConstraint qc : constraints) {
             if (qc.getValueExpr().equals(nodeValue)) {
                 if (ancestor != null) {
+                    System.out.println("Found multiple ancestors");
                     return; //I don't know how to cope with this case, multiple ancestors?
                 }
                 ancestor = qc.getSubjExpr();
@@ -713,7 +763,7 @@ public class QueryResolver {
         for (QueryConstraint qc : constraints) {
             if (qc.getSubjExpr().equals(var)) {
                 if (qc.getAttrExpr().equals("isEntity")
-                        || qc.getAttrExpr().equals("isVal")
+                        || qc.getAttrExpr().equals("isLiteral")
                         || qc.getAttrExpr().equals("rdf:type") && !resultVariables.contains(var)) {
                     boundVariables.add(var);
                     return;
@@ -742,7 +792,7 @@ public class QueryResolver {
         }
 
         HashMap<String, String> isEntity = new HashMap<>();
-        HashMap<String, String> isVal = new HashMap<>();
+        HashMap<String, String> isLiteral = new HashMap<>();
 
         HashSet<String> boundVariables = new HashSet<>();
         for (QueryConstraint qc : qm.getConstraints()) {
@@ -753,29 +803,29 @@ public class QueryResolver {
 
         for (QueryConstraint qc : qm.getConstraints()) {
             if (qc.getAttrExpr().startsWith("isEntity")) {
-                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
+                if (isEntity.containsKey(qc.getSubjExpr()) || isLiteral.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
                     return false;
                 }
                 isEntity.put(qc.getSubjExpr(), qc.getValueExpr());
                 if (qm.getEntityVariableName().equals(qc.getSubjExpr())) {
                     qm.setExampleEntity(qc.getValueExpr());
                 }
-            } else if (qc.getAttrExpr().startsWith("isVal")) {
-                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
+            } else if (qc.getAttrExpr().startsWith("isLiteral")) {
+                if (isEntity.containsKey(qc.getSubjExpr()) || isLiteral.containsKey(qc.getSubjExpr())) { //each variable can be at most one entity or one value
                     return false;
                 }
-                isVal.put(qc.getSubjExpr(), qc.getValueExpr());
+                isLiteral.put(qc.getSubjExpr(), qc.getValueExpr());
             } else {
                 newConstraints.add(new QueryConstraint(qc.getSubjExpr(), qc.getAttrExpr(), qc.getValueExpr(), qc.isOptional()));
             }
         }
 
-        HashMap<String, String> unboundAncestors = computeUnboundAncestor(isEntity.keySet(), isVal.keySet(), newConstraints);
+        HashMap<String, String> unboundAncestors = computeUnboundAncestor(isEntity.keySet(), isLiteral.keySet(), newConstraints);
 
         for (QueryConstraint qc : newConstraints) {
             if (boundVariables.contains(qc.getValueExpr())) { //the value is bounded
                 //therefore, the subject cannot be a specific entity or value
-                if (isEntity.containsKey(qc.getSubjExpr()) || isVal.containsKey(qc.getSubjExpr())) {
+                if (isEntity.containsKey(qc.getSubjExpr()) || isLiteral.containsKey(qc.getSubjExpr())) {
                     if (unboundAncestors.containsKey(qc.getSubjExpr())) {
                         qc.setSubjExpr(unboundAncestors.get(qc.getSubjExpr()));
                     } else {
@@ -785,12 +835,12 @@ public class QueryResolver {
             }
             if (isEntity.containsKey(qc.getValueExpr())) {
                 qc.setValueExpr(isEntity.get(qc.getValueExpr()));
-            } else if (isVal.containsKey(qc.getValueExpr())) {
-                qc.setValueExpr(isVal.get(qc.getValueExpr()));
+            } else if (isLiteral.containsKey(qc.getValueExpr())) {
+                qc.setValueExpr(isLiteral.get(qc.getValueExpr()));
             }
             if (isEntity.containsKey(qc.getSubjExpr())) {
                 qc.setSubjExpr(isEntity.get(qc.getSubjExpr()));
-            } else if (isVal.containsKey(qc.getSubjExpr())) {
+            } else if (isLiteral.containsKey(qc.getSubjExpr())) {
                 return false;
             }
         }
@@ -801,7 +851,7 @@ public class QueryResolver {
             }
         }
 
-        if (qm.getExampleEntity() != null) {
+        if (qm.getExampleEntity() != null && newConstraints.isEmpty()) {
             qm.setConstraints(newConstraints);
             return true;
         }
