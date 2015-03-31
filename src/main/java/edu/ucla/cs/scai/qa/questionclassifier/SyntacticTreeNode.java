@@ -12,6 +12,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,8 +38,33 @@ public class SyntacticTreeNode implements Externalizable {
     boolean examplePage;
     boolean npSimple, npCompound, whnpSimple, whnpCompound, npQp;
     int begin, end;
+    boolean isLeafParent;
 
     ArrayList<SyntacticTreeNode> children = new ArrayList<>();
+
+    private static final HashSet<String> standardTagsForLookup = new HashSet<>();
+
+    static {
+        standardTagsForLookup.add("NP");
+        standardTagsForLookup.add("NN");
+        standardTagsForLookup.add("NNS");
+        standardTagsForLookup.add("NNP");
+        standardTagsForLookup.add("NNPS");
+        standardTagsForLookup.add("WHNP");
+        standardTagsForLookup.add("IN");
+        standardTagsForLookup.add("TO");
+        standardTagsForLookup.add("VP");
+        standardTagsForLookup.add("VB");
+        standardTagsForLookup.add("VBD");
+        standardTagsForLookup.add("VBG");
+        standardTagsForLookup.add("VBN");
+        standardTagsForLookup.add("VBP");
+        standardTagsForLookup.add("VBZ");
+        standardTagsForLookup.add("CD");
+        standardTagsForLookup.add("CC");
+        standardTagsForLookup.add("JJ");
+        standardTagsForLookup.add("RB");
+    }
 
     public SyntacticTreeNode(Tree t, ArrayList<CoreLabel> tokens, SyntacticTreeNode parent) throws Exception {
         this.parent = parent;
@@ -47,6 +73,7 @@ public class SyntacticTreeNode implements Externalizable {
             CoreLabel c = tokens.remove(0);
             begin = c.beginPosition();
             end = c.endPosition();
+            parent.isLeafParent = true;
             if (c == null) {
                 throw new Exception("Mapping between TreeNode and CoreLabel not found");
             } else {
@@ -275,46 +302,68 @@ public class SyntacticTreeNode implements Externalizable {
      return null;
      }
      */
-    public String getLeafValues() {
+    public String getLeafValues(HashSet<String> tags) {
         StringBuilder sb = new StringBuilder();
-        fillLeafValues(sb);
+        fillLeafValues(sb, tags);
         return sb.toString();
     }
 
-    public void fillLeafValues(StringBuilder sb) {
+    public String getLeafValues() {
+        return getLeafValues(standardTagsForLookup);
+    }
+
+    public void fillLeafValues(StringBuilder sb, HashSet<String> tags) {
         if (children.isEmpty()) {
             if (sb.length() > 0) {
                 sb.append(" ");
             }
             sb.append(value);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN") || value.startsWith("V")
-                    || value.equals("CD") || value.equals("CC")) {
+            if (tags.contains(value)) {
                 for (SyntacticTreeNode c : children) {
-                    c.fillLeafValues(sb);
+                    c.fillLeafValues(sb, tags);
                 }
             }
         }
     }
 
-    public String getLeafLemmas() {
+    public String getLeafLemmas(HashSet<String> tags) {
         StringBuilder sb = new StringBuilder();
-        fillLeafLemmas(sb);
+        fillLeafLemmas(sb, tags);
         return sb.toString();
     }
 
-    public void fillLeafLemmas(StringBuilder sb) {
+    public String getLeafLemmas() {
+        return getLeafLemmas(standardTagsForLookup);
+    }
+
+    public void fillLeafLemmas(StringBuilder sb, HashSet<String> tags) {
         if (children.isEmpty()) {
             if (sb.length() > 0) {
                 sb.append(" ");
             }
             sb.append(lemma);
         } else {
-            if (value.startsWith("N") || value.startsWith("WHN") || value.equals("IN") || value.startsWith("V")
-                    || value.equals("CD") || value.equals("CC") || value.equals("ADVP") || value.equals("RB")) {
+            if (tags.contains(value)) {
                 for (SyntacticTreeNode c : children) {
-                    c.fillLeafLemmas(sb);
+                    c.fillLeafLemmas(sb, tags);
                 }
+            }
+        }
+    }
+
+    public ArrayList<SyntacticTreeNode> getLeafParents() {
+        ArrayList<SyntacticTreeNode> res = new ArrayList<>();
+        fillLeafParentsArray(res);
+        return res;
+    }
+
+    private void fillLeafParentsArray(ArrayList<SyntacticTreeNode> a) {
+        if (isLeafParent) {
+            a.add(this);
+        } else {
+            for (SyntacticTreeNode c:children) {
+                c.fillLeafParentsArray(a);
             }
         }
     }

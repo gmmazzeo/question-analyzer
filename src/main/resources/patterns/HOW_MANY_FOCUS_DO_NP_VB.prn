@@ -2,11 +2,17 @@
   (SBARQ
     (WHNP
       (WHADJP (WRB (*/how)) (JJ (*/many)))
-      (NP|NNS (*#1)))
+      (NP|NNS#1))
     (SQ (VBD|VBP|VBZ (*/do))
       (NP#2)
-      (VP (VB (*#3))))
+      (VP (VB#3)))
     ))
+
+boundThroughAttribute(?en, 1+3, ?ans).
+entities(2, ?en)
+
+boundThroughAttribute(?en, 1+3, ?ans).
+values(2, ?en2, ?en)
 
 %values(2, lookupAttribute(1+3), ?ans)
 

@@ -36,7 +36,7 @@ public class SyntacticTree {
 
     ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations;
 
-    public SyntacticTree(CoreMap sentenceTree, CoreMap sentenceTokens) throws Exception {
+    public SyntacticTree(CoreMap sentenceTree, CoreMap sentenceTokens, ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations) throws Exception {
         Tree tree = sentenceTree.get(TreeAnnotation.class);
         List<Tree> leaves = tree.getLeaves();
         tokens = (ArrayList<CoreLabel>) sentenceTokens.get(TokensAnnotation.class);
@@ -44,6 +44,7 @@ public class SyntacticTree {
             throw new Exception("Different number of leaves and tokens!");
         }
         root = new SyntacticTreeNode(tree, tokens, null);
+        this.namedEntityAnnotations = namedEntityAnnotations;
     }
 
     public void compactNamedEntities() {
@@ -69,10 +70,6 @@ public class SyntacticTree {
         } else {
             return false;
         }
-    }
-
-    public void setNamedEntityAnnotations(ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations) {
-        this.namedEntityAnnotations = namedEntityAnnotations;
     }
 
     public ArrayList<NamedEntityAnnotationResult> getNamedEntityAnnotations() {

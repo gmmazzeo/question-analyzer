@@ -9,6 +9,7 @@ import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -20,7 +21,7 @@ import java.util.Set;
  *
  * @author Giuseppe M. Mazzeo <mazzeo@cs.ucla.edu>
  */
-public class QueryResolver {
+public class QueryResolver2 {
 
     private int entityCounter;
     private int valueCounter;
@@ -30,83 +31,18 @@ public class QueryResolver {
     HashMap<SyntacticTreeNode, ArrayList<QueryModel>> ppCache = new HashMap<>();
     HashMap<SyntacticTreeNode, String> ppCacheLabel = new HashMap<>();
 
-    //HashMap<String, String> namedEntitiesAnnotationMap = new HashMap<>();
-    HashMap<NamedEntityAnnotationResult, SyntacticTreeNode> bestCoveringNode = new HashMap<>();
-    HashMap<SyntacticTreeNode, ArrayList<NamedEntityAnnotationResult>> matchingAnnotations = new HashMap<>();
-
-    public QueryResolver(SyntacticTree tree) {
+    public QueryResolver2(SyntacticTree tree) {
         this.tree = tree;
-        //for (NamedEntityAnnotationResult nar : tree.namedEntityAnnotations) {
-        //    namedEntitiesAnnotationMap.put(nar.getSpot().replaceAll(" ", ""), nar.getNamedEntity().getUri());
-        //}
 
         LinkedList<SyntacticTreeNode> queue = new LinkedList<>();
         queue.addLast(tree.root);
 
         while (!queue.isEmpty()) {
             SyntacticTreeNode n = queue.removeFirst();
-            if (n.value.equals("NP")) {
-                matchingAnnotations.put(n, new ArrayList<NamedEntityAnnotationResult>());
-                for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
-                    if (n.begin > ar.getBegin() || n.end < ar.getEnd()) {
-                        continue;
-                    }
-                    SyntacticTreeNode currentBestNode = bestCoveringNode.get(ar);
-                    if (currentBestNode == null) {
-                        bestCoveringNode.put(ar, n);
-                    } else {
-                        double currentOverlapping = 1.0 * (ar.getEnd() - ar.getBegin()) / (currentBestNode.end - currentBestNode.begin);
-                        double newOverlapping = 1.0 * (ar.getEnd() - ar.getBegin()) / (n.end - n.begin);
-                        if (newOverlapping > currentOverlapping) {
-                            bestCoveringNode.put(ar, n);
-                        }
-                    }
-                }
-            }
             for (SyntacticTreeNode c : n.children) {
                 queue.addLast(c);
             }
         }
-
-        System.out.println("Best overlappings:");
-        for (Map.Entry<NamedEntityAnnotationResult, SyntacticTreeNode> e : bestCoveringNode.entrySet()) {
-            NamedEntityAnnotationResult ar = e.getKey();
-            SyntacticTreeNode node = e.getValue();
-            System.out.println(node + ":\n" + ar + "\n");
-            ArrayList<SyntacticTreeNode> uncoveredNodes = new ArrayList<>();
-            queue.clear(); //actually, at is point queue is already empty
-            queue.addLast(node);
-            while (!queue.isEmpty()) {
-                SyntacticTreeNode n = queue.removeFirst();
-                if (!overlap(n, ar)) {
-                    uncoveredNodes.add(n);
-                } else {
-                    for (SyntacticTreeNode c : n.children) {
-                        queue.addLast(c);
-                    }
-                }
-            }
-            boolean validMatching = true;
-            if (uncoveredNodes.isEmpty()) {
-                System.out.println("No uncovered nodes for " + ar.getSpot());
-            } else {
-                System.out.println("Uncovered nodes for " + ar.getSpot());
-                for (SyntacticTreeNode un : uncoveredNodes) {
-                    System.out.println("-  "+un);
-                    if (!un.value.equals("DT")) {
-                        validMatching = false;
-                        System.out.println("This uncovered node makes the matching invalid");
-                    }
-                    //TODO: are there other nodes which makes the matching invalid?
-                }
-            }
-            if (validMatching) {
-                ArrayList<NamedEntityAnnotationResult> l = matchingAnnotations.get(node);
-                l.add(ar);
-            }
-            System.out.println("====");
-        }
-
     }
 
     public ArrayList<QueryModel> resolveQueries(ArrayList<PennTreebankPattern> patterns) throws Exception {
@@ -134,21 +70,21 @@ public class QueryResolver {
         for (IQueryConstraint qc : iqm.getConstraints()) {
             if (qc instanceof IEntityNodeQueryConstraint) {
                 IEntityNodeQueryConstraint c = (IEntityNodeQueryConstraint) qc;
-                ArrayList<QueryModel> entity = resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.includeSpecificEntity, c.includeCategoryEntities, null, null);
+                ArrayList<QueryModel> entity = resolveEntityNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.includeSpecificEntity, c.includeCategoryEntities, new ArrayList<SyntacticTreeNode>());
                 if (entity.isEmpty()) {
                     return new ArrayList<>();
                 }
                 res = combineQueryConstraints(res, entity, true, true);
             } else if (qc instanceof IValueNodeQueryConstraint) {
                 IValueNodeQueryConstraint c = (IValueNodeQueryConstraint) qc;
-                ArrayList<QueryModel> values = resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.valueVariableName, c.attributePrefix);
+                ArrayList<QueryModel> values = resolveValueNode(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, c.valueVariableName, /*c.attributePrefix*/ new ArrayList<SyntacticTreeNode>());
                 if (values.isEmpty()) {
                     return new ArrayList<>();
                 }
                 res = combineQueryConstraints(res, values, true, true);
             } else if (qc instanceof ISiblingsQueryConstraint && !res.isEmpty()) {
                 ISiblingsQueryConstraint c = (ISiblingsQueryConstraint) qc;
-                res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, "", c.includeSelf), true, c.independent);
+                res = combineQueryConstraints(res, resolveSiblingConstraints(tree.labelledNodes.get(c.nodeLabel), c.entityVariableName, new ArrayList<SyntacticTreeNode>(), c.includeSelf), true, c.independent);
             } else if (qc instanceof IBoundThroughAttributeQueryConstraint) {
                 IBoundThroughAttributeQueryConstraint c = (IBoundThroughAttributeQueryConstraint) qc;
                 res = combineQueryConstraints(res, resolveBoundThroughAttributeConstraint(c), true, true);
@@ -162,11 +98,22 @@ public class QueryResolver {
             QueryModel qm = it.next();
             if (!reduceIsAttributes(qm) || qm.getConstraints().isEmpty() && qm.getExampleEntity() == null) {
                 it.remove();
-                System.out.println("Dropped:\n" + qm);
-
+                //System.out.println("Dropped:\n" + qm);
+            } else {
+                for (Iterator<QueryConstraint> it2 = qm.getConstraints().iterator(); it2.hasNext();) {
+                    QueryConstraint qc = it2.next();
+                    if (qc.getAttrExpr().startsWith("lookupOperator")) {
+                        it2.remove();
+                        qm.getFilters().add(qc);
+                    } else if (qc.getAttrExpr().equals("isLiteral")) {
+                        it2.remove();
+                        qc.setAttrExpr("lookupOperator(equalsLiteral)");
+                        qm.getFilters().add(qc);
+                    }
+                }
             }
         }
-        System.out.println("Final query models: " + res.size());
+        //System.out.println("Final query models: " + res.size());
         return res;
     }
 
@@ -181,8 +128,20 @@ public class QueryResolver {
             for (QueryModel qm1 : qms1) {
                 for (QueryModel qm2 : qms2) {
                     QueryModel qmc = new QueryModel(qm1.getEntityVariableName(), qm1.getAttributeVariableName());
+                    qmc.setWeight(qm1.getWeight() * qm2.getWeight());
                     qmc.getConstraints().addAll(qm1.getConstraints());
                     qmc.getConstraints().addAll(qm2.getConstraints());
+                    for (Map.Entry<String, HashSet<String>> e : qm1.getIgnoreEntitiesForLookup().entrySet()) {
+                        qmc.getIgnoreEntitiesForLookup().put(e.getKey(), e.getValue());
+                    }
+                    for (Map.Entry<String, HashSet<String>> e : qm2.getIgnoreEntitiesForLookup().entrySet()) {
+                        HashSet<String> current = qmc.getIgnoreEntitiesForLookup().get(e.getKey());
+                        if (current == null) {
+                            qmc.getIgnoreEntitiesForLookup().put(e.getKey(), e.getValue());
+                        } else {
+                            current.addAll(e.getValue());
+                        }
+                    }
                     res.add(qmc);
                 }
             }
@@ -198,44 +157,30 @@ public class QueryResolver {
             SyntacticTreeNode ppNode = null;
             for (SyntacticTreeNode c : node.children) {
                 if (c.npSimple) {
-                    if (npNode != null) {
-                        return null;
+                    if (npNode == null) {
+                        npNode = c;
                     }
-                    npNode = c;
                 } else if (c.value.equals("PP")) {
-                    if (ppNode != null) {
-                        return null;
+                    if (ppNode == null) {
+                        ppNode = c;
                     }
-                    ppNode = c;
                 }
             }
             if (npNode == null || ppNode == null) {
                 return null; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppNode);
+            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFormPp(ppNode);
 
-            if (!prepNP[0].lemma.equals("of") || prepNP[2] != null) {
+            if (!inNpAdvp[0].children.get(0).lemma.equals("of") || inNpAdvp[2] != null) {
                 return null; //this was added to limit the possibile combinations - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
             }
 
-            return prepNP;
+            return inNpAdvp;
 
         } else {
             return null;
         }
-    }
-
-    private String normalizePrefix(String prefix) {
-        if (prefix == null) {
-            prefix = "";
-        } else {
-            prefix = prefix.trim();
-        }
-        if (prefix.length() > 0) {
-            prefix += " ";
-        }
-        return prefix;
     }
 
     private boolean overlap(SyntacticTreeNode node, NamedEntityAnnotationResult annotation) {
@@ -244,53 +189,197 @@ public class QueryResolver {
         return sup > inf;
     }
 
+    private boolean overlap(Collection<SyntacticTreeNode> nodes, NamedEntityAnnotationResult annotation) {
+        for (SyntacticTreeNode node : nodes) {
+            if (overlap(node, annotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //a list of nodes matches with an annotation if
+    //1) the list contains all the tokens of the annotation
+    //2) the list does not contain any other "relevant" node
+    //it is assumed that the list of nodes is sorted according to their order in the sentence
+    private ArrayList<NamedEntityAnnotationResult> getMatchingAnnotations(ArrayList<SyntacticTreeNode> nodes) {
+        ArrayList<NamedEntityAnnotationResult> res = new ArrayList<>();
+        int inf = nodes.get(0).begin;
+        int sup = nodes.get(nodes.size() - 1).end;
+        for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
+            if (ar.getBegin() < inf || ar.getEnd() > sup) { //condition 1 is non satisfied
+                continue;
+            }
+            boolean validMatching = true;
+            for (SyntacticTreeNode n : nodes) {
+                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT")) { //condition 2 is not satisfied
+                    validMatching = false;
+                    break;
+                }
+            }
+            if (validMatching) {
+                res.add(ar);
+            }
+        }
+        return res;
+    }
+
+    private String lookupEntity(ArrayList<SyntacticTreeNode> nodes) {
+        String res = "lookupEntity(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafValues();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        res += ")";
+        return res;
+    }
+
+    private String lookupLiteral(ArrayList<SyntacticTreeNode> nodes) {
+        String res = "lookupLiteral(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafValues();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        res += ")";
+        return res;
+    }
+
+    private String lookupCategory(ArrayList<SyntacticTreeNode> nodes) {
+        String res = "lookupCategory(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafLemmas();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        res += ")";
+        return res;
+    }
+
+    private String lookupAttribute(ArrayList<SyntacticTreeNode> nodes) {
+        String res = "lookupAttribute(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafLemmas();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        res += ")";
+        return res;
+    }
+
+    private String lookupOperator(ArrayList<SyntacticTreeNode> nodes) {
+        String res = "lookupOperator(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafValues();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        res += ")";
+        return res;
+    }
+
     //resolves a NP/WHNP node, which can be either simple or compound
-    private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, String valuePrefix, String lemmaPrefix) throws Exception {
-        valuePrefix = normalizePrefix(valuePrefix);
-        lemmaPrefix = normalizePrefix(lemmaPrefix);
+    private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, ArrayList<SyntacticTreeNode> prefix) throws Exception {
 
         ArrayList<QueryModel> res = new ArrayList<>();
-        //for (NamedEntityAnnotationResult r : tree.namedEntityAnnotations) {
-        //    if (overlap(node, r)) {
-        //        System.out.println();
-        //    }
-        //}
         if (node.npSimple || node.whnpSimple) {
+            ArrayList<SyntacticTreeNode> entityNodes = new ArrayList<>(prefix);
+            entityNodes.addAll(node.getLeafParents());
+            boolean plural = false;
+            for (SyntacticTreeNode n : entityNodes) {
+                if (n.value.startsWith("N")) {
+                    plural = n.value.endsWith("S");
+                }
+            }
+            double minWeight = 1;
+            boolean annotationsFound = false;
             if (includeSpecificEntity) {
+                ArrayList<NamedEntityAnnotationResult> annotations = getMatchingAnnotations(entityNodes);
+                annotationsFound = !annotations.isEmpty();
+                for (NamedEntityAnnotationResult ar : annotations) {
+                    QueryModel qm = new QueryModel(entityVariableName, null);
+                    qm.setWeight(ar.getWeight());
+                    minWeight = Math.min(minWeight, ar.getWeight());
+                    QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false);
+                    qc.setValueEntity(ar.getNamedEntity());
+                    qm.getConstraints().add(qc);
+                    res.add(qm);
+                }
 
-                /*
-                 String entityName = node.getLeafValues();
-                 String possibileSpot = (valuePrefix + entityName).replaceAll(" ", "");
-                 if (namedEntitiesAnnotationMap.containsKey(possibileSpot)) {
-                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", namedEntitiesAnnotationMap.get(possibileSpot), false));
-                 } else {
-                
-                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
-                 }*/
-                boolean annotationFound = false;
-                if (valuePrefix.length() == 0) {
-                    for (NamedEntityAnnotationResult ar : matchingAnnotations.get(node)) {
-                        QueryModel qm = new QueryModel(entityVariableName, null);
-                        annotationFound = true;
-                        qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false));
-                        res.add(qm);
+                QueryModel qm1 = new QueryModel(entityVariableName, null);
+                QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", lookupEntity(entityNodes), false);
+                qm1.getConstraints().add(qc);
+                res.add(qm1);
+                if (annotationsFound) {
+                    qm1.setWeight(0.8 * minWeight);
+                    HashSet<String> entitiesToIgnore = new HashSet<>();
+                    qm1.getIgnoreEntitiesForLookup().put(qc.getValueExpr().substring(13, qc.getValueExpr().length() - 1), entitiesToIgnore);
+                    for (NamedEntityAnnotationResult ar : annotations) {
+                        entitiesToIgnore.add(ar.getNamedEntity().getUri());
+                    }
+                } else {
+                    if (plural) {
+                        qm1.setWeight(0.5);
+                    } else {
+                        qm1.setWeight(1);
                     }
                 }
-                if (!annotationFound) {
-                    QueryModel qm = new QueryModel(entityVariableName, null);
-                    String entityName = node.getLeafValues();
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
-                    res.add(qm);
+
+                QueryModel qm2 = new QueryModel(entityVariableName, null);
+                qm2.setWeight(1);
+                qm2.getConstraints().add(new QueryConstraint(entityVariableName, "isLiteral", lookupLiteral(entityNodes), false));
+                res.add(qm2);
+                if (!annotations.isEmpty()) {
+                    qm2.setWeight(0.5 * minWeight);
                 }
 
             }
             if (includeCategoryEntities) {
                 QueryModel qm = new QueryModel(entityVariableName, null);
-                String categoryName = node.getLeafLemmas();
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", "lookupCategory(" + lemmaPrefix + categoryName + ")", false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(entityNodes), false));
                 res.add(qm);
+                if (annotationsFound) {
+                    qm.setWeight(1 - minWeight * 0.5);
+                } else {
+                    qm.setWeight(1);
+                }
             }
-
         } else if (node.npCompound || node.whnpCompound || node.value.equals("WHPP")) {
             //get the first NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode np1 = null;
@@ -304,19 +393,16 @@ public class QueryResolver {
                 return res; //node has not the structure we are looking for
             }
 
-            ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, valuePrefix, lemmaPrefix);
-            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, "", false);
+            ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
+            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
             res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
-                res.addAll(resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, valuePrefix + np1.getLeafValues() + " " + npExt[0].value, lemmaPrefix + np1.getLeafLemmas() + " " + npExt[0].lemma));
-            }
-
-            for (NamedEntityAnnotationResult ar : matchingAnnotations.get(node)) {
-                QueryModel qm = new QueryModel(entityVariableName, null);
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false));
-                res.add(qm);
+                ArrayList<SyntacticTreeNode> newPrefix = new ArrayList<>(prefix);
+                newPrefix.addAll(np1.getLeafParents());
+                newPrefix.addAll(npExt[0].getLeafParents());
+                res.addAll(resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, newPrefix));
             }
         }
         return res;
@@ -329,17 +415,22 @@ public class QueryResolver {
             QueryModel qm = new QueryModel(valueVariableName, null);
             String literalValue = node.getLeafValues();
             qm.getConstraints().add(new QueryConstraint(valueVariableName, "isLiteral", "literalValue(" + literalValue + ")", false));
+            for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
+                if (overlap(node, ar)) {
+                    qm.setWeight(0.5);
+                    break;
+                }
+            }
             res.add(qm);
         } else if (node.npCompound || node.whnpCompound) {
             String entityVariableName = getNextEntityVariableName();
-            res = resolveValueNode(node, entityVariableName, valueVariableName, "");
+            res = resolveValueNode(node, entityVariableName, valueVariableName, new ArrayList<SyntacticTreeNode>());
         }
         return res;
     }
 
     //construct the query model from a NP node containing a simple NP node representing an attribute, and a PP node where the preposition is part of the attribute and the NP child represents the entity
-    ArrayList<QueryModel> resolveValueNode(SyntacticTreeNode node, String entityVariableName, String valueVariableName, String attributePrefix) throws Exception {
-        attributePrefix = normalizePrefix(attributePrefix);
+    ArrayList<QueryModel> resolveValueNode(SyntacticTreeNode node, String entityVariableName, String valueVariableName, ArrayList<SyntacticTreeNode> attributePrefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npCompound || node.whnpCompound) {
             //get the first simple NP child - TODO: what if the node has more NP children?
@@ -362,32 +453,49 @@ public class QueryResolver {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppEntityNode);
+            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFormPp(ppEntityNode);
 
-            if (prepNP == null) {
+            if (inNpAdvp == null) {
                 return res;
             }
 
-            String attributeName = npAttributeNode.getLeafLemmas();
+            //what if advp (inNpAdvp[2]) is not null?
+            ArrayList<SyntacticTreeNode> attributeNodes = new ArrayList<>(attributePrefix);
+            ArrayList<SyntacticTreeNode> attributeName = npAttributeNode.getLeafParents();
+            attributeNodes.addAll(attributeName);
 
-            ArrayList<QueryModel> qms1 = resolveEntityNode(prepNP[1], entityVariableName, true, true, null, null);
+            boolean plural = false;
+            for (SyntacticTreeNode n : attributeName) {
+                if (n.value.startsWith("N")) {
+                    plural = n.value.endsWith("S");
+                }
+            }
+
+            ArrayList<QueryModel> qms1 = resolveEntityNode(inNpAdvp[1], entityVariableName, true, true, new ArrayList<SyntacticTreeNode>());
             for (QueryModel qm : qms1) {
                 qm.setAttributeVariableName(valueVariableName);
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributePrefix + attributeName + "(s))", valueVariableName, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeNodes), valueVariableName, false));
+                if (plural) {
+                    qm.setWeight(qm.getWeight() * 0.8);
+                }
             }
             res.addAll(qms1);
 
             String newEntityVariable = getNextEntityVariableName();
-            ArrayList<QueryModel> qms2 = resolveValueNode(prepNP[1], entityVariableName, newEntityVariable, "");
+            ArrayList<QueryModel> qms2 = resolveValueNode(inNpAdvp[1], entityVariableName, newEntityVariable, new ArrayList<SyntacticTreeNode>());
             for (QueryModel qm : qms2) {
                 qm.setAttributeVariableName(valueVariableName);
-                qm.getConstraints().add(new QueryConstraint(newEntityVariable, "lookupAttribute(" + attributePrefix + attributeName + "(s))", valueVariableName, false));
+                qm.getConstraints().add(new QueryConstraint(newEntityVariable, lookupAttribute(attributeNodes), valueVariableName, false));
+                if (plural) {
+                    qm.setWeight(qm.getWeight() * 0.8);
+                }
             }
             res.addAll(qms2);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
-                res.addAll(resolveValueNode(npExt[1], entityVariableName, valueVariableName, attributePrefix + attributeName + " " + npExt[0].value));
+                attributeNodes.addAll(npExt[0].getLeafParents());
+                res.addAll(resolveValueNode(npExt[1], entityVariableName, valueVariableName, attributeNodes));
             }
 
         } else {
@@ -398,29 +506,20 @@ public class QueryResolver {
 
     //receive a node and constructs a set of constraints with the entity called entityVariableName as subject of the constraints
     //using the PP and VP siblings of the node
-    ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode node, String entityVariableName, String baseAttributeName, boolean includeSelf) throws Exception {
-        if (baseAttributeName == null) {
-            baseAttributeName = "";
-        } else {
-            baseAttributeName = baseAttributeName.trim();
-            if (baseAttributeName.length() > 0) {
-                baseAttributeName += " ";
-            }
-        }
+    ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode node, String entityVariableName, ArrayList<SyntacticTreeNode> baseAttribute, boolean includeSelf) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         for (SyntacticTreeNode c : node.parent.children) {
             if (c == node && !includeSelf) {
                 continue;
             }
-
             if (c.value.equals("PP")) {
-                res = combineQueryConstraints(res, resolvePPConstraint(c, entityVariableName, baseAttributeName), true, true);
+                res = combineQueryConstraints(res, resolvePPConstraint(c, entityVariableName, baseAttribute), true, true);
             } else if (c.value.equals("VP")) {
-                res = combineQueryConstraints(res, resolveVPConstraint(c, entityVariableName, baseAttributeName), true, true);
+                res = combineQueryConstraints(res, resolveVPConstraint(c, entityVariableName, baseAttribute), true, true);
             } else if (c.value.equals("SBAR")) {
                 SyntacticTreeNode vp = extractVPfromSBAR(c);
                 if (vp != null) {
-                    res = combineQueryConstraints(res, resolveVPConstraint(vp, entityVariableName, baseAttributeName), true, true);
+                    res = combineQueryConstraints(res, resolveVPConstraint(vp, entityVariableName, baseAttribute), true, true);
                 }
             }
 
@@ -435,14 +534,12 @@ public class QueryResolver {
         if (c.getAttributeNodes().length == 1 && !tree.labelledNodes.containsKey(c.getAttributeNodes()[0])) { //it is a reserved word - e.g. date
             qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "defaultAttribute(" + c.getAttributeNodes()[0] + ")", c.valueVariableName, c.optional));
         } else {
-            String attributeName = "";
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>();
             for (String a : c.attributeNodes) {
-                if (attributeName.length() > 0) {
-                    attributeName += " ";
-                }
-                attributeName += tree.labelledNodes.get(a).getLeafLemmas();
+                attributeName.addAll(tree.labelledNodes.get(a).getLeafParents());
             }
 
+            //TODO: explain this!
             SyntacticTreeNode ppEntityNode = null;
             for (String a : c.attributeNodes) {
                 if (tree.labelledNodes.get(a).value.equals("PP")) {
@@ -453,23 +550,22 @@ public class QueryResolver {
                 }
             }
 
-            String prep = "";
-
             if (ppEntityNode != null) {
-                SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppEntityNode);
+                SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(ppEntityNode);
 
                 if (prepNP != null) {
-                    prep = prepNP[0].lemma;
+                    attributeName.addAll(prepNP[0].getLeafParents());
                 }
             }
 
-            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.isEmpty() ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
+            //qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.isEmpty() ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, lookupAttribute(attributeName), c.valueVariableName, c.typeName, c.optional));
         }
         return res;
     }
 
     private ArrayList<QueryModel> resolveOptionalCategoryConstraint(IOptionalCategoryQueryConstraint c) throws Exception {
-        ArrayList<QueryModel> res = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true, null, null);
+        ArrayList<QueryModel> res = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true, new ArrayList<SyntacticTreeNode>());
         for (QueryModel qm : res) {
             for (QueryConstraint qc : qm.getConstraints()) {
                 qc.setOptional(true);
@@ -479,13 +575,14 @@ public class QueryResolver {
     }
 
     //construct the query model from a NP node containing a simple NP node representing an attribute, and a PP node where the preposition is the operator and the NP child represents the literal
-    private ArrayList<QueryModel> resolveLiteralConstraint(SyntacticTreeNode node, String entityVariableName) throws Exception {
+    private ArrayList<QueryModel> resolveLiteralConstraint(SyntacticTreeNode node, String entityVariableName, ArrayList<SyntacticTreeNode> attributePrefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npCompound || node.value.equals("VP")) {
             //get the first simple NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode npAttributeNode = null;
             SyntacticTreeNode ppConstraintNode = null;
             SyntacticTreeNode vbConstraintNode = null;
+            SyntacticTreeNode adjpConstraintNode = null;
             for (SyntacticTreeNode c : node.children) {
                 if (c.npSimple) {
                     if (npAttributeNode != null) {
@@ -502,35 +599,64 @@ public class QueryResolver {
                         System.out.println("Warning: node with two or more VB? children");
                     }
                     vbConstraintNode = c;
+                } else if (c.value.equals("ADJP")) {
+                    if (adjpConstraintNode != null) {
+                        System.out.println("Warning: node with two or more ADJP children");
+                    }
+                    adjpConstraintNode = c;
                 }
             }
+
+            SyntacticTreeNode adjOp = null;
+            if (ppConstraintNode == null && adjpConstraintNode != null) { //then adjpConstraint is not null
+                for (SyntacticTreeNode c : adjpConstraintNode.children) {
+                    if (c.value.equals("JJ")) {
+                        adjOp = c;
+                    } else if (c.value.equals("PP")) {
+                        ppConstraintNode = c;
+                    }
+                }
+            }
+
             if ((npAttributeNode == null && vbConstraintNode == null) || ppConstraintNode == null) {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractPPADVPprepNP(ppConstraintNode);
+            SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(ppConstraintNode);
 
             if (prepNP == null) {
                 return res;
             }
 
-            String attributeName = npAttributeNode != null ? npAttributeNode.getLeafLemmas() : vbConstraintNode.children.get(0).lemma;
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(attributePrefix);
+            if (npAttributeNode != null) {
+                attributeName.addAll(npAttributeNode.getLeafParents());
+            }
+            if (vbConstraintNode != null) {
+                attributeName.addAll(vbConstraintNode.getLeafParents());
+            }
 
             String valueVariableName1 = getNextValueVariableName();
             String valueVariableName2 = getNextValueVariableName();
             ArrayList<QueryModel> qms = resolveLiteralNode(prepNP[1], valueVariableName2);
+            ArrayList<SyntacticTreeNode> operatorNodes = new ArrayList<>();
+            if (adjOp != null) {
+                operatorNodes.add(adjOp);
+            }
+            operatorNodes.add(prepNP[0]);
             for (QueryModel qm : qms) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false));
-                qm.getConstraints().add(new QueryConstraint(valueVariableName1, "lookupOperator(" + prepNP[0].lemma + ")", valueVariableName2, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), valueVariableName1, false));
+                qm.getConstraints().add(new QueryConstraint(valueVariableName1, lookupOperator(operatorNodes), valueVariableName2, false));
             }
             res.addAll(qms);
         } else if (node.npQp) {
-            String attributeName = node.getLeafLemmas();
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(attributePrefix);
             SyntacticTreeNode qpNode = null;
             for (SyntacticTreeNode c : node.children) {
                 if (c.value.equals("QP")) {
                     qpNode = c;
-                    break;
+                } else {
+                    attributeName.addAll(c.getLeafParents());
                 }
             }
             if (qpNode != null) {
@@ -556,7 +682,7 @@ public class QueryResolver {
 
                     String valueVariableName1 = getNextValueVariableName();
                     String valueVariableName2 = getNextValueVariableName();
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + attributeName + ")", valueVariableName1, false));
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), valueVariableName1, false));
                     qm.getConstraints().add(new QueryConstraint(valueVariableName1, "lookupOperator(" + operator + ")", valueVariableName2, false));
                     qm.getConstraints().add(new QueryConstraint(valueVariableName2, "isLiteral", "literalValue(" + literalValue + ")", false));
                     res.add(qm);
@@ -570,41 +696,55 @@ public class QueryResolver {
 
     //receive a PP node and constructs a set of constraints with the entity called entityVariableName as subject of the constraints
     //using the IN and NP children of the node
-    public ArrayList<QueryModel> resolvePPConstraint(SyntacticTreeNode node, String entityVariableName, String baseAttribute) throws Exception {
+    public ArrayList<QueryModel> resolvePPConstraint(SyntacticTreeNode node, String entityVariableName, ArrayList<SyntacticTreeNode> baseAttribute) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
 
         if (!node.value.equals("PP")) {
             return res;
         }
 
-        SyntacticTreeNode[] prepNP = extractPPADVPprepNP(node);
-        String prep = "";
-        if (prepNP != null) {
-            prep = prepNP[0].lemma;
-            if (prepNP[2] != null) {
-                prep = prepNP[2].getLeafLemmas() + " " + prep;
-            }
-        }
+        SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(node);
 
         if (prepNP != null) {
+            ArrayList<SyntacticTreeNode> prep = new ArrayList<>();
+            if (prepNP[2] != null) {
+                prep.addAll(prepNP[2].getLeafParents());
+            }
+            prep.addAll(prepNP[0].getLeafParents());
             //create constraints with attributes, assuming that the values of the constraints are entities
             String newEntityName = getNextEntityVariableName();
-            ArrayList<QueryModel> qmsE = resolveEntityNode(prepNP[1], newEntityName, true, true, null, null);
+            ArrayList<QueryModel> qmsE = resolveEntityNode(prepNP[1], newEntityName, true, true, new ArrayList<SyntacticTreeNode>());
+            boolean annotationFound = false;
             for (QueryModel qm : qmsE) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prep + ")", newEntityName, false));
+                for (QueryConstraint qc : qm.getConstraints()) {
+                    if (qc.getSubjExpr().equals(newEntityName) && qc.getAttrExpr().equals("isEntity") && !qc.getValueExpr().startsWith("lookupEntity")) {
+                        annotationFound = true;
+                        break;
+                    }
+                }
+                if (annotationFound) {
+                    break;
+                }
+            }
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
+            attributeName.addAll(prep);
+            for (QueryModel qm : qmsE) {
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
             }
             res.addAll(qmsE);
 
             String newEntityName2 = getNextEntityVariableName();
-            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, "");
+            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, new ArrayList<SyntacticTreeNode>());
             for (QueryModel qm : qmsV) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + prep + ")", newEntityName, false));
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
             }
             res.addAll(qmsV);
 
             //create constraints with attributes, assuming that the values of the constraints are literals
-            ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName);
-            res.addAll(qmsL);
+            if (!annotationFound) {
+                ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNP[1], entityVariableName, attributeName);
+                res.addAll(qmsL);
+            }
         } else {
             for (SyntacticTreeNode c : node.children) {
                 res = combineQueryConstraints(res, resolvePPConstraint(c, entityVariableName, baseAttribute), true, true);
@@ -615,7 +755,7 @@ public class QueryResolver {
 
     //receive a VP node and constructs a set of constraints with the entity called entityVariableName as subject of the constraints
     //using the VB, PP, and NP children of the node
-    public ArrayList<QueryModel> resolveVPConstraint(SyntacticTreeNode node, String entityVariableName, String baseAttribute) throws Exception {
+    public ArrayList<QueryModel> resolveVPConstraint(SyntacticTreeNode node, String entityVariableName, ArrayList<SyntacticTreeNode> baseAttribute) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
 
         if (!node.value.equals("VP")) {
@@ -625,9 +765,11 @@ public class QueryResolver {
         //some cases are not covered: e.g.: trumpet players that "were bandleaders"
         SyntacticTreeNode[] verbPPNP = extractVerbPPNP(node);
         if (verbPPNP != null) {
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
+            attributeName.addAll(verbPPNP[0].getLeafParents());
             if (verbPPNP[1] != null) {
-                res = resolvePPConstraint(verbPPNP[1], entityVariableName, baseAttribute + verbPPNP[0].lemma + " ");
-                ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName);
+                res = resolvePPConstraint(verbPPNP[1], entityVariableName, attributeName);
+                ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName, baseAttribute);
                 res.addAll(qmsL);
 //                    res.addAll(qmsL);                
 //                SyntacticTreeNode[] prepNp = extractPPprepNP(verbPPNP[1]);
@@ -651,27 +793,27 @@ public class QueryResolver {
 //                }
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();
-                ArrayList<QueryModel> qmsE = resolveEntityNode(verbPPNP[2], newEntityName, true, true, null, null);
+                ArrayList<QueryModel> qmsE = resolveEntityNode(verbPPNP[2], newEntityName, true, true, new ArrayList<SyntacticTreeNode>());
                 for (QueryModel qm : qmsE) {
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + verbPPNP[0].lemma + ")", newEntityName, false));
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
                 }
                 res.addAll(qmsE);
 
                 String newEntityName2 = getNextEntityVariableName();
-                ArrayList<QueryModel> qmsV = resolveValueNode(verbPPNP[2], newEntityName2, newEntityName, "");
+                ArrayList<QueryModel> qmsV = resolveValueNode(verbPPNP[2], newEntityName2, newEntityName, new ArrayList<SyntacticTreeNode>());
                 for (QueryModel qm : qmsV) {
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + verbPPNP[0].lemma + ")", newEntityName, false));
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
                 }
                 res.addAll(qmsV);
 
                 String newValName = getNextValueVariableName();
                 ArrayList<QueryModel> qmsL1 = resolveLiteralNode(verbPPNP[2], newValName);
                 for (QueryModel qm : qmsL1) {
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + verbPPNP[0].lemma + ")", newValName, false));
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newValName, false));
                 }
                 res.addAll(qmsL1);
 
-                ArrayList<QueryModel> qmsL2 = resolveLiteralConstraint(verbPPNP[2], entityVariableName);
+                ArrayList<QueryModel> qmsL2 = resolveLiteralConstraint(verbPPNP[2], entityVariableName, baseAttribute);
                 res.addAll(qmsL2);
             }
         } else {
@@ -694,7 +836,7 @@ public class QueryResolver {
         return res;
     }
 
-    SyntacticTreeNode[] extractPPADVPprepNP(SyntacticTreeNode node) {
+    SyntacticTreeNode[] extractInNpAdvpFormPp(SyntacticTreeNode node) {
         SyntacticTreeNode prepNode = null;
         SyntacticTreeNode[] res = new SyntacticTreeNode[3];
         for (SyntacticTreeNode c : node.children) {
@@ -726,7 +868,7 @@ public class QueryResolver {
                     System.out.println("PP node without NP child");
                     return null;
                 } else {
-                    res[0] = prepNode.children.get(0);
+                    res[0] = prepNode;
                     res[1] = npNode;
                     res[2] = advpNode;
                 }
@@ -772,7 +914,7 @@ public class QueryResolver {
                     System.out.println("PP/NP node not found");
                     return null;
                 } else { //TODO: what if both pp and np are not null? is it possible?
-                    res[0] = vbNode.children.get(0);
+                    res[0] = vbNode;
                     res[1] = ppNode;
                     res[2] = npNode;
                 }
@@ -882,6 +1024,7 @@ public class QueryResolver {
 
         HashMap<String, String> isEntity = new HashMap<>();
         HashMap<String, String> isLiteral = new HashMap<>();
+        HashSet<String> literalConstraintsToReAdd=new HashSet<>();
 
         HashSet<String> boundVariables = new HashSet<>();
         for (QueryConstraint qc : qm.getConstraints()) {
@@ -905,7 +1048,7 @@ public class QueryResolver {
                 }
                 isLiteral.put(qc.getSubjExpr(), qc.getValueExpr());
             } else {
-                newConstraints.add(new QueryConstraint(qc.getSubjExpr(), qc.getAttrExpr(), qc.getValueExpr(), qc.isOptional()));
+                newConstraints.add(qc.copy());
             }
         }
 
@@ -925,13 +1068,20 @@ public class QueryResolver {
             if (isEntity.containsKey(qc.getValueExpr())) {
                 qc.setValueExpr(isEntity.get(qc.getValueExpr()));
             } else if (isLiteral.containsKey(qc.getValueExpr())) {
-                qc.setValueExpr(isLiteral.get(qc.getValueExpr()));
+                if (!qc.getAttrExpr().startsWith("lookupAttribute")) {
+                    qc.setValueExpr(isLiteral.get(qc.getValueExpr()));
+                } else {
+                    literalConstraintsToReAdd.add(qc.getValueExpr());
+                }
             }
             if (isEntity.containsKey(qc.getSubjExpr())) {
                 qc.setSubjExpr(isEntity.get(qc.getSubjExpr()));
-            } else if (isLiteral.containsKey(qc.getSubjExpr())) {
+            } else if (isLiteral.containsKey(qc.getSubjExpr()) && !qc.getAttrExpr().equals("isLiteral")) {
                 return false;
             }
+        }
+        for (String var:literalConstraintsToReAdd) {
+            newConstraints.add(new QueryConstraint(var, "isLiteral", isLiteral.get(var), false));            
         }
         for (QueryConstraint qc : newConstraints) {
             if (resultVariables.contains(qc.getSubjExpr()) || resultVariables.contains(qc.getValueExpr())) {
@@ -946,5 +1096,9 @@ public class QueryResolver {
         }
 
         return false;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        Test.main(args);
     }
 }

@@ -6,6 +6,8 @@
       (VP#2))
     ))
 
-entities(1, ?ans)
+boundThroughAttribute(?en, 2, ?ans).
+entities(1, ?en)
 
-values(1, ?en, ?ans)
+boundThroughAttribute(?en, 2, ?ans).
+values(1, ?en2, ?en)

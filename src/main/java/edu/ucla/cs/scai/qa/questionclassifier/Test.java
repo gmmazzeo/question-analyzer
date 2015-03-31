@@ -6,11 +6,13 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -27,26 +29,45 @@ public class Test {
     public static void main(String args[]) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         Parser parser = new Parser(DBpediaOntology.getInstance());
-        PennTreebankPatternMatcher m = new PennTreebankPatternMatcher();
+        PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         while (true) {
             System.out.print("question> ");
             String qt = in.readLine();
             if (qt.equals("exit")) {
                 break;
-            } else if(qt.equals("reload")) {
-                m = new PennTreebankPatternMatcher();
+            } else if (qt.equals("reload")) {
+                matcher = new PennTreebankPatternMatcher();
             } else {
                 try {
                     SyntacticTree t = parser.parse(qt);
                     System.out.println(t.toString());
-                    HashMap<PennTreebankPattern, SyntacticTree> ps = m.match(qt);
+                    HashMap<PennTreebankPattern, SyntacticTree> ps = matcher.match(qt);
+                    QueryMapping qm = new QueryMapping();
+                    ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
-                        QueryResolver qr = new QueryResolver(ps.get(p));
-                        for (QueryModel qm : qr.resolveIQueryModels(p)) {
-                            System.out.println();
-                            System.out.println(qm);
-                        }
+                        QueryResolver2 qr = new QueryResolver2(ps.get(p));
+                        initialModels.addAll(qr.resolveIQueryModels(p));
+                    }
+
+                    Collections.sort(initialModels);
+                    System.out.println("#####################################");
+                    System.out.println("######### INITIAL MODELS ############");
+                    System.out.println("#####################################");
+                    for (QueryModel im : initialModels) {
+                        System.out.println("Weight: " + im.getWeight());
+                        System.out.println(im);
+                        System.out.println("-------------------------");
+                    }
+                    System.out.println();
+                    ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntology.getInstance());
+                    System.out.println("#####################################");
+                    System.out.println("######### MAPPED MODELS #############");
+                    System.out.println("#####################################");
+                    for (int i = 0; i < Math.min(initialModels.size(), mappedModels.size()); i++) {
+                        System.out.println("Weight: " + mappedModels.get(i).getWeight());
+                        System.out.println(mappedModels.get(i));
+                        System.out.println("-------------------------");
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

@@ -6,8 +6,8 @@
       (VP#2))
     ))
 
-entities(1, ?en).
-boundThroughAttribute(?ent, 2, ?ans, date)
+boundThroughAttribute(?en, 2, ?ans, date).
+entities(1, ?en)
 
 %When did Latvia join the EU?
 %When did Michael Jackson die?

@@ -7,10 +7,10 @@ package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaEntityAnnotationResult;
-import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.TagMeClient;
 import java.io.BufferedReader;
 import java.io.File;

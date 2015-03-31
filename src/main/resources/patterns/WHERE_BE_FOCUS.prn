@@ -2,7 +2,8 @@
   (SBARQ
     (WHADVP (WRB (*/where)))
     (SQ (VBD|VBZ (*/be))
-      (NP#1))
+      (NP#1)
+      ^(*))
     ))
 
 values(1, ?en, ?ans)

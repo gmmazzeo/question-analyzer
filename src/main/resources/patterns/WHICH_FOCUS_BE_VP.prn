@@ -8,10 +8,6 @@
 entities(1, ?ans).
 siblingConstraints(2, ?ans)
 
-%entitiesWithConstraints(1,2) 
-
-%attributesWithConstraints(1,2)
-
 %Which actors were born in Germany?
 %Which airports are located in California, USA?
 %Which countries are connected by the Rhine?

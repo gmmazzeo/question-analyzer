@@ -1,19 +1,34 @@
 (ROOT
   (SBARQ
-    (WHPP (IN#1)
-      (WHNP#2))
+    (WHPP#2 (IN#1))
     (SQ (VBZ|VBD|VBP (*/be))
       (NP#3)
       ^(*))
     ))
 
-entities(3, ?en).
-boundThroughAttribute(?en, 2, ?ans).
-optionalCategory(?ans, 2)
+%entities(3, ?en).
+%boundThroughAttribute(?en, 2, ?ans).
+%optionalCategory(?ans, 2)
 
-values(3, ?en, ?val).
-boundThroughAttribute(?val, 2, ?ans).
-optionalCategory(?ans, 2)
+%values(3, ?en, ?val).
+%boundThroughAttribute(?val, 2, ?ans).
+%optionalCategory(?ans, 2)
+
+entities(2, ?ans).
+entities(3, ?subj).
+boundThroughAttribute(?subj, 1, ?ans).
+
+values(2, ?en, ?ans).
+entities(3, ?subj).
+boundThroughAttribute(?subj, 1, ?ans).
+
+entities(2, ?ans).
+values(3, ?en1, ?subj).
+boundThroughAttribute(?subj, 1, ?ans).
+
+values(2, ?en, ?ans).
+values(3, ?en1, ?subj).
+boundThroughAttribute(?subj, 1, ?ans).
 
 %In which country is the Limerick Lake?
 %In which UK city are the headquarters of the MI6?

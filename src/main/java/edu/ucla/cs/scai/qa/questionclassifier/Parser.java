@@ -60,9 +60,7 @@ public class Parser {
         CoreMap qsTree = qssTree.get(0);
         CoreMap qsTokens = qssTokens.get(0);
 
-        SyntacticTree qt = new SyntacticTree(qsTree, qsTokens);
-        
-        qt.setNamedEntityAnnotations(entityAnnotations);
+        SyntacticTree qt = new SyntacticTree(qsTree, qsTokens, entityAnnotations);        
 
         //qt.compactNamedEntities();
         return qt;

@@ -6,14 +6,6 @@
       (VP#4))
     ))
 
-%entities(3, ?en).
-%boundThroughAttribute(?en, 2+4+1, ?ans).
-%optionalCategory(?ans, 2)
-
-%values(3, ?en, ?val).
-%boundThroughAttribute(?val, 2+4+1, ?ans).
-%optionalCategory(?ans, 2)
-
 entities(2, ?ans).
 entities(3, ?subj).
 boundThroughAttribute(?subj, 4+1, ?ans).

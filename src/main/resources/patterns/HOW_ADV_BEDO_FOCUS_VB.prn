@@ -1,6 +1,6 @@
 (ROOT
   (SBARQ
-    (WHADVP (WRB (*/how)) (RB (*#1)))
+    (WHADVP (WRB (*/how)) (RB#1))
     (SQ (VBD|VBP|VBZ (*/be|do))
       (NP#2)
       (VP#3))

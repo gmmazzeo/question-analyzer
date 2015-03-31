@@ -1,6 +1,6 @@
 (ROOT
   (S
-    (VP#8 (VB (*/give|tell|show))
+    (VP (VB (*/give|tell|show))
       (NP (PRP) ^(*))
       (NP#1 ^(NP (NN (*/list)))))
     ))
