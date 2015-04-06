@@ -9,6 +9,7 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntologyWithStatistics;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class Test {
     //They explain the tags used by Stanford Parser
     public static void main(String args[]) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        Parser parser = new Parser(DBpediaOntology.getInstance());
+        Parser parser = new Parser(DBpediaOntologyWithStatistics.getInstance());
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         while (true) {
             System.out.print("question> ");
@@ -60,7 +61,7 @@ public class Test {
                         System.out.println("-------------------------");
                     }
                     System.out.println();
-                    ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntology.getInstance());
+                    ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntologyWithStatistics.getInstance());
                     System.out.println("#####################################");
                     System.out.println("######### MAPPED MODELS #############");
                     System.out.println("#####################################");
