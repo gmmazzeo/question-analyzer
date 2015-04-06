@@ -6,11 +6,11 @@
       (VP#2))
     ))
 
-entities(1, ?en).
-boundThroughAttribute(?ent, 2, ?ans)
+boundThroughAttribute(?en, 2, ?ans).
+entities(1, ?en)
 
-values(1, ?en, ?val).
-boundThroughAttribute(?val, 2, ?ans)
+boundThroughAttribute(?val, 2, ?ans).
+values(1, ?en, ?val)
 
 %What did Bruce Carver die from?
 %What is the total amount of men and women serving in the FDNY?

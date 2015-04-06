@@ -6,7 +6,7 @@
     ))
 
 entities(1, ?ans).
-siblingConstraints(2, ?ans, 0, 1)
+siblingConstraints(2, ?ans, 1, 1)
 
 %Through which countries does the Yenisei river flow?
 %Which caves have more than 3 entrances?
