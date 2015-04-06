@@ -5,7 +5,6 @@
  */
 package edu.ucla.cs.scai.qa.questionclassifier;
 
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
@@ -15,7 +14,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  *
@@ -43,7 +41,6 @@ public class Test {
                     SyntacticTree t = parser.parse(qt);
                     System.out.println(t.toString());
                     HashMap<PennTreebankPattern, SyntacticTree> ps = matcher.match(qt);
-                    QueryMapping qm = new QueryMapping();
                     ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
@@ -61,6 +58,7 @@ public class Test {
                         System.out.println("-------------------------");
                     }
                     System.out.println();
+                    QueryMapping qm = new QueryMapping();                    
                     ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntologyWithStatistics.getInstance());
                     System.out.println("#####################################");
                     System.out.println("######### MAPPED MODELS #############");
@@ -72,9 +70,9 @@ public class Test {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SyntacticTree t = parser.parse(qt);
-                    t.compactNamedEntities();
-                    System.out.println(t);
+                    //SyntacticTree t = parser.parse(qt);
+                    //t.compactNamedEntities();
+                    //System.out.println(t);
                 }
             }
         }

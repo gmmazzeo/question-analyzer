@@ -5,12 +5,8 @@
  */
 package edu.ucla.cs.scai.qa.questionclassifier;
 
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.ucla.cs.scai.swim.qa.ontology.Ontology;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
-import edu.ucla.cs.scai.swim.qa.ontology.QueryConstraint;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
-import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaEntityAnnotationResult;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.TagMeClient;
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -29,9 +26,9 @@ import java.util.regex.Pattern;
  */
 public class PennTreebankPatternMatcher {
 
-    private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();       
+    private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();
 
-    private Parser parser = new Parser(DBpediaOntology.getInstance());        
+    private Parser parser = new Parser(DBpediaOntology.getInstance()); 
 
     private static ArrayList<String> getResources(
             final Pattern pattern) {
@@ -109,36 +106,37 @@ public class PennTreebankPatternMatcher {
         SyntacticTree st = parser.parse(s);
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         for (PennTreebankPattern pattern : patterns.values()) {
-            if (st.match(pattern)) {
-                res.put(pattern, st);
+            SyntacticTree t = new SyntacticTree(st);
+            if (t.match(pattern)) {
+                res.put(pattern, t);
             }
         }
         return res;
     }
 
     public static void main(String[] args) throws Exception {
-        TagMeClient tm=new TagMeClient();
+        TagMeClient tm = new TagMeClient();
         BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald3")));
         String l = in.readLine();
         int tot = 0;
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         HashMap<String, ArrayList<String>> questions = new HashMap<>();
-        long time1=0;
-        long time2=0;
-        int n=0;
+        long time1 = 0;
+        long time2 = 0;
+        int n = 0;
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 System.out.println("\n\n" + l);
-                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
-                    System.out.println(r);
-                }
+//                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
+//                    System.out.println(r);
+//                }
                 tot++;
                 try {
-                    long start=System.currentTimeMillis();
+                    long start = System.currentTimeMillis();
                     HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(l);
-                    long stop=System.currentTimeMillis();
-                    time1+=stop-start;
+                    long stop = System.currentTimeMillis();
+                    time1 += stop - start;
                     n++;
                     for (PennTreebankPattern match : matches.keySet()) {
                         ArrayList<String> q = questions.get(match.name);
@@ -158,16 +156,22 @@ public class PennTreebankPatternMatcher {
                         }
                         q.add(l);
                     }
+
+                    ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern pattern : matches.keySet()) {
-                        System.out.println(pattern.name);                        
-                        start=System.currentTimeMillis();
-                        QueryResolver qr = new QueryResolver(matches.get(pattern));
-                        ArrayList<QueryModel> qms=qr.resolveIQueryModels(pattern);
-                        stop=System.currentTimeMillis();
-                        time2+=stop-start;
-                        for (QueryModel qm : qms) {
-                            System.out.println("\n" + qm);
-                        }
+                        System.out.println(pattern.name); 
+                        start = System.currentTimeMillis();
+                        QueryResolver2 qr = new QueryResolver2(matches.get(pattern));
+                        initialModels.addAll(qr.resolveIQueryModels(pattern));
+                        stop = System.currentTimeMillis();
+                        time2 += stop - start;
+                    }
+                    Collections.sort(initialModels);
+                    System.out.println();
+                    for (QueryModel im : initialModels) {
+                        System.out.println("Weight: " + im.getWeight());
+                        System.out.println(im);
+                        System.out.println("-------------------------");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -197,8 +201,8 @@ public class PennTreebankPatternMatcher {
             }
         }
         System.out.println(ok + "/" + tot);
-        System.out.println(time1+" msec");
-        System.out.println(time2+" msec");
+        System.out.println("total pattern match: " + time1 + " msec");
+        System.out.println("total pattern resolve: " + time2 + " msec");
 
     }
 }

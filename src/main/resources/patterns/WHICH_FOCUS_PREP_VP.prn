@@ -1,18 +1,15 @@
 (ROOT
   (SBARQ
     (WHNP#1
-      (WHNP|NP#2 (WDT)))
+      (WHNP|NP (WDT)))
     (SQ
-      (VP (VB|VBZ|VBD|VBP#3)
-        (NP#4))
+      (VP#2 (VB|VBZ|VBD|VBP)
+        (NP))
       ^(NP))
     ))
 
-entities(4, ?en).
-boundThroughAttribute(?ans, 3, ?en).
-siblingConstraints(2, ?ans).
-optionalCategory(?ans, 1)
-
+entities(1, ?ans).
+siblingConstraints(2, ?ans, 1)
 
 %Which countries in the European Union adopted the Euro?
 %Which state of the USA has the highest population density?
