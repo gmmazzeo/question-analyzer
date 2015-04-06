@@ -1,6 +1,5 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
-import edu.stanford.nlp.ling.CoreAnnotations.IndexAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
@@ -9,7 +8,6 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 /*
@@ -24,16 +22,13 @@ import java.util.List;
 public class SyntacticTree {
 
     SyntacticTreeNode root;
-
     ArrayList<CoreLabel> tokens;
 
     QuestionFocus focus;
     SyntacticTreeNode examplePage;
 
     HashMap<String, SyntacticTreeNode> labelledNodes = new HashMap<>();
-
-    String focusPossibilities; //c=category, a=attribute, e=entity
-
+    String focusPossibilities; //c = category, a = attribute, e = entity
     ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations;
 
     public SyntacticTree(CoreMap sentenceTree, CoreMap sentenceTokens, ArrayList<NamedEntityAnnotationResult> namedEntityAnnotations) throws Exception {
@@ -47,6 +42,15 @@ public class SyntacticTree {
         this.namedEntityAnnotations = namedEntityAnnotations;
     }
 
+    public SyntacticTree(SyntacticTree st) throws Exception {
+        root = st.root;
+        tokens = st.tokens;
+        focus = st.focus;
+        examplePage = st.examplePage;
+        focusPossibilities = st.focusPossibilities;
+        namedEntityAnnotations = st.namedEntityAnnotations;
+    }
+ 
     public void compactNamedEntities() {
         root.compactNamedEntities();
     }

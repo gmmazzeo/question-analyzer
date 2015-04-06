@@ -113,7 +113,7 @@ public class QueryResolver2 {
                 }
             }
         }
-        //System.out.println("Final query models: " + res.size());
+        System.out.println("Final query models: " + res.size());
         return res;
     }
 
@@ -365,7 +365,7 @@ public class QueryResolver2 {
                 qm2.setWeight(1);
                 qm2.getConstraints().add(new QueryConstraint(entityVariableName, "isLiteral", lookupLiteral(entityNodes), false));
                 res.add(qm2);
-                if (!annotations.isEmpty()) {
+                if (annotationsFound) {
                     qm2.setWeight(0.5 * minWeight);
                 }
 
@@ -375,7 +375,7 @@ public class QueryResolver2 {
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(entityNodes), false));
                 res.add(qm);
                 if (annotationsFound) {
-                    qm.setWeight(1 - minWeight * 0.5);
+                    qm.setWeight(0.8 * minWeight);
                 } else {
                     qm.setWeight(1);
                 }
@@ -770,27 +770,7 @@ public class QueryResolver2 {
             if (verbPPNP[1] != null) {
                 res = resolvePPConstraint(verbPPNP[1], entityVariableName, attributeName);
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName, baseAttribute);
-                res.addAll(qmsL);
-//                    res.addAll(qmsL);                
-//                SyntacticTreeNode[] prepNp = extractPPprepNP(verbPPNP[1]);
-//                if (prepNp != null) {
-//                    String newEntityName = getNextEntityVariableName();
-//                    ArrayList<QueryModel> qmsE = resolveEntityNode(prepNp[1], newEntityName, true, true, null, null);
-//                    for (QueryModel qm : qmsE) {
-//                        qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + verbPPNP[0].lemma + " " + prepNp[0].lemma + ")", newEntityName, false));
-//                    }
-//                    res.addAll(qmsE);
-//
-//                    String newEntityName2 = getNextEntityVariableName();
-//                    ArrayList<QueryModel> qmsV = resolveValueNode(prepNp[1], newEntityName2, newEntityName, "");
-//                    for (QueryModel qm : qmsV) {
-//                        qm.getConstraints().add(new QueryConstraint(entityVariableName, "lookupAttribute(" + baseAttribute + verbPPNP[0].lemma + " " + prepNp[0].lemma + ")", newEntityName, false));
-//                    }
-//                    res.addAll(qmsV);
-//
-//                    ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName);
-//                    res.addAll(qmsL);
-//                }
+                res.addAll(qmsL); 
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();
                 ArrayList<QueryModel> qmsE = resolveEntityNode(verbPPNP[2], newEntityName, true, true, new ArrayList<SyntacticTreeNode>());
@@ -1024,7 +1004,7 @@ public class QueryResolver2 {
 
         HashMap<String, String> isEntity = new HashMap<>();
         HashMap<String, String> isLiteral = new HashMap<>();
-        HashSet<String> literalConstraintsToReAdd=new HashSet<>();
+        HashSet<String> literalConstraintsToReAdd = new HashSet<>();
 
         HashSet<String> boundVariables = new HashSet<>();
         for (QueryConstraint qc : qm.getConstraints()) {
@@ -1081,7 +1061,7 @@ public class QueryResolver2 {
             }
         }
         for (String var:literalConstraintsToReAdd) {
-            newConstraints.add(new QueryConstraint(var, "isLiteral", isLiteral.get(var), false));            
+            newConstraints.add(new QueryConstraint(var, "isLiteral", isLiteral.get(var), false)); 
         }
         for (QueryConstraint qc : newConstraints) {
             if (resultVariables.contains(qc.getSubjExpr()) || resultVariables.contains(qc.getValueExpr())) {
@@ -1097,7 +1077,7 @@ public class QueryResolver2 {
 
         return false;
     }
-    
+
     public static void main(String[] args) throws Exception {
         Test.main(args);
     }

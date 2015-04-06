@@ -37,7 +37,7 @@ public class Parser {
     }
 
     public SyntacticTree parse(String text) throws Exception {
-        entityAnnotations=(ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
+        entityAnnotations = (ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
         //char[] c=text.toCharArray();
         //int j=c.length-1;
         //while (j>=0 && (c[j]=='.' || c[j]=='!' || c[j]=='?' || c[j]==' ')) {
@@ -60,7 +60,7 @@ public class Parser {
         CoreMap qsTree = qssTree.get(0);
         CoreMap qsTokens = qssTokens.get(0);
 
-        SyntacticTree qt = new SyntacticTree(qsTree, qsTokens, entityAnnotations);        
+        SyntacticTree qt = new SyntacticTree(qsTree, qsTokens, entityAnnotations);
 
         //qt.compactNamedEntities();
         return qt;

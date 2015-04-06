@@ -1,18 +1,12 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.IndexedWord;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.IntPair;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -362,7 +356,7 @@ public class SyntacticTreeNode implements Externalizable {
         if (isLeafParent) {
             a.add(this);
         } else {
-            for (SyntacticTreeNode c:children) {
+            for (SyntacticTreeNode c : children) {
                 c.fillLeafParentsArray(a);
             }
         }

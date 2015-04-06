@@ -92,7 +92,7 @@ public class QueryResolver {
             } else {
                 System.out.println("Uncovered nodes for " + ar.getSpot());
                 for (SyntacticTreeNode un : uncoveredNodes) {
-                    System.out.println("-  "+un);
+                    System.out.println("-  " + un);
                     if (!un.value.equals("DT")) {
                         validMatching = false;
                         System.out.println("This uncovered node makes the matching invalid");
@@ -264,7 +264,7 @@ public class QueryResolver {
                  if (namedEntitiesAnnotationMap.containsKey(possibileSpot)) {
                  qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", namedEntitiesAnnotationMap.get(possibileSpot), false));
                  } else {
-                
+
                  qm.getConstraints().add(new QueryConstraint(entityVariableName, "isEntity", "lookupEntity(" + valuePrefix + entityName + ")", false));
                  }*/
                 boolean annotationFound = false;
@@ -628,8 +628,7 @@ public class QueryResolver {
             if (verbPPNP[1] != null) {
                 res = resolvePPConstraint(verbPPNP[1], entityVariableName, baseAttribute + verbPPNP[0].lemma + " ");
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName);
-                res.addAll(qmsL);
-//                    res.addAll(qmsL);                
+                res.addAll(qmsL); 
 //                SyntacticTreeNode[] prepNp = extractPPprepNP(verbPPNP[1]);
 //                if (prepNp != null) {
 //                    String newEntityName = getNextEntityVariableName();
