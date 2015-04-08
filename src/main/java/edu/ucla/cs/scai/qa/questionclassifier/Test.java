@@ -8,12 +8,12 @@ package edu.ucla.cs.scai.qa.questionclassifier;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
-import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntologyWithStatistics;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  *
@@ -27,7 +27,7 @@ public class Test {
     //They explain the tags used by Stanford Parser
     public static void main(String args[]) throws Exception {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        Parser parser = new Parser(DBpediaOntologyWithStatistics.getInstance());
+        Parser parser = new Parser(DBpediaOntology.getInstance());
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         while (true) {
             System.out.print("question> ");
@@ -49,6 +49,16 @@ public class Test {
                     }
 
                     Collections.sort(initialModels);
+                    double threshold = 0.5;
+                    double maxWeight = initialModels.isEmpty() ? 0 : initialModels.get(0).getWeight();
+                    for (Iterator<QueryModel> it = initialModels.iterator(); it.hasNext();) {
+                        QueryModel im = it.next();
+                        im.setWeight(im.getWeight() / maxWeight);
+                        if (im.getWeight() < threshold) {
+                            it.remove();
+                        }
+                    }
+                    System.out.println("Final query models with weight above threshold : " + initialModels.size());
                     System.out.println("#####################################");
                     System.out.println("######### INITIAL MODELS ############");
                     System.out.println("#####################################");
@@ -58,8 +68,8 @@ public class Test {
                         System.out.println("-------------------------");
                     }
                     System.out.println();
-                    QueryMapping qm = new QueryMapping();                    
-                    ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntologyWithStatistics.getInstance());
+                    QueryMapping qm = new QueryMapping();
+                    ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntology.getInstance());
                     System.out.println("#####################################");
                     System.out.println("######### MAPPED MODELS #############");
                     System.out.println("#####################################");

@@ -33,16 +33,6 @@ public class QueryResolver2 {
 
     public QueryResolver2(SyntacticTree tree) {
         this.tree = tree;
-
-        LinkedList<SyntacticTreeNode> queue = new LinkedList<>();
-        queue.addLast(tree.root);
-
-        while (!queue.isEmpty()) {
-            SyntacticTreeNode n = queue.removeFirst();
-            for (SyntacticTreeNode c : n.children) {
-                queue.addLast(c);
-            }
-        }
     }
 
     public ArrayList<QueryModel> resolveQueries(ArrayList<PennTreebankPattern> patterns) throws Exception {

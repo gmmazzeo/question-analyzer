@@ -21,6 +21,7 @@ public class PennTreebankPattern {
     String name;
     PennTreebankPatternNode root;
     ArrayList<IQueryModel> iQueryModels = new ArrayList<>();
+    int numberOfLeaves;
 
     public PennTreebankPattern(String name, String stringPattern) throws Exception {
         this.name = name;
@@ -46,6 +47,8 @@ public class PennTreebankPattern {
         String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)|(?<=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
+        numberOfLeaves=root.annotateLeaves(name);
+        root.fillLabels(name);
         while (i < lines.length) {
             if (lines[i].isEmpty()) {
                 i++;
@@ -137,23 +140,23 @@ public class PennTreebankPattern {
     }
 
     public IValueNodeQueryConstraint nodeValues(String nodeLabel, String entityVariableName, String valueVariableName, String attributePrefix, boolean optional) {
-        return new IValueNodeQueryConstraint(nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
+        return new IValueNodeQueryConstraint(name+"#"+nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
     }
 
     public IEntityNodeQueryConstraint nodeEntities(String nodeLabel, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, boolean optional) {
-        return new IEntityNodeQueryConstraint(nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
+        return new IEntityNodeQueryConstraint(name+"#"+nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
     }
 
     public ISiblingsQueryConstraint siblingConstraints(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf, boolean independent) {
-        return new ISiblingsQueryConstraint(nodeLabel, entityVariableName, optional, includeSelf, independent);
+        return new ISiblingsQueryConstraint(name+"#"+nodeLabel, entityVariableName, optional, includeSelf, independent);
     }
 
     public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName, String typeName) {
-        return new IBoundThroughAttributeQueryConstraint(entityVariableName, nodeLabel, valueVariableName, typeName, false);
+        return new IBoundThroughAttributeQueryConstraint(entityVariableName, name+"#"+nodeLabel, valueVariableName, typeName, false);
     }
 
     public IOptionalCategoryQueryConstraint optionalCategory(String entityVariableName, String nodeLabel) {
-        return new IOptionalCategoryQueryConstraint(entityVariableName, nodeLabel);
+        return new IOptionalCategoryQueryConstraint(entityVariableName, name+"#"+nodeLabel);
     }
 
     public void print() {
@@ -183,5 +186,4 @@ public class PennTreebankPattern {
     public String toString() {
         return "PennTreebankPattern{" + "name=" + name + ", root=" + root + '}';
     }
-
 }
