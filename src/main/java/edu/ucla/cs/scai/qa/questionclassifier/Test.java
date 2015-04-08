@@ -40,7 +40,7 @@ public class Test {
                 try {
                     SyntacticTree t = parser.parse(qt);
                     System.out.println(t.toString());
-                    HashMap<PennTreebankPattern, SyntacticTree> ps = matcher.match(qt);
+                    HashMap<PennTreebankPattern, SyntacticTree> ps = matcher.match(t);
                     ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
@@ -73,7 +73,7 @@ public class Test {
                     System.out.println("#####################################");
                     System.out.println("######### MAPPED MODELS #############");
                     System.out.println("#####################################");
-                    for (int i = 0; i < Math.min(initialModels.size(), mappedModels.size()); i++) {
+                    for (int i = 0; i < mappedModels.size(); i++) {
                         System.out.println("Weight: " + mappedModels.get(i).getWeight());
                         System.out.println(mappedModels.get(i));
                         System.out.println("-------------------------");

@@ -1,7 +1,7 @@
 (ROOT
   (SBARQ
     (WHNP#1 (WDT))
-    (SQ (VBZ|VBD|VBP (*/do))
+    (SQ (VBZ|VBD|VBP (*/be|do))
       (NP#2)
       (VP#3))
     ))

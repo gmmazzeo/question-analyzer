@@ -102,8 +102,7 @@ public class PennTreebankPatternMatcher {
         }
     }
 
-    public HashMap<PennTreebankPattern, SyntacticTree> match(String s) throws Exception {
-        SyntacticTree st = parser.parse(s);
+    public HashMap<PennTreebankPattern, SyntacticTree> match(SyntacticTree st) throws Exception {
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         for (PennTreebankPattern pattern : patterns.values()) {
             SyntacticTree t = new SyntacticTree(st);
@@ -122,6 +121,7 @@ public class PennTreebankPatternMatcher {
         int ok = 0;
         PennTreebankPatternMatcher matcher = new PennTreebankPatternMatcher();
         HashMap<String, ArrayList<String>> questions = new HashMap<>();
+        long time0 = 0;
         long time1 = 0;
         long time2 = 0;
         int n = 0;
@@ -134,8 +134,12 @@ public class PennTreebankPatternMatcher {
                 tot++;
                 try {
                     long start = System.currentTimeMillis();
-                    HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(l);
+                    SyntacticTree st = matcher.parser.parse(l);
                     long stop = System.currentTimeMillis();
+                    time0 += stop - start;
+                    start = System.currentTimeMillis();
+                    HashMap<PennTreebankPattern, SyntacticTree> matches = matcher.match(st);
+                    stop = System.currentTimeMillis();
                     time1 += stop - start;
                     n++;
                     for (PennTreebankPattern match : matches.keySet()) {
@@ -201,6 +205,7 @@ public class PennTreebankPatternMatcher {
             }
         }
         System.out.println(ok + "/" + tot);
+        System.out.println("total parse time: " + time0 + " msec");
         System.out.println("total pattern match: " + time1 + " msec");
         System.out.println("total pattern resolve: " + time2 + " msec");
 

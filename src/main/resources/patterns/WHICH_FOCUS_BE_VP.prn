@@ -2,7 +2,8 @@
   (SBARQ
     (WHNP#1 (WDT))
     (SQ (VBD|VBP|VBZ#2 (*/be))
-      (VP))
+      (VP)
+      ^(NP))
     ))
 
 entities(1, ?ans).
