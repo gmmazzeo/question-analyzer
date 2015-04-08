@@ -49,7 +49,7 @@ public class Test {
                     }
 
                     Collections.sort(initialModels);
-                    double threshold = 0.5;
+                    double threshold = 0.1;
                     double maxWeight = initialModels.isEmpty() ? 0 : initialModels.get(0).getWeight();
                     for (Iterator<QueryModel> it = initialModels.iterator(); it.hasNext();) {
                         QueryModel im = it.next();

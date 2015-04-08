@@ -306,7 +306,7 @@ public class QueryResolver2 {
         res += ")";
         return res;
     }
-    
+
     private String lookupOperator(ArrayList<SyntacticTreeNode> nodes) {
         String res = "lookupOperator(";
         boolean first = true;
@@ -413,7 +413,15 @@ public class QueryResolver2 {
                 ArrayList<SyntacticTreeNode> newPrefix = new ArrayList<>(prefix);
                 newPrefix.addAll(np1.getLeafParents());
                 newPrefix.addAll(npExt[0].getLeafParents());
-                res.addAll(resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, newPrefix));
+                ArrayList<QueryModel> qm2 = resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, newPrefix);
+                ArrayList<SyntacticTreeNode> nodes = new ArrayList<>();
+                nodes.add(node);
+                ArrayList<NamedEntityAnnotationResult> a = getMatchingAnnotations(nodes);
+                double weight = Math.pow(0.2, a.size());
+                for (QueryModel qm : qm2) {
+                    qm.setWeight(qm.getWeight() * weight);
+                }
+                res.addAll(qm2);
             }
         }
         return res;
@@ -781,7 +789,7 @@ public class QueryResolver2 {
             if (verbPPNP[1] != null) {
                 res = resolvePPConstraint(verbPPNP[1], entityVariableName, attributeName);
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName, baseAttribute);
-                res.addAll(qmsL); 
+                res.addAll(qmsL);
             } else if (verbPPNP[2] != null) {
                 String newEntityName = getNextEntityVariableName();
                 ArrayList<QueryModel> qmsE = resolveEntityNode(verbPPNP[2], newEntityName, true, true, new ArrayList<SyntacticTreeNode>());
@@ -1071,8 +1079,8 @@ public class QueryResolver2 {
                 return false;
             }
         }
-        for (String var:literalConstraintsToReAdd) {
-            newConstraints.add(new QueryConstraint(var, "isLiteral", isLiteral.get(var), false)); 
+        for (String var : literalConstraintsToReAdd) {
+            newConstraints.add(new QueryConstraint(var, "isLiteral", isLiteral.get(var), false));
         }
         for (QueryConstraint qc : newConstraints) {
             if (resultVariables.contains(qc.getSubjExpr()) || resultVariables.contains(qc.getValueExpr())) {
