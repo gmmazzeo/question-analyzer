@@ -296,6 +296,27 @@ public class QueryResolver2 {
         return res;
     }
 
+    private String lookupAttribute(ArrayList<SyntacticTreeNode> nodes, String typeName) {
+        String res = "lookupAttribute(";
+        boolean first = true;
+        for (SyntacticTreeNode n : nodes) {
+            String newValues = n.getLeafLemmas();
+            if (newValues.length() > 0) {
+                if (first) {
+                    first = false;
+                } else {
+                    res += " ";
+                }
+                res += newValues;
+            }
+        }
+        if (!typeName.isEmpty()) {
+            res += " " + typeName;
+        }
+        res += ")";
+        return res;
+    }
+    
     private String lookupOperator(ArrayList<SyntacticTreeNode> nodes) {
         String res = "lookupOperator(";
         boolean first = true;
@@ -559,7 +580,7 @@ public class QueryResolver2 {
             }
 
             //qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.isEmpty() ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
-            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, lookupAttribute(attributeName), c.valueVariableName, c.typeName, c.optional));
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, lookupAttribute(attributeName, c.typeName), c.valueVariableName, c.typeName, c.optional));
         }
         return res;
     }
