@@ -414,13 +414,6 @@ public class QueryResolver2 {
                 newPrefix.addAll(np1.getLeafParents());
                 newPrefix.addAll(npExt[0].getLeafParents());
                 ArrayList<QueryModel> qm2 = resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, newPrefix);
-                ArrayList<SyntacticTreeNode> nodes = new ArrayList<>();
-                nodes.add(node);
-                ArrayList<NamedEntityAnnotationResult> a = getMatchingAnnotations(nodes);
-                double weight = Math.pow(0.2, a.size());
-                for (QueryModel qm : qm2) {
-                    qm.setWeight(qm.getWeight() * weight);
-                }
                 res.addAll(qm2);
             }
         }
