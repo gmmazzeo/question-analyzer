@@ -214,6 +214,29 @@ public class QueryResolver2 {
         return res;
     }
 
+    //returns true if the nodes partially overlap with at least one annotation
+    private boolean partialAnnotationsOverlap(ArrayList<SyntacticTreeNode> nodes) {
+        ArrayList<NamedEntityAnnotationResult> res = new ArrayList<>();
+        int inf = nodes.get(0).begin;
+        int sup = nodes.get(nodes.size() - 1).end;
+        for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
+            if (ar.getEnd() < inf || ar.getBegin() > sup) { //there is no overlap
+                continue;
+            }
+            //there is overlap
+            if (ar.getBegin()< inf || ar.getEnd() > sup) { //some token of the annotation is outside the nodes
+                return true;
+            }
+            //the annotation is completely contained in the nodes
+            for (SyntacticTreeNode n : nodes) {                
+                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT")) { //a relevant node in not contained in the annotation
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private String lookupEntity(ArrayList<SyntacticTreeNode> nodes) {
         String res = "lookupEntity(";
         boolean first = true;
@@ -340,6 +363,7 @@ public class QueryResolver2 {
             }
             double minWeight = 1;
             boolean annotationsFound = false;
+            boolean partialAnnotationOverlap=partialAnnotationsOverlap(entityNodes);
             if (includeSpecificEntity) {
                 ArrayList<NamedEntityAnnotationResult> annotations = getMatchingAnnotations(entityNodes);
                 annotationsFound = !annotations.isEmpty();
@@ -366,9 +390,9 @@ public class QueryResolver2 {
                     }
                 } else {
                     if (plural) {
-                        qm1.setWeight(0.5);
+                        qm1.setWeight(0.5*(partialAnnotationOverlap?0.2:1));
                     } else {
-                        qm1.setWeight(1);
+                        qm1.setWeight(1*(partialAnnotationOverlap?0.2:1));
                     }
                 }
 
@@ -378,6 +402,8 @@ public class QueryResolver2 {
                 res.add(qm2);
                 if (annotationsFound) {
                     qm2.setWeight(0.5 * minWeight);
+                } else if (partialAnnotationOverlap) {
+                    qm2.setWeight(0.2);
                 }
 
             }
@@ -386,9 +412,13 @@ public class QueryResolver2 {
                 qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(entityNodes), false));
                 res.add(qm);
                 if (annotationsFound) {
+                    //TODO: max weight should be used - if max weight is low, it is more likely that this node represent a category
+                    //the idea is: the node is either an entity or a category (it cannot be both)
+                    //so, the sum of the weights should for the different models be constants
+                    //even the weights for literals should be involded in this reasoning
                     qm.setWeight(0.8 * minWeight);
                 } else {
-                    qm.setWeight(1);
+                    qm.setWeight(partialAnnotationOverlap?0.2:1);
                 }
             }
         } else if (node.npCompound || node.whnpCompound || node.value.equals("WHPP")) {
