@@ -208,6 +208,9 @@ public class PennTreebankPatternMatcher {
         System.out.println("total parse time: " + time0 + " msec");
         System.out.println("total pattern match: " + time1 + " msec");
         System.out.println("total pattern resolve: " + time2 + " msec");
+        System.out.println("avg parse time: " + time0 / tot + " msec");
+        System.out.println("avg pattern match: " + time1 / tot + " msec");
+        System.out.println("avg pattern resolve: " + time2 / tot + " msec");
 
     }
 }

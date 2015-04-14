@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -224,7 +223,7 @@ public class QueryResolver2 {
                 continue;
             }
             //there is overlap
-            if (ar.getBegin()< inf || ar.getEnd() > sup) { //some token of the annotation is outside the nodes
+            if (ar.getBegin() < inf || ar.getEnd() > sup) { //some token of the annotation is outside the nodes
                 return true;
             }
             //the annotation is completely contained in the nodes
@@ -295,7 +294,7 @@ public class QueryResolver2 {
         String res = "lookupAttribute(";
         boolean first = true;
         for (SyntacticTreeNode n : nodes) {
-            String newValues = n.getLeafLemmas();
+            String newValues = n.getLeafValues();
             if (newValues.length() > 0) {
                 if (first) {
                     first = false;
@@ -313,7 +312,7 @@ public class QueryResolver2 {
         String res = "lookupAttribute(";
         boolean first = true;
         for (SyntacticTreeNode n : nodes) {
-            String newValues = n.getLeafLemmas();
+            String newValues = n.getLeafValues();
             if (newValues.length() > 0) {
                 if (first) {
                     first = false;
@@ -352,6 +351,12 @@ public class QueryResolver2 {
     private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, ArrayList<SyntacticTreeNode> prefix) throws Exception {
 
         ArrayList<QueryModel> res = new ArrayList<>();
+        for (SyntacticTreeNode c : node.children) {
+            if (c.value.equals("CD")) {
+                return res;
+            }
+        }
+
         if (node.npSimple || node.whnpSimple) {
             ArrayList<SyntacticTreeNode> entityNodes = new ArrayList<>(prefix);
             entityNodes.addAll(node.getLeafParents());
@@ -361,28 +366,32 @@ public class QueryResolver2 {
                     plural = n.value.endsWith("S");
                 }
             }
+            double maxWeight = 0;
             double minWeight = 1;
             boolean annotationsFound = false;
-            boolean partialAnnotationOverlap=partialAnnotationsOverlap(entityNodes);
+            boolean partialAnnotationOverlap = partialAnnotationsOverlap(entityNodes);
             if (includeSpecificEntity) {
                 ArrayList<NamedEntityAnnotationResult> annotations = getMatchingAnnotations(entityNodes);
                 annotationsFound = !annotations.isEmpty();
                 for (NamedEntityAnnotationResult ar : annotations) {
                     QueryModel qm = new QueryModel(entityVariableName, null);
                     qm.setWeight(ar.getWeight());
+                    System.out.println(ar.getNamedEntity().getName() + " " + ar.getWeight());
+                    maxWeight = Math.max(maxWeight, ar.getWeight());
                     minWeight = Math.min(minWeight, ar.getWeight());
                     QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false);
                     qc.setValueEntity(ar.getNamedEntity());
                     qm.getConstraints().add(qc);
                     res.add(qm);
                 }
+                minWeight = (minWeight == maxWeight) ? 0 : minWeight;
 
                 QueryModel qm1 = new QueryModel(entityVariableName, null);
                 QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", lookupEntity(entityNodes), false);
                 qm1.getConstraints().add(qc);
                 res.add(qm1);
                 if (annotationsFound) {
-                    qm1.setWeight(0.8 * minWeight);
+                    qm1.setWeight(0.8 * maxWeight);
                     HashSet<String> entitiesToIgnore = new HashSet<>();
                     qm1.getIgnoreEntitiesForLookup().put(qc.getValueExpr().substring(13, qc.getValueExpr().length() - 1), entitiesToIgnore);
                     for (NamedEntityAnnotationResult ar : annotations) {
@@ -390,20 +399,19 @@ public class QueryResolver2 {
                     }
                 } else {
                     if (plural) {
-                        qm1.setWeight(0.5*(partialAnnotationOverlap?0.2:1));
+                        qm1.setWeight(0.5 * (partialAnnotationOverlap ? 0.2 : 1));
                     } else {
-                        qm1.setWeight(1*(partialAnnotationOverlap?0.2:1));
+                        qm1.setWeight(partialAnnotationOverlap ? 0.2 : 1);
                     }
                 }
 
                 QueryModel qm2 = new QueryModel(entityVariableName, null);
-                qm2.setWeight(1);
                 qm2.getConstraints().add(new QueryConstraint(entityVariableName, "isLiteral", lookupLiteral(entityNodes), false));
                 res.add(qm2);
                 if (annotationsFound) {
-                    qm2.setWeight(0.5 * minWeight);
-                } else if (partialAnnotationOverlap) {
-                    qm2.setWeight(0.2);
+                    qm2.setWeight(0.8 * maxWeight);
+                } else {
+                    qm2.setWeight(partialAnnotationOverlap ? 0.2 : 1);
                 }
 
             }
@@ -415,10 +423,10 @@ public class QueryResolver2 {
                     //TODO: max weight should be used - if max weight is low, it is more likely that this node represent a category
                     //the idea is: the node is either an entity or a category (it cannot be both)
                     //so, the sum of the weights should for the different models be constants
-                    //even the weights for literals should be involded in this reasoning
-                    qm.setWeight(0.8 * minWeight);
+                    //even the weights for literals should be involved in this reasoning
+                    qm.setWeight(0.2 * (maxWeight - minWeight));
                 } else {
-                    qm.setWeight(partialAnnotationOverlap?0.2:1);
+                    qm.setWeight(partialAnnotationOverlap ? 0.2 : 1);
                 }
             }
         } else if (node.npCompound || node.whnpCompound || node.value.equals("WHPP")) {
@@ -436,7 +444,7 @@ public class QueryResolver2 {
 
             ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
             ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
-            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
+            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, false, false);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
@@ -497,7 +505,7 @@ public class QueryResolver2 {
 
             SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFormPp(ppEntityNode);
 
-            if (inNpAdvp == null) {
+            if (inNpAdvp == null || inNpAdvp[0].getLeafValues().equals("with")) {
                 return res;
             }
 
@@ -768,23 +776,26 @@ public class QueryResolver2 {
                     break;
                 }
             }
-            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
-            attributeName.addAll(prep);
-            for (QueryModel qm : qmsE) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
-            }
-            res.addAll(qmsE);
 
-            String newEntityName2 = getNextEntityVariableName();
-            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, new ArrayList<SyntacticTreeNode>());
-            for (QueryModel qm : qmsV) {
-                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
+            if (!prepNP[0].getLeafValues().equals("of")) {
+                ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
+                attributeName.addAll(prep);
+                for (QueryModel qm : qmsE) {
+                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
+                }
+                res.addAll(qmsE);
             }
-            res.addAll(qmsV);
+            //TODO: can we have value of value of entity or value of values of entity? is this too complex?
+//            String newEntityName2 = getNextEntityVariableName();
+//            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, new ArrayList<SyntacticTreeNode>());
+//            for (QueryModel qm : qmsV) {
+//                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
+//            }
+//            res.addAll(qmsV);
 
             //create constraints with attributes, assuming that the values of the constraints are literals
             if (!annotationFound) {
-                ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNP[1], entityVariableName, attributeName);
+                ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNP[1], entityVariableName, baseAttribute);
                 res.addAll(qmsL);
             }
         } else {
@@ -810,6 +821,7 @@ public class QueryResolver2 {
             ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
             attributeName.addAll(verbPPNP[0].getLeafParents());
             if (verbPPNP[1] != null) {
+                //TODO: add case for "spoken in Estonia" to "Estonia, speak, ans" to resolvePP
                 res = resolvePPConstraint(verbPPNP[1], entityVariableName, attributeName);
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName, baseAttribute);
                 res.addAll(qmsL);

@@ -37,19 +37,20 @@ public class Parser {
     }
 
     public SyntacticTree parse(String text) throws Exception {
+        long start = System.currentTimeMillis();
         entityAnnotations = (ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
-        //char[] c=text.toCharArray();
-        //int j=c.length-1;
-        //while (j>=0 && (c[j]=='.' || c[j]=='!' || c[j]=='?' || c[j]==' ')) {
-        //    j--;
-        //}
-        //text=String.copyValueOf(c, 0, j+1);
+        long stop = System.currentTimeMillis();
+        System.out.println("TagMe time: " + (stop - start));
+        
+        start = System.currentTimeMillis();
         Annotation qaTree = new Annotation(text);
         pipelineTree.annotate(qaTree);
         Annotation qaTokens = new Annotation(text);
         pipelineTokens.annotate(qaTokens);
         List<CoreMap> qssTree = qaTree.get(CoreAnnotations.SentencesAnnotation.class);
         List<CoreMap> qssTokens = qaTokens.get(CoreAnnotations.SentencesAnnotation.class);
+        stop = System.currentTimeMillis();
+        System.out.println("Annotate time: " + (stop - start));
 
         if (qssTree.isEmpty()) {
             throw new Exception("Empty question");
@@ -60,7 +61,10 @@ public class Parser {
         CoreMap qsTree = qssTree.get(0);
         CoreMap qsTokens = qssTokens.get(0);
 
+        start = System.currentTimeMillis();
         SyntacticTree qt = new SyntacticTree(qsTree, qsTokens, entityAnnotations);
+        stop = System.currentTimeMillis();
+        System.out.println("Tree time: " + (stop - start));
 
         //qt.compactNamedEntities();
         return qt;
