@@ -1,11 +1,11 @@
 (ROOT
   (S
     (VP (VB (*/give|tell|show))
-      (NP (PRP) ^(*))
-      (NP#1 ^(NP (DT (*/all))) (NP (DT (*/all))) ^(NP (NN (*/list)))))
+      (NP (PRP) ^(!PRP))
+      (NP#1 ^(NP (NN (*/list)))))
     ))
 
-entities(1, ?ans).
+entities(1, ?ans, 0, 1).
 siblingConstraints(1, ?ans)
 
 values(1, ?en, ?ans).

@@ -5,6 +5,7 @@
  */
 package edu.ucla.cs.scai.qa.questionclassifier;
 
+import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.TagMeClient;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -28,7 +30,7 @@ public class PennTreebankPatternMatcher {
 
     private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();
 
-    private Parser parser = new Parser(DBpediaOntology.getInstance()); 
+    private Parser parser = new Parser(DBpediaOntology.getInstance());
 
     private static ArrayList<String> getResources(
             final Pattern pattern) {
@@ -124,10 +126,12 @@ public class PennTreebankPatternMatcher {
         long time0 = 0;
         long time1 = 0;
         long time2 = 0;
+        long time3 = 0;
         int n = 0;
+        QueryMapping qmap = new QueryMapping();
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
-                System.out.println("\n\n" + l);
+                System.out.println("\n\n************************************************************************************************\n" + l);
 //                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
 //                    System.out.println(r);
 //                }
@@ -163,20 +167,40 @@ public class PennTreebankPatternMatcher {
 
                     ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern pattern : matches.keySet()) {
-                        System.out.println(pattern.name); 
+                        System.out.println(pattern.name);
                         start = System.currentTimeMillis();
                         QueryResolver2 qr = new QueryResolver2(matches.get(pattern));
                         initialModels.addAll(qr.resolveIQueryModels(pattern));
                         stop = System.currentTimeMillis();
                         time2 += stop - start;
                     }
+                    start = System.currentTimeMillis();
                     Collections.sort(initialModels);
+                    double threshold = 0.1;
+                    double maxWeight = initialModels.isEmpty() ? 0 : initialModels.get(0).getWeight();
+                    for (Iterator<QueryModel> it = initialModels.iterator(); it.hasNext();) {
+                        QueryModel im = it.next();
+                        im.setWeight(im.getWeight() / maxWeight);
+                        if (im.getWeight() < threshold) {
+                            it.remove();
+                        }
+                    }
+                    stop = System.currentTimeMillis();
+                    time2 += stop - start;
                     System.out.println();
                     for (QueryModel im : initialModels) {
                         System.out.println("Weight: " + im.getWeight());
                         System.out.println(im);
                         System.out.println("-------------------------");
                     }
+                    start = System.currentTimeMillis();
+                    qmap.mapOnOntology(initialModels, DBpediaOntology.getInstance());
+                    stop = System.currentTimeMillis();
+                    time3 += stop - start;
+                    System.out.println("total parse time: " + time0 + " msec");
+                    System.out.println("total pattern match: " + time1 + " msec");
+                    System.out.println("total pattern resolve: " + time2 + " msec");
+                    System.out.println("total mapping time: " + time3 + " msec");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -208,6 +232,7 @@ public class PennTreebankPatternMatcher {
         System.out.println("total parse time: " + time0 + " msec");
         System.out.println("total pattern match: " + time1 + " msec");
         System.out.println("total pattern resolve: " + time2 + " msec");
+        System.out.println("total mapping time: " + time3 + " msec");
 
     }
 }
