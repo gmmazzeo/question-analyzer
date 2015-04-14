@@ -65,12 +65,12 @@ public class SyntacticTreeNode implements Externalizable {
         value = t.value();
         if (t.isLeaf()) {
             CoreLabel c = tokens.remove(0);
-            begin = c.beginPosition();
-            end = c.endPosition();
             parent.isLeafParent = true;
             if (c == null) {
                 throw new Exception("Mapping between TreeNode and CoreLabel not found");
             } else {
+                begin = c.beginPosition();
+                end = c.endPosition();
                 lemma = c.lemma();
                 ner = c.ner();
                 //System.out.println(value + " -> " + c.value());

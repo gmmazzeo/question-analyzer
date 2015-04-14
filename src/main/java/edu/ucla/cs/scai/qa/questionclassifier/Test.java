@@ -62,8 +62,11 @@ public class Test {
                     System.out.println("#####################################");
                     System.out.println("######### INITIAL MODELS ############");
                     System.out.println("#####################################");
+                    int num = 0;
                     for (QueryModel im : initialModels) {
+                        im.setModelNumber(num++);
                         System.out.println("Weight: " + im.getWeight());
+                        System.out.println("Number: " + im.getModelNumber());
                         System.out.println(im);
                         System.out.println("-------------------------");
                     }
@@ -75,6 +78,7 @@ public class Test {
                     System.out.println("#####################################");
                     for (int i = 0; i < mappedModels.size(); i++) {
                         System.out.println("Weight: " + mappedModels.get(i).getWeight());
+                        System.out.println("Number: " + mappedModels.get(i).getModelNumber());
                         System.out.println(mappedModels.get(i));
                         System.out.println("-------------------------");
                     }

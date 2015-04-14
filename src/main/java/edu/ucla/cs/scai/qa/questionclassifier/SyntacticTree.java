@@ -66,7 +66,7 @@ public class SyntacticTree {
             for (SyntacticTreeNode k : pairs.keySet()) {
                 PennTreebankPatternNode v = pairs.get(k);
                 if (v.label != null) {
-                    labelledNodes.put(pattern.name+"#"+v.label, k);
+                    labelledNodes.put(pattern.name + "#" + v.label, k);
                     //System.out.println(k.value + " -> " + v.label);
                 }
             }
