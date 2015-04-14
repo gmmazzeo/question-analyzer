@@ -396,14 +396,14 @@ public class QueryResolver2 {
                     qm.getConstraints().add(qc);
                     res.add(qm);
                 }
-                minWeight = (minWeight == maxWeight) ? 0 : minWeight;
+                //minWeight = (minWeight == maxWeight) ? 0 : minWeight;
 
                 try {
                     QueryModel qm1 = new QueryModel(entityVariableName, null);
                     QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", lookupEntity(entityNodes), false);
                     qm1.getConstraints().add(qc);
                     if (annotationsFound) {
-                        qm1.setWeight(0.8 * minWeight);
+                        qm1.setWeight(0.8 * maxWeight);
                         HashSet<String> entitiesToIgnore = new HashSet<>();
                         qm1.getIgnoreEntitiesForLookup().put(qc.getValueExpr().substring(13, qc.getValueExpr().length() - 1), entitiesToIgnore);
                         for (NamedEntityAnnotationResult ar : annotations) {
@@ -445,7 +445,7 @@ public class QueryResolver2 {
                         //the idea is: the node is either an entity or a category (it cannot be both)
                         //so, the sum of the weights should for the different models be constants
                         //even the weights for literals should be involded in this reasoning
-                        qm.setWeight(0.8 * minWeight);
+                        qm.setWeight(1 - (maxWeight + minWeight) * 0.5);
                     } else {
                         qm.setWeight(partialAnnotationOverlap ? 0.2 : 1);
                     }
@@ -470,7 +470,7 @@ public class QueryResolver2 {
 
             ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
             ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
-            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, false, false);
+            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
