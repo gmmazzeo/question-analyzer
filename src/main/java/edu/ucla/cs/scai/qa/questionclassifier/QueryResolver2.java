@@ -614,7 +614,7 @@ public class QueryResolver2 {
         QueryModel qm = new QueryModel(c.getEntityVariableName(), c.getValueVariableName());
         res.add(qm);
         if (c.getAttributeNodes().length == 1 && !tree.labelledNodes.containsKey(c.getAttributeNodes()[0])) { //it is a reserved word - e.g. date
-            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "defaultAttribute(" + c.getAttributeNodes()[0] + ")", c.valueVariableName, c.optional));
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + c.getAttributeNodes()[0] + ")", c.valueVariableName, c.optional));
         } else {
             ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>();
             for (String a : c.attributeNodes) {
@@ -826,7 +826,7 @@ public class QueryResolver2 {
 //            res.addAll(qmsV);
 
             //create constraints with attributes, assuming that the values of the constraints are literals
-            if (!annotationFound) {
+            if (!annotationFound || (annotationFound && prepNP[0].getLeafValues().equals("with"))) {
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(prepNP[1], entityVariableName, baseAttribute);
                 res.addAll(qmsL);
             }

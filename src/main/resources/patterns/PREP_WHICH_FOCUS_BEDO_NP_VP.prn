@@ -8,19 +8,19 @@
 
 entities(2, ?ans).
 entities(3, ?subj).
-boundThroughAttribute(?subj, 4+1, ?ans).
+boundThroughAttribute(?subj, 4+1, ?ans)
 
 values(2, ?en, ?ans).
 entities(3, ?subj).
-boundThroughAttribute(?subj, 4+1, ?ans).
+boundThroughAttribute(?subj, 4+1, ?ans)
 
 entities(2, ?ans).
 values(3, ?en1, ?subj).
-boundThroughAttribute(?subj, 4+1, ?ans).
+boundThroughAttribute(?subj, 4+1, ?ans)
 
 values(2, ?en, ?ans).
 values(3, ?en1, ?subj).
-boundThroughAttribute(?subj, 4+1, ?ans).
+boundThroughAttribute(?subj, 4+1, ?ans)
 
 %For which label did Elvis record his first album?
 %In which city did John F. Kennedy die?
