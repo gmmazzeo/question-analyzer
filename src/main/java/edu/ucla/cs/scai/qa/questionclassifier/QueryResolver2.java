@@ -159,7 +159,7 @@ public class QueryResolver2 {
                 return null; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFormPp(ppNode);
+            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFromPp(ppNode);
 
             if (!inNpAdvp[0].children.get(0).lemma.equals("of") || inNpAdvp[2] != null) {
                 return null; //this was added to limit the possibile combinations - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
@@ -469,8 +469,11 @@ public class QueryResolver2 {
             }
 
             ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
-            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
-            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
+            try {
+                ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
+                res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
+            } catch (Exception e) {
+            }
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
@@ -529,7 +532,7 @@ public class QueryResolver2 {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFormPp(ppEntityNode);
+            SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFromPp(ppEntityNode);
 
             if (inNpAdvp == null || inNpAdvp[0].getLeafValues().equals("with")) {
                 return res;
@@ -590,21 +593,27 @@ public class QueryResolver2 {
     //using the PP and VP siblings of the node
     ArrayList<QueryModel> resolveSiblingConstraints(SyntacticTreeNode node, String entityVariableName, ArrayList<SyntacticTreeNode> baseAttribute, boolean includeSelf) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
+        boolean constraintFound = false;
         for (SyntacticTreeNode c : node.parent.children) {
             if (c == node && !includeSelf) {
                 continue;
             }
             if (c.value.equals("PP")) {
+                constraintFound = true;
                 res = combineQueryConstraints(res, resolvePPConstraint(c, entityVariableName, baseAttribute), true, true);
             } else if (c.value.equals("VP")) {
+                constraintFound = true;
                 res = combineQueryConstraints(res, resolveVPConstraint(c, entityVariableName, baseAttribute), true, true);
             } else if (c.value.equals("SBAR")) {
+                constraintFound = true;
                 SyntacticTreeNode vp = extractVPfromSBAR(c);
                 if (vp != null) {
                     res = combineQueryConstraints(res, resolveVPConstraint(vp, entityVariableName, baseAttribute), true, true);
                 }
             }
-
+        }
+        if (res.isEmpty() && constraintFound) {
+            throw new Exception("constraintResolution failed");
         }
         return res;
     }
@@ -633,7 +642,7 @@ public class QueryResolver2 {
             }
 
             if (ppEntityNode != null) {
-                SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(ppEntityNode);
+                SyntacticTreeNode[] prepNP = extractInNpAdvpFromPp(ppEntityNode);
 
                 if (prepNP != null) {
                     attributeName.addAll(prepNP[0].getLeafParents());
@@ -704,7 +713,7 @@ public class QueryResolver2 {
                 return res; //node has not the structure we are looking for
             }
 
-            SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(ppConstraintNode);
+            SyntacticTreeNode[] prepNP = extractInNpAdvpFromPp(ppConstraintNode);
 
             if (prepNP == null) {
                 return res;
@@ -785,7 +794,7 @@ public class QueryResolver2 {
             return res;
         }
 
-        SyntacticTreeNode[] prepNP = extractInNpAdvpFormPp(node);
+        SyntacticTreeNode[] prepNP = extractInNpAdvpFromPp(node);
 
         if (prepNP != null) {
             ArrayList<SyntacticTreeNode> prep = new ArrayList<>();
@@ -902,7 +911,7 @@ public class QueryResolver2 {
         return res;
     }
 
-    SyntacticTreeNode[] extractInNpAdvpFormPp(SyntacticTreeNode node) {
+    SyntacticTreeNode[] extractInNpAdvpFromPp(SyntacticTreeNode node) {
         SyntacticTreeNode prepNode = null;
         SyntacticTreeNode[] res = new SyntacticTreeNode[3];
         for (SyntacticTreeNode c : node.children) {
