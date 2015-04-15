@@ -140,23 +140,23 @@ public class PennTreebankPattern {
     }
 
     public IValueNodeQueryConstraint nodeValues(String nodeLabel, String entityVariableName, String valueVariableName, String attributePrefix, boolean optional) {
-        return new IValueNodeQueryConstraint(name+"#"+nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
+        return new IValueNodeQueryConstraint(name + "#" + nodeLabel, entityVariableName, valueVariableName, attributePrefix, optional);
     }
 
     public IEntityNodeQueryConstraint nodeEntities(String nodeLabel, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, boolean optional) {
-        return new IEntityNodeQueryConstraint(name+"#"+nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
+        return new IEntityNodeQueryConstraint(name + "#" + nodeLabel, entityVariableName, includeSpecificEntity, includeCategoryEntities, optional);
     }
 
     public ISiblingsQueryConstraint siblingConstraints(String nodeLabel, String entityVariableName, boolean optional, boolean includeSelf, boolean independent) {
-        return new ISiblingsQueryConstraint(name+"#"+nodeLabel, entityVariableName, optional, includeSelf, independent);
+        return new ISiblingsQueryConstraint(name + "#" + nodeLabel, entityVariableName, optional, includeSelf, independent);
     }
 
     public IBoundThroughAttributeQueryConstraint boundThroughAttribute(String entityVariableName, String nodeLabel, String valueVariableName, String typeName) {
-        return new IBoundThroughAttributeQueryConstraint(entityVariableName, name+"#"+nodeLabel, valueVariableName, typeName, false);
+        return new IBoundThroughAttributeQueryConstraint(entityVariableName, name + "#" + nodeLabel, valueVariableName, typeName, false);
     }
 
     public IOptionalCategoryQueryConstraint optionalCategory(String entityVariableName, String nodeLabel) {
-        return new IOptionalCategoryQueryConstraint(entityVariableName, name+"#"+nodeLabel);
+        return new IOptionalCategoryQueryConstraint(entityVariableName, name + "#" + nodeLabel);
     }
 
     public void print() {
