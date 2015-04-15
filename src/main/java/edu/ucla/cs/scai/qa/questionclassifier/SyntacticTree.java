@@ -50,7 +50,7 @@ public class SyntacticTree {
         focusPossibilities = st.focusPossibilities;
         namedEntityAnnotations = st.namedEntityAnnotations;
     }
- 
+
     public void compactNamedEntities() {
         root.compactNamedEntities();
     }

@@ -210,7 +210,7 @@ public class SyntacticTreeNode implements Externalizable {
             c.parent = this;
         }
     }
-    
+
     boolean match(PennTreebankPatternNode patternNode, HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs) {
         //check for the word-level negation (!)
         if (patternNode.notValues.contains(value) || patternNode.notLemmas.contains(lemma)) {

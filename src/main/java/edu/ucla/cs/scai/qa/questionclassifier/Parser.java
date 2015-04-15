@@ -41,7 +41,7 @@ public class Parser {
         entityAnnotations = (ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
         long stop = System.currentTimeMillis();
         System.out.println("TagMe time: " + (stop - start));
-        
+
         start = System.currentTimeMillis();
         Annotation qaTree = new Annotation(text);
         pipelineTree.annotate(qaTree);

@@ -169,15 +169,14 @@ public class PennTreebankPatternNode {
             return res;
         }
     }
-    
+
     public int countNodes() {
-        int res=1;
+        int res = 1;
         for (PennTreebankPatternNode c:children) {
-            res+=c.countNodes();
+            res += c.countNodes();
         }
         return res;
     }
-    
 
     public void fillLabels(String name) {
         if (label != null) {

@@ -47,7 +47,7 @@ public class PennTreebankPattern {
         String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)|(?<=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
-        numberOfLeaves=root.annotateLeaves(name);
+        numberOfLeaves = root.annotateLeaves(name);
         root.fillLabels(name);
         while (i < lines.length) {
             if (lines[i].isEmpty()) {
