@@ -210,8 +210,9 @@ public class SyntacticTreeNode implements Externalizable {
             c.parent = this;
         }
     }
-
+    
     boolean match(PennTreebankPatternNode patternNode, HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs) {
+        //check for the word-level negation (!)
         if (patternNode.notValues.contains(value) || patternNode.notLemmas.contains(lemma)) {
             return false;
         }
@@ -236,6 +237,21 @@ public class SyntacticTreeNode implements Externalizable {
             }
         }
         LinkedList<SyntacticTreeNode> nodesAvailable = new LinkedList(children);
+        //we first ensure that no "not-children" is matched
+        while (!nodesNotToBeMatched.isEmpty()) {
+            PennTreebankPatternNode sn = nodesNotToBeMatched.removeFirst();
+            boolean found = false;
+            for (SyntacticTreeNode n : nodesAvailable) {
+                if (n.match(sn, pairs)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                return false;
+            }
+        }
+        //now we try to match all children pattern nodes
         while (!nodesToBeMatched.isEmpty()) {
             PennTreebankPatternNode sn = nodesToBeMatched.removeFirst();
             boolean found = false;
@@ -248,19 +264,6 @@ public class SyntacticTreeNode implements Externalizable {
                 }
             }
             if (!found) {
-                return false;
-            }
-        }
-        while (!nodesNotToBeMatched.isEmpty()) {
-            PennTreebankPatternNode sn = nodesNotToBeMatched.removeFirst();
-            boolean found = false;
-            for (SyntacticTreeNode n : nodesAvailable) {
-                if (n.match(sn, pairs)) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
                 return false;
             }
         }

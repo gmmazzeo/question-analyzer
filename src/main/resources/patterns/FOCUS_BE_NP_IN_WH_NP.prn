@@ -8,11 +8,11 @@
           (WHNP#4))))
     ))
 
-entities(4, ?ans, 0, 1).
-entities(1, ?subj).
-boundThroughAttribute(?subj, 2+3, ?ans).
-
 values(5, ?ans, ?subj).
-entities(1, ?subj).
+entities(1, ?subj)
+
+boundThroughAttribute(?subj, 2+3, ?ans).
+entities(4, ?ans, 0, 1).
+entities(1, ?subj)
 
 %Sean Parnell is the governor of which U.S. state?
