@@ -628,7 +628,7 @@ public class QueryResolver {
             if (verbPPNP[1] != null) {
                 res = resolvePPConstraint(verbPPNP[1], entityVariableName, baseAttribute + verbPPNP[0].lemma + " ");
                 ArrayList<QueryModel> qmsL = resolveLiteralConstraint(node, entityVariableName);
-                res.addAll(qmsL); 
+                res.addAll(qmsL);
 //                SyntacticTreeNode[] prepNp = extractPPprepNP(verbPPNP[1]);
 //                if (prepNp != null) {
 //                    String newEntityName = getNextEntityVariableName();

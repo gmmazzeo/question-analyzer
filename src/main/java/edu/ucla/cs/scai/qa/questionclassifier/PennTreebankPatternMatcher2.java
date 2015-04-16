@@ -25,7 +25,7 @@ public class PennTreebankPatternMatcher2 {
     private final HashMap<String, Integer> numberOfLeaves = new HashMap<>();
 
     private PennTreebankPatternNode rootOfMergedPatterns;
-    
+
     private static final HashMap<String, PennTreebankPattern> patterns = new HashMap<>();
 
     private Parser parser = new Parser(DBpediaOntology.getInstance());
@@ -149,7 +149,7 @@ public class PennTreebankPatternMatcher2 {
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         return res;
     }
-    
+
     public static void main(String[] args) throws Exception {
         PennTreebankPatternMatcher2 matcher = new PennTreebankPatternMatcher2();
     }
