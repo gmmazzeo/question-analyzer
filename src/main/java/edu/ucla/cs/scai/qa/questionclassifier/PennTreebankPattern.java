@@ -47,7 +47,7 @@ public class PennTreebankPattern {
         String[] tokens = treeStringPattern.replaceAll(" ", "").split("(?<=\\))|(?=\\))|(?<=\\()|(?=\\()|(?=\\^)|(?<=\\^)");
         int[] currentPosition = new int[1];
         root = new PennTreebankPatternNode(tokens, currentPosition);
-        numberOfLeaves=root.annotateLeaves(name);
+        numberOfLeaves = root.annotateLeaves(name);
         root.fillLabels(name);
         while (i < lines.length) {
             if (lines[i].isEmpty()) {
@@ -157,6 +157,10 @@ public class PennTreebankPattern {
 
     public IOptionalCategoryQueryConstraint optionalCategory(String entityVariableName, String nodeLabel) {
         return new IOptionalCategoryQueryConstraint(entityVariableName, name + "#" + nodeLabel);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void print() {

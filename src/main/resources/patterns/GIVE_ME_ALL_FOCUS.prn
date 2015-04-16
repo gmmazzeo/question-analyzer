@@ -2,7 +2,7 @@
   (S
     (VP (VB (*/give|tell|show))
       (NP (PRP) ^(!PRP))
-      (NP#1 ^(NP (NN (*/list)))))
+      (NP#1 (NP (DT (*/all)))))
     ))
 
 entities(1, ?ans, 0, 1).

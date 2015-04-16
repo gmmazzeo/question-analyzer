@@ -57,6 +57,7 @@ public class PennTreebankPatternMatcher {
     private static ArrayList<String> getResourcesFromDirectory(
             final File directory,
             final Pattern pattern) {
+        System.out.println("Loading patterns in "+directory.getAbsolutePath());
         final ArrayList<String> retval = new ArrayList<>();
         final File[] fileList = directory.listFiles();
         for (final File file : fileList) {
@@ -78,8 +79,18 @@ public class PennTreebankPatternMatcher {
     }
 
     public PennTreebankPatternMatcher() {
-        Pattern pattern = Pattern.compile(".*\\.prn");
-        final Collection<String> list = getResources(pattern);
+        this(getResources(Pattern.compile(".*\\.prn")));
+    }
+    
+    public PennTreebankPatternMatcher(final String directoryName) {   
+        this(new File(directoryName));
+    }    
+    
+    public PennTreebankPatternMatcher(final File directory) {                
+        this(getResourcesFromDirectory(directory, Pattern.compile(".*\\.prn")));
+    }    
+    
+    public PennTreebankPatternMatcher(Collection<String> list) {        
         for (final String fileName : list) {
             System.out.println(fileName);
             try {
@@ -102,7 +113,7 @@ public class PennTreebankPatternMatcher {
                 e.printStackTrace();
             }
         }
-    }
+    }        
 
     public HashMap<PennTreebankPattern, SyntacticTree> match(SyntacticTree st) throws Exception {
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
