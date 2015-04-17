@@ -13,7 +13,4 @@ boundThroughAttribute(?en, 1+3+4, ?ans).
 values(2, ?en2, ?en)
 
 %How many big fires struck Paris during the Middle Ages?
-%How many monarchical countries are there in Europe?
-%How many official languages are spoken on the Seychelles?
 %How many people live in the capital of Australia?
-%How many space missions have there been?

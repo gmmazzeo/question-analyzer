@@ -1,0 +1,12 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHADJP 
+         (WRB (*/how)) (JJ (*/many))))
+    (SQ#2 
+       (VBP (*/have)) (NP (EX (*/there))) (VP (VBN (*/be))))))
+
+%count(?ans rdf:type lookupCategory(1))
+%constraint on #3
+
+%How many space missions have there been?

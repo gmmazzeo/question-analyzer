@@ -3,7 +3,7 @@
     (WHPP#2 (IN#1))
     (SQ (VBZ|VBD|VBP (*/be))
       (NP#3)
-      ^(*))
+      ^(VP))
     ))
 
 %entities(3, ?en).

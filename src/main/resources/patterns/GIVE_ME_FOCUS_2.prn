@@ -2,7 +2,7 @@
   (S
     (VP (VB (*/give|tell|show))
       (S
-          (NP (PRP) ^(*))
+          (NP (PRP) ^(!PRP))
           (NP#1)))
     ))
 

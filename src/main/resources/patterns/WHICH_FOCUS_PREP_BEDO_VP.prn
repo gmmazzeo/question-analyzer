@@ -4,9 +4,15 @@
       (WHNP|NP# (WDT))
       (PP))
     (SQ (VBZ|VBD|VBP#5 (*/be|do))
-      (VP))
-    ))
+      (VP)
+      ^(NP))))
 
+%entities(4, ?ent).
+%boundThroughAttribute(?ans, 2+3, ?ent).
+%siblingConstraints(1, ?ans).
+%optionalCategory(?ans, 1)
+
+%might need qm below to support literals
 entities(1, ?ans).
 siblingConstraints(5, ?ans)
 

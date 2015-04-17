@@ -650,6 +650,7 @@ public class QueryResolver2 {
             }
 
             //qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + attributeName + prep + (c.typeName.isEmpty() ? "" : " " + c.typeName) + ")", c.valueVariableName, c.optional));
+            //TODO: remove the typeName from the lookupAttribute argument and use it later during the resolution of the attribute (QueryMapping) of the contraint - better not to mix semantic elements with strings in strings, since it can be done later, when necesessary
             qm.getConstraints().add(new QueryConstraint(c.entityVariableName, lookupAttribute(attributeName, c.typeName), c.valueVariableName, c.typeName, c.optional));
         }
         return res;

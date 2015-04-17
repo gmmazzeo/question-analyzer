@@ -217,7 +217,7 @@ public class SyntacticTreeNode implements Externalizable {
             return false;
         }
         boolean ok
-                = (patternNode.values.contains("*") || patternNode.values.contains(value))
+                = (patternNode.values.isEmpty() || patternNode.values.contains("*") || patternNode.values.contains(value))
                 && (patternNode.lemmas.isEmpty() || patternNode.lemmas.contains("*") || patternNode.lemmas.contains(lemma))
                 && (patternNode.ners.isEmpty() || patternNode.ners.contains("*") || patternNode.ners.contains(lemma));
 

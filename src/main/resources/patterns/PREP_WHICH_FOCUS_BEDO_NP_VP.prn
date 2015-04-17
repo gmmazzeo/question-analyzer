@@ -24,11 +24,11 @@ boundThroughAttribute(?subj, 4+1, ?ans)
 
 %For which label did Elvis record his first album?
 %In which city did John F. Kennedy die?
-%In which city was the former Dutch queen Juliana buried?
+%In which city was the former Dutch queen Juliana buried? <DUP>
 %In which country does the Nile start?
 %In which films did Julia Roberts as well as Richard Gere play?
-%In which films directed by Garry Marshall was Julia Roberts starring?
+%In which films directed by Garry Marshall was Julia Roberts starring? <DUP>
 %In which military conflicts did Lawrence of Arabia participate?
-%In which programming language is GIMP written?
-%In which U.S. state is Fort Knox located?
+%In which programming language is GIMP written? <DUP>
+%In which U.S. state is Fort Knox located? <DUP>
 %To which countries does the Himalayan mountain system extend?

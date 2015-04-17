@@ -5,7 +5,7 @@
       (PP#2))
     (SQ (VBZ|VBD|VBP (*/be|do))
       (NP#3)
-      ^(*))
+      ^(VP))
     ))
 
 values(3, ?en, ?ans).

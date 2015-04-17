@@ -51,8 +51,11 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-    private static ArrayList<String> getResourcesFromDirectory(final File directory, final Pattern pattern) {
-        System.out.println("Loading patterns in "+directory.getAbsolutePath());
+
+    private static ArrayList<String> getResourcesFromDirectory(
+            final File directory,
+            final Pattern pattern) {
+        System.out.println("Loading patterns in " + directory.getAbsolutePath());
         final ArrayList<String> retval = new ArrayList<>();
         final File[] fileList = directory.listFiles();
         for (final File file : fileList) {
@@ -76,16 +79,16 @@ public class PennTreebankPatternMatcher {
     public PennTreebankPatternMatcher() {
         this(getResources(Pattern.compile(".*\\.prn")));
     }
-    
-    public PennTreebankPatternMatcher(final String directoryName) {   
+
+    public PennTreebankPatternMatcher(final String directoryName) {
         this(new File(directoryName));
-    }    
-    
-    public PennTreebankPatternMatcher(final File directory) {                
+    }
+
+    public PennTreebankPatternMatcher(final File directory) {
         this(getResourcesFromDirectory(directory, Pattern.compile(".*\\.prn")));
-    }    
-    
-    public PennTreebankPatternMatcher(Collection<String> list) {        
+    }
+
+    public PennTreebankPatternMatcher(Collection<String> list) {
         for (final String fileName : list) {
             System.out.println(fileName);
             try {
@@ -108,11 +111,14 @@ public class PennTreebankPatternMatcher {
                 e.printStackTrace();
             }
         }
-    }        
+    }
 
     public HashMap<PennTreebankPattern, SyntacticTree> match(SyntacticTree st) throws Exception {
         HashMap<PennTreebankPattern, SyntacticTree> res = new HashMap<>();
         for (PennTreebankPattern pattern : patterns.values()) {
+            if (pattern.name.equals("PREP_WHICH_FOCUS_BE_NP")) {
+                System.out.println("");
+            }
             SyntacticTree t = new SyntacticTree(st);
             if (t.match(pattern)) {
                 res.put(pattern, t);
@@ -123,7 +129,7 @@ public class PennTreebankPatternMatcher {
 
     public static void main(String[] args) throws Exception {
         TagMeClient tm = new TagMeClient();
-        BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald3")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald5")));
         String l = in.readLine();
         int tot = 0;
         int ok = 0;
@@ -137,11 +143,11 @@ public class PennTreebankPatternMatcher {
         QueryMapping qmap = new QueryMapping();
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
-                System.out.println("\n\n************************************************************************************************\n" + l);
+                tot++;
+                System.out.println("\n\n************************************************************************************************\nQuestion n. " + tot + "\n" + l);
 //                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
 //                    System.out.println(r);
-//                }
-                tot++;
+//                }                
                 try {
                     long start = System.currentTimeMillis();
                     SyntacticTree st = matcher.parser.parse(l);
@@ -194,15 +200,33 @@ public class PennTreebankPatternMatcher {
                     stop = System.currentTimeMillis();
                     time2 += stop - start;
                     System.out.println();
+                    System.out.println("Initial models");
+                    System.out.println();
                     for (QueryModel im : initialModels) {
                         System.out.println("Weight: " + im.getWeight());
                         System.out.println(im);
                         System.out.println("-------------------------");
                     }
                     start = System.currentTimeMillis();
-                    qmap.mapOnOntology(initialModels, DBpediaOntology.getInstance());
+                    ArrayList<QueryModel> mappedModels=qmap.mapOnOntology(initialModels, DBpediaOntology.getInstance());
                     stop = System.currentTimeMillis();
                     time3 += stop - start;
+                    System.out.println("Mapped models");
+                    System.out.println();
+                    Collections.sort(mappedModels);
+                    maxWeight = mappedModels.isEmpty() ? 0 : mappedModels.get(0).getWeight();
+                    for (Iterator<QueryModel> it = mappedModels.iterator(); it.hasNext();) {
+                        QueryModel mm = it.next();
+                        //mm.setWeight(mm.getWeight() / maxWeight);
+                        if (mm.getWeight()/maxWeight < threshold) {
+                            it.remove();
+                        }
+                    }                    
+                    for (QueryModel mm : mappedModels) {
+                        System.out.println("Weight: " + mm.getWeight());
+                        System.out.println(mm);
+                        System.out.println("-------------------------");
+                    }                    
                     System.out.println("total parse time: " + time0 + " msec");
                     System.out.println("total pattern match: " + time1 + " msec");
                     System.out.println("total pattern resolve: " + time2 + " msec");
@@ -242,6 +266,6 @@ public class PennTreebankPatternMatcher {
         System.out.println("avg parse time: " + time0 / tot + " msec");
         System.out.println("avg pattern match: " + time1 / tot + " msec");
         System.out.println("avg pattern resolve: " + time2 / tot + " msec");
-
+        System.out.println("avg mapping: " + time3 / tot + " msec");
     }
 }
