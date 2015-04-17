@@ -1,7 +1,7 @@
 (ROOT
   (S
     (VP (VB (*/give|tell|show))
-      (NP (PRP) ^(*))
+      (NP (PRP) ^(!PRP))
       (NP
         (NP (NN (*/set|list)))
         (PP#2 (IN (*/of))

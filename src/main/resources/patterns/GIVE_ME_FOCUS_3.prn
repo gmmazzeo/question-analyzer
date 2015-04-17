@@ -2,9 +2,10 @@
   (S
     (S#1
       (VP (VB (*/give))
-        (NP (PRP) ^(*))
+        (NP (PRP) ^(!PRP))
         (NP#2)))
     ))
+
 
 entities(2,?ans).
 siblingConstraints(1, ?ans)

@@ -1,0 +1,12 @@
+(ROOT
+  (SBARQ
+    (WHNP#1
+      (WHADJP (WRB (*/how)) (JJ (*/many))))
+    (SQ#2 
+       (VBP (*/be)) 
+       (VP))))
+
+%count(?ans rdf:type lookupCategory(1))
+%constraint on #3
+
+%How many monarchical countries are there in Europe?

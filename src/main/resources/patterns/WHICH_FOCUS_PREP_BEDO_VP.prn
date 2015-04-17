@@ -4,10 +4,8 @@
       (WHNP|NP#1 (WDT))
       (PP))
     (SQ (VBZ|VBD|VBP#5 (*/be|do))
-      (VP))
-    ))
-
-%      (VP#2 (PP#3 (NP#4))))
+      (VP)
+      ^(NP))))
 
 %entities(4, ?ent).
 %boundThroughAttribute(?ans, 2+3, ?ent).

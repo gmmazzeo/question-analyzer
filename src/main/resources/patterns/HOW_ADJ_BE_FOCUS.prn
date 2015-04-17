@@ -13,6 +13,6 @@ boundThroughAttribute(?en, 1, ?ans).
 values(2, ?en2, ?en).
 siblingConstraints(2, ?en)
 
+%How high is the Mount Everest?
 %How tall is Claudia Schiffer?
 %How tall is Michael Jordan?
-%How high is the Mount Everest?

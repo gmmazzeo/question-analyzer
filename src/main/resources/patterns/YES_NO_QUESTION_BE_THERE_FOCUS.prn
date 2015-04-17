@@ -1,7 +1,8 @@
 (ROOT
-  (SQ (VBD|VBP|VBZ (*/be)
+  (SQ 
+    (VBD|VBP|VBZ (*/be))
     (NP (EX))
-    (NP#1))))
+    (NP#1 ^(EX))))
 
 entities(1, ?ans)
 

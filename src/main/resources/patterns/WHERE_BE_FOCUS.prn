@@ -3,7 +3,7 @@
     (WHADVP (WRB (*/where)))
     (SQ (VBD|VBZ (*/be))
       (NP#1)
-      ^(*))
+      ^(VP))
     ))
 
 values(1, ?en, ?ans)

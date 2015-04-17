@@ -1,0 +1,21 @@
+(ROOT
+  (S
+    (VP (VB (*/give|tell|show))
+      (NP (PRP) ^(!PRP))
+      (NP#1 ^(PRP) (DT (*/all))))
+    ))
+
+entities(1, ?ans, 0, 1).
+siblingConstraints(1, ?ans)
+
+values(1, ?en, ?ans).
+siblingConstraints(1, ?ans)
+
+%Give me all Argentine films.
+%Give me all Australian nonprofit organizations.
+%Give me all books by William Goldman with more than 300 pages.
+%Give me all Canadian Grunge record labels.
+%Give me all current Methodist national leaders.
+%Give me all female German chancellors.
+%Give me all female Russian astronauts.
+%Give me all school types.
