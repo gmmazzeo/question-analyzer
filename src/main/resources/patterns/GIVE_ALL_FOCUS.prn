@@ -1,0 +1,12 @@
+(ROOT
+  (S
+    (VP (VB (*/give|tell|show))
+      (NP (DT (*/all)))
+      (NP#1))
+    ))
+
+entities(1, ?ans, 0, 1).
+siblingConstraints(1, ?ans)
+
+values(1, ?en, ?ans).
+siblingConstraints(1, ?ans)

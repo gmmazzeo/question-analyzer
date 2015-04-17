@@ -1,13 +1,13 @@
 (ROOT
   (SBARQ
     (WHADVP (WRB (*/where)))
-    (SQ (VBD|VBZ (*/be))
+    (SQ (VBD|VBZ (*/be|do))
       (NP#1)
       (VP#2))
     ))
 
-boundThroughAttribute(?en, 2, ?ans).
+boundThroughAttribute(?en, 2, ?ans, place).
 entities(1, ?en)
 
-boundThroughAttribute(?en, 2, ?ans).
+boundThroughAttribute(?en, 2, ?ans, place).
 values(1, ?en2, ?en)
