@@ -32,8 +32,7 @@ public class PennTreebankPatternMatcher {
 
     private Parser parser = new Parser(DBpediaOntology.getInstance());
 
-    private static ArrayList<String> getResources(
-            final Pattern pattern) {
+    private static ArrayList<String> getResources(final Pattern pattern) {
         final ArrayList<String> retval = new ArrayList<>();
         final String classPath = System.getProperty("java.class.path", ".");
         final String[] classPathElements = classPath.split(File.pathSeparator);
@@ -43,9 +42,7 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-    private static ArrayList<String> getResources(
-            final String element,
-            final Pattern pattern) {
+    private static ArrayList<String> getResources(final String element, final Pattern pattern) {
         final ArrayList<String> retval = new ArrayList<>();
         final File file = new File(element);
         if (file.isDirectory()) {
@@ -54,9 +51,7 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-    private static ArrayList<String> getResourcesFromDirectory(
-            final File directory,
-            final Pattern pattern) {
+    private static ArrayList<String> getResourcesFromDirectory(final File directory, final Pattern pattern) {
         System.out.println("Loading patterns in "+directory.getAbsolutePath());
         final ArrayList<String> retval = new ArrayList<>();
         final File[] fileList = directory.listFiles();
