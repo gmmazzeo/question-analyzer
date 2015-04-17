@@ -1,27 +1,17 @@
 (ROOT
   (SBARQ
-    (WHNP
-      (WHNP|NP#1 (WDT))
+    (WHNP#1
+      (WHNP|NP# (WDT))
       (PP))
     (SQ (VBZ|VBD|VBP#5 (*/be|do))
       (VP))
     ))
 
-%      (VP#2 (PP#3 (NP#4))))
-
-%entities(4, ?ent).
-%boundThroughAttribute(?ans, 2+3, ?ent).
-%siblingConstraints(1, ?ans).
-%optionalCategory(?ans, 1)
-
-%might need qm below to support literals
 entities(1, ?ans).
-siblingConstraints(1, ?ans).
 siblingConstraints(5, ?ans)
 
-%entitiesWithConstraints(1,2) 
-
-%attributesWithConstraints(1,2)
+values(1, ?en, ?ans).
+siblingConstraints(5, ?ans)
 
 %Which books by Kerouac were published by Viking Press?
 %Which films starring Clint Eastwood did he direct himself?
