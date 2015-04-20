@@ -33,6 +33,8 @@ public class SyntacticTreeNode implements Externalizable {
     boolean npSimple, npCompound, whnpSimple, whnpCompound, npQp;
     int begin, end;
     boolean isLeafParent;
+    boolean saxonGenitiveParent;
+    boolean saxonGenitive;
 
     ArrayList<SyntacticTreeNode> children = new ArrayList<>();
 
@@ -89,10 +91,15 @@ public class SyntacticTreeNode implements Externalizable {
                 children.add(child);
                 if (child.value.equals("NP")) {
                     hasNPchildren = true;
+                    if (child.saxonGenitive) {
+                        saxonGenitiveParent=true;
+                    }
                 } else if (child.value.equals("QP")) {
                     hasQPchildren = true;
                 } else if (child.value.equals("WHNP")) {
                     hasWHNPchildren = true;
+                } else if (child.value.equals("POS")) {
+                    saxonGenitive=true;
                 }
                 begin = Math.min(begin, child.begin);
                 end = Math.max(end, child.end);

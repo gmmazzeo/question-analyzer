@@ -6,9 +6,12 @@
       ^(VP))
     ))
 
-entities(1, ?ans)
+entities(1, ?ans).
+siblingConstraints(1, ?ans)
 
-values(1, ?en, ?ans)
+values(1, ?en, ?ans).
+siblingConstraints(1, ?ans)
+
 
 %What are the nicknames of San Francisco?
 %What are the official languages of the Philippines?

@@ -201,7 +201,7 @@ public class QueryResolver2 {
             }
             boolean validMatching = true;
             for (SyntacticTreeNode n : nodes) {
-                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT")) { //condition 2 is not satisfied
+                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT") && !n.value.equals("POS")) { //condition 2 is not satisfied
                     validMatching = false;
                     break;
                 }
@@ -228,7 +228,7 @@ public class QueryResolver2 {
             }
             //the annotation is completely contained in the nodes
             for (SyntacticTreeNode n : nodes) {
-                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT")) { //a relevant node in not contained in the annotation
+                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT") && !n.value.equals("POS")) { //a relevant node is not contained in the annotation
                     return true;
                 }
             }
@@ -297,7 +297,7 @@ public class QueryResolver2 {
             throw new Exception("No leaf nodes can be used for looking up a category");
         }
         return res;
-    }
+    }    
 
     private String lookupAttribute(ArrayList<SyntacticTreeNode> nodes) throws Exception {
         String res = "lookupAttribute(";
@@ -361,7 +361,6 @@ public class QueryResolver2 {
 
     //resolves a NP/WHNP node, which can be either simple or compound
     private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, ArrayList<SyntacticTreeNode> prefix) throws Exception {
-
         ArrayList<QueryModel> res = new ArrayList<>();
         for (SyntacticTreeNode c : node.children) {
             if (c.value.equals("CD")) {
@@ -369,7 +368,32 @@ public class QueryResolver2 {
             }
         }
 
-        if (node.npSimple || node.whnpSimple) {
+        if (node.saxonGenitiveParent && includeCategoryEntities) { //"e1's e2" if not meaningful if e2 is a specific entity - it would be a specific entity with a constraint (it would be dropped later)
+            //TODO: handle prefix
+            SyntacticTreeNode np1 = null;
+            ArrayList<SyntacticTreeNode> categoryNodes = new ArrayList<>();
+            for (SyntacticTreeNode c : node.children) {
+                if (c.saxonGenitive) {
+                    np1 = c;
+                } else {
+                    categoryNodes.add(c);
+                }
+            }
+            if (np1 == null || categoryNodes.isEmpty()) {
+                return res; //node has not the structure we are looking for
+            }
+
+            String possessorVarName=getNextEntityVariableName();
+            ArrayList<QueryModel> qmsPossessor = resolveEntityNode(np1, possessorVarName, true, true, new ArrayList<SyntacticTreeNode>());
+            QueryConstraint qc1 = new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(categoryNodes), false);
+            QueryConstraint qc2 = new QueryConstraint(entityVariableName, "lookupAttribute(of)", possessorVarName, false);
+            for (QueryModel qm1 : qmsPossessor) {
+                qm1.getConstraints().add(qc1);
+                qm1.getConstraints().add(qc2);
+                qm1.setEntityVariableName(entityVariableName);
+            }
+            res.addAll(qmsPossessor);
+        } else if (node.npSimple || node.whnpSimple) {
             ArrayList<SyntacticTreeNode> entityNodes = new ArrayList<>(prefix);
             entityNodes.addAll(node.getLeafParents());
             boolean plural = false;
@@ -455,7 +479,7 @@ public class QueryResolver2 {
                 }
 
             }
-        } else if (node.npCompound || node.whnpCompound || node.value.equals("WHPP")) {
+        } else if ((node.npCompound || node.whnpCompound || node.value.equals("WHPP")) && !node.saxonGenitiveParent) {
             //get the first NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode np1 = null;
             for (SyntacticTreeNode c : node.children) {
@@ -489,6 +513,7 @@ public class QueryResolver2 {
 
     //return the literal value represented by a node
     private ArrayList<QueryModel> resolveLiteralNode(SyntacticTreeNode node, String valueVariableName) throws Exception {
+        //TODO: handle saxon genitive nodes (eg., John's wife) - May be nothing has to be done
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npSimple || node.whnpSimple) {
             QueryModel qm = new QueryModel(valueVariableName, null);
@@ -501,7 +526,7 @@ public class QueryResolver2 {
                 }
             }
             res.add(qm);
-        } else if (node.npCompound || node.whnpCompound) {
+        } else if (node.npCompound || node.whnpCompound) { //???
             String entityVariableName = getNextEntityVariableName();
             res = resolveValueNode(node, entityVariableName, valueVariableName, new ArrayList<SyntacticTreeNode>());
         }
@@ -510,8 +535,31 @@ public class QueryResolver2 {
 
     //construct the query model from a NP node containing a simple NP node representing an attribute, and a PP node where the preposition is part of the attribute and the NP child represents the entity
     ArrayList<QueryModel> resolveValueNode(SyntacticTreeNode node, String entityVariableName, String valueVariableName, ArrayList<SyntacticTreeNode> attributePrefix) throws Exception {
+        //TODO: handle saxon genitive nodes (eg., John's wife) - May be nothing has to be done
         ArrayList<QueryModel> res = new ArrayList<>();
-        if (node.npCompound || node.whnpCompound) {
+
+        if (node.saxonGenitiveParent) {
+            SyntacticTreeNode np1 = null;
+            ArrayList<SyntacticTreeNode> attributeNodes = new ArrayList<>(attributePrefix); //TODO: find an example where the attributePrexix is not empty
+            for (SyntacticTreeNode c : node.children) {
+                if (c.saxonGenitive) {
+                    np1 = c;
+                } else {
+                    attributeNodes.add(c);
+                }
+            }
+            if (np1 == null || attributeNodes.isEmpty()) {
+                return res; //node has not the structure we are looking for
+            }
+
+            ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, true, true, new ArrayList<SyntacticTreeNode>());
+            QueryConstraint qc = new QueryConstraint(entityVariableName, lookupAttribute(attributeNodes), valueVariableName, false);
+            for (QueryModel qm1 : qmsMainEntity) {
+                qm1.getConstraints().add(qc);
+                qm1.setAttributeVariableName(valueVariableName);
+            }
+            res.addAll(qmsMainEntity);
+        } else if (node.npCompound || node.whnpCompound) {
             //get the first simple NP child - TODO: what if the node has more NP children?
             SyntacticTreeNode npAttributeNode = null;
             SyntacticTreeNode ppEntityNode = null;
@@ -819,14 +867,14 @@ public class QueryResolver2 {
                 }
             }
 
-            if (!prepNP[0].getLeafValues().equals("of")) {
+            //if (!prepNP[0].getLeafValues().equals("of")) { //??? Why this condition? It make us miss the correct model for "What are the rivers of California?"
                 ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
                 attributeName.addAll(prep);
                 for (QueryModel qm : qmsE) {
                     qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
                 }
                 res.addAll(qmsE);
-            }
+            //}
             //TODO: can we have value of value of entity or value of values of entity? is this too complex?
 //            String newEntityName2 = getNextEntityVariableName();
 //            ArrayList<QueryModel> qmsV = resolveValueNode(prepNP[1], newEntityName2, newEntityName, new ArrayList<SyntacticTreeNode>());
