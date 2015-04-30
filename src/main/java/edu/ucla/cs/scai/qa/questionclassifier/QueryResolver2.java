@@ -362,7 +362,7 @@ public class QueryResolver2 {
     //resolves a NP/WHNP node, which can be either simple or compound
     private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, ArrayList<SyntacticTreeNode> prefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
-        for (SyntacticTreeNode c : node.children) {
+        for (SyntacticTreeNode c : node.children) { //nodes containing numbers can't be entities - why? 
             if (c.value.equals("CD")) {
                 return res;
             }
@@ -526,7 +526,7 @@ public class QueryResolver2 {
                 }
             }
             res.add(qm);
-        } else if (node.npCompound || node.whnpCompound) { //???
+        } else if (node.npCompound || node.whnpCompound) { ////This needed for case such as "...greater than the population of California")
             String entityVariableName = getNextEntityVariableName();
             res = resolveValueNode(node, entityVariableName, valueVariableName, new ArrayList<SyntacticTreeNode>());
         }

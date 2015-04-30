@@ -51,7 +51,6 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-
     private static ArrayList<String> getResourcesFromDirectory(
             final File directory,
             final Pattern pattern) {
@@ -208,7 +207,7 @@ public class PennTreebankPatternMatcher {
                         System.out.println("-------------------------");
                     }
                     start = System.currentTimeMillis();
-                    ArrayList<QueryModel> mappedModels=qmap.mapOnOntology(initialModels, DBpediaOntology.getInstance());
+                    ArrayList<QueryModel> mappedModels = qmap.mapOnOntology(initialModels, DBpediaOntology.getInstance());
                     stop = System.currentTimeMillis();
                     time3 += stop - start;
                     System.out.println("Mapped models");
@@ -218,15 +217,15 @@ public class PennTreebankPatternMatcher {
                     for (Iterator<QueryModel> it = mappedModels.iterator(); it.hasNext();) {
                         QueryModel mm = it.next();
                         //mm.setWeight(mm.getWeight() / maxWeight);
-                        if (mm.getWeight()/maxWeight < threshold) {
+                        if (mm.getWeight() / maxWeight < threshold) {
                             it.remove();
                         }
-                    }                    
+                    }
                     for (QueryModel mm : mappedModels) {
                         System.out.println("Weight: " + mm.getWeight());
                         System.out.println(mm);
                         System.out.println("-------------------------");
-                    }                    
+                    }
                     System.out.println("total parse time: " + time0 + " msec");
                     System.out.println("total pattern match: " + time1 + " msec");
                     System.out.println("total pattern resolve: " + time2 + " msec");

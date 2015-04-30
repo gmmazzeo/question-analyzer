@@ -23,7 +23,7 @@ import java.util.LinkedList;
  */
 public class SyntacticTreeNode implements Externalizable {
 
-    String value, lemma, ner, identifier;
+    String value, lemma, ner;
 
     SyntacticTreeNode parent;
     boolean containsNamedEntities;
@@ -92,14 +92,14 @@ public class SyntacticTreeNode implements Externalizable {
                 if (child.value.equals("NP")) {
                     hasNPchildren = true;
                     if (child.saxonGenitive) {
-                        saxonGenitiveParent=true;
+                        saxonGenitiveParent = true;
                     }
                 } else if (child.value.equals("QP")) {
                     hasQPchildren = true;
                 } else if (child.value.equals("WHNP")) {
                     hasWHNPchildren = true;
                 } else if (child.value.equals("POS")) {
-                    saxonGenitive=true;
+                    saxonGenitive = true;
                 }
                 begin = Math.min(begin, child.begin);
                 end = Math.max(end, child.end);
@@ -129,18 +129,23 @@ public class SyntacticTreeNode implements Externalizable {
         return sb.toString();
     }
 
-    private void fillStringBuilder(StringBuilder sb, int level) {
+    public void fillStringBuilder(StringBuilder sb, int level) {
+        fillStringBuilder(sb, level, new HashMap<SyntacticTreeNode, String>());
+    }
+
+    public void fillStringBuilder(StringBuilder sb, int level, HashMap<SyntacticTreeNode, String> nodeLabels) {
         for (int i = 0; i < level; i++) {
             sb.append("\t");
         }
         sb.append(value).append("\\").append(lemma).append("\\").append(ner);
-        if (identifier != null) {
-            sb.append("#" + identifier);
+        String label = nodeLabels.get(this);
+        if (label != null) {
+            sb.append("#").append(label);
         }
         sb.append(" [").append(begin).append("..").append(end).append("]");
         for (SyntacticTreeNode c : children) {
             sb.append("\n");
-            c.fillStringBuilder(sb, level + 1);
+            c.fillStringBuilder(sb, level + 1, nodeLabels);
         }
     }
 
@@ -196,7 +201,6 @@ public class SyntacticTreeNode implements Externalizable {
         out.writeObject(value);
         out.writeObject(lemma);
         out.writeObject(ner);
-        out.writeObject(identifier);
         out.writeInt(children.size());
         for (SyntacticTreeNode c : children) {
             out.writeObject(c);
@@ -208,7 +212,6 @@ public class SyntacticTreeNode implements Externalizable {
         value = (String) in.readObject();
         lemma = (String) in.readObject();
         ner = (String) in.readObject();
-        identifier = (String) in.readObject();
         int n = in.readInt();
         children = new ArrayList<>();
         for (int i = 0; i < n; i++) {

@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xms2g -Xmx8g -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
+                <exec.args>-Xms2g -Xmx8g -Dpatterns.path=/home/massimo/patterns -Dswoogle.cache.path=/home/massimo/swoogle.cache -Ddbpedia.ontology.definitions.path=/home/massimo/dbpedia.ontology.definitions.json -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -24,7 +24,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms2g -Xmx8g -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms2g -Xmx8g -Dpatterns.path=/home/massimo/patterns -Dswoogle.cache.path=/home/massimo/swoogle.cache -Ddbpedia.ontology.definitions.path=/home/massimo/dbpedia.ontology.definitions.json -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,7 +39,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xms2g -Xmx8g -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
+                <exec.args>-Xms2g -Xmx8g -Dpatterns.path=/home/massimo/patterns -Dswoogle.cache.path=/home/massimo/swoogle.cache -Ddbpedia.ontology.definitions.path=/home/massimo/dbpedia.ontology.definitions.json -classpath %classpath edu.ucla.cs.scai.qa.questionclassifier.PennTreebankPatternMatcher</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>

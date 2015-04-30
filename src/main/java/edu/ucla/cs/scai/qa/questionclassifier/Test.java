@@ -44,6 +44,7 @@ public class Test {
                     ArrayList<QueryModel> initialModels = new ArrayList<>();
                     for (PennTreebankPattern p : ps.keySet()) {
                         System.out.println("Pattern found: " + p.name);
+                        System.out.println(ps.get(p));
                         QueryResolver2 qr = new QueryResolver2(ps.get(p));
                         initialModels.addAll(qr.resolveIQueryModels(p));
                     }

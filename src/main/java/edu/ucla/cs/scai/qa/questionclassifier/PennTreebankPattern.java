@@ -190,4 +190,9 @@ public class PennTreebankPattern {
     public String toString() {
         return "PennTreebankPattern{" + "name=" + name + ", root=" + root + '}';
     }
+
+    public ArrayList<IQueryModel> getiQueryModels() {
+        return iQueryModels;
+    }
+
 }

@@ -9,6 +9,7 @@ import edu.ucla.cs.scai.swim.qa.ontology.NamedEntityAnnotationResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -57,9 +58,15 @@ public class SyntacticTree {
 
     @Override
     public String toString() {
-        return root.toString();
+        HashMap<SyntacticTreeNode, String> nodeLabels=new HashMap<>();
+        for (Map.Entry<String, SyntacticTreeNode> e:labelledNodes.entrySet()) {
+            nodeLabels.put(e.getValue(), e.getKey());
+        }
+        StringBuilder sb=new StringBuilder();
+        root.fillStringBuilder(sb, 0, nodeLabels);
+        return sb.toString();
     }
-
+    
     public boolean match(PennTreebankPattern pattern) {
         HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs = new HashMap<>();
         if (root.match(pattern.root, pairs)) {
@@ -79,4 +86,9 @@ public class SyntacticTree {
     public ArrayList<NamedEntityAnnotationResult> getNamedEntityAnnotations() {
         return namedEntityAnnotations;
     }
+
+    public HashMap<String, SyntacticTreeNode> getLabelledNodes() {
+        return labelledNodes;
+    }
+
 }
