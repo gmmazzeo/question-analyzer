@@ -297,7 +297,7 @@ public class QueryResolver2 {
             throw new Exception("No leaf nodes can be used for looking up a category");
         }
         return res;
-    }    
+    }
 
     private String lookupAttribute(ArrayList<SyntacticTreeNode> nodes) throws Exception {
         String res = "lookupAttribute(";
@@ -383,7 +383,7 @@ public class QueryResolver2 {
                 return res; //node has not the structure we are looking for
             }
 
-            String possessorVarName=getNextEntityVariableName();
+            String possessorVarName = getNextEntityVariableName();
             ArrayList<QueryModel> qmsPossessor = resolveEntityNode(np1, possessorVarName, true, true, new ArrayList<SyntacticTreeNode>());
             QueryConstraint qc1 = new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(categoryNodes), false);
             QueryConstraint qc2 = new QueryConstraint(entityVariableName, "lookupAttribute(of)", possessorVarName, false);
@@ -719,6 +719,9 @@ public class QueryResolver2 {
         ArrayList<QueryModel> res = new ArrayList<>();
         if (node.npCompound || node.value.equals("VP")) {
             //get the first simple NP child - TODO: what if the node has more NP children?
+            if (node.value.equals("VP")) {
+                System.out.print("");
+            }
             SyntacticTreeNode npAttributeNode = null;
             SyntacticTreeNode ppConstraintNode = null;
             SyntacticTreeNode vbConstraintNode = null;
@@ -868,12 +871,12 @@ public class QueryResolver2 {
             }
 
             //if (!prepNP[0].getLeafValues().equals("of")) { //??? Why this condition? It make us miss the correct model for "What are the rivers of California?"
-                ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
-                attributeName.addAll(prep);
-                for (QueryModel qm : qmsE) {
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
-                }
-                res.addAll(qmsE);
+            ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>(baseAttribute);
+            attributeName.addAll(prep);
+            for (QueryModel qm : qmsE) {
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute(attributeName), newEntityName, false));
+            }
+            res.addAll(qmsE);
             //}
             //TODO: can we have value of value of entity or value of values of entity? is this too complex?
 //            String newEntityName2 = getNextEntityVariableName();
