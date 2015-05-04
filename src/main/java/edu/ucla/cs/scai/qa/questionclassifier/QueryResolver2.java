@@ -412,7 +412,7 @@ public class QueryResolver2 {
                 for (NamedEntityAnnotationResult ar : annotations) {
                     QueryModel qm = new QueryModel(entityVariableName, null);
                     qm.setWeight(ar.getWeight());
-                    System.out.println(ar.getNamedEntity().getName() + " " + ar.getWeight());
+                    //System.out.println(ar.getNamedEntity().getName() + " " + ar.getWeight());
                     maxWeight = Math.max(maxWeight, ar.getWeight());
                     minWeight = Math.min(minWeight, ar.getWeight());
                     QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false);
@@ -671,7 +671,7 @@ public class QueryResolver2 {
         QueryModel qm = new QueryModel(c.getEntityVariableName(), c.getValueVariableName());
         res.add(qm);
         if (c.getAttributeNodes().length == 1 && !tree.labelledNodes.containsKey(c.getAttributeNodes()[0])) { //it is a reserved word - e.g. date
-            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + c.getAttributeNodes()[0] + ")", c.valueVariableName, c.optional));
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "lookupAttribute(" + c.getAttributeNodes()[0].split("#")[1] + ")", c.valueVariableName, c.optional));
         } else {
             ArrayList<SyntacticTreeNode> attributeName = new ArrayList<>();
             for (String a : c.attributeNodes) {
@@ -705,6 +705,14 @@ public class QueryResolver2 {
     }
 
     private ArrayList<QueryModel> resolveOptionalCategoryConstraint(IOptionalCategoryQueryConstraint c) throws Exception {
+        if (!tree.labelledNodes.containsKey(c.getNodeLabel())) { //it is a reserved word - e.g. person
+            ArrayList<QueryModel> res = new ArrayList<>();
+            QueryModel qm = new QueryModel("", "");
+            qm.getConstraints().add(new QueryConstraint(c.entityVariableName, "rdf:type", "lookupCategory(" + c.getNodeLabel().split("#")[1] + ")", false));
+            res.add(qm);
+            return res;
+        }
+
         ArrayList<QueryModel> res = resolveEntityNode(tree.labelledNodes.get(c.getNodeLabel()), c.entityVariableName, false, true, new ArrayList<SyntacticTreeNode>());
         for (QueryModel qm : res) {
             for (QueryConstraint qc : qm.getConstraints()) {
