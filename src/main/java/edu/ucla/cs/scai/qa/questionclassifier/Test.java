@@ -83,6 +83,32 @@ public class Test {
                         System.out.println(mappedModels.get(i));
                         System.out.println("-------------------------");
                     }
+
+                    String answer = "Answer not found";
+                    QueryModel resultModel = null;
+                    DBpediaOntology ontology = DBpediaOntology.getInstance();
+                    for (QueryModel m : mappedModels) {
+                        //String sparqlQuery = ontology.modelToSparqlQuery(m);
+                        ArrayList<HashMap<String, String>> res = ontology.executeSparql(m, 10);
+                        if (!res.isEmpty()) {
+                            resultModel = m;
+                            if (m.getExampleEntity() == null) {
+                                m.setExampleEntity(res.get(0).get(m.getEntityVariableName()));
+                            }
+                            answer = "";
+                            for (HashMap<String, String> pairs : res) {
+                                for (String v : pairs.values()) {
+                                    answer += v + "\t";
+                                }
+                                answer += "\n";
+                            }
+                            break;
+                        }
+                    }
+                    System.out.println(answer);
+                    if (resultModel!=null) {
+                        System.out.println("Answer found with model\n"+resultModel);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     //SyntacticTree t = parser.parse(qt);
