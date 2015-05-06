@@ -226,6 +226,30 @@ public class PennTreebankPatternMatcher {
                         System.out.println(mm);
                         System.out.println("-------------------------");
                     }
+
+                    QueryModel resultModel = null;
+                    DBpediaOntology ontology = DBpediaOntology.getInstance();
+                    for (QueryModel m : mappedModels) {
+                        //String sparqlQuery = ontology.modelToSparqlQuery(m);
+                        ArrayList<HashMap<String, String>> res = ontology.executeSparql(m);
+                        if (!res.isEmpty()) {
+                            resultModel = m;
+                            if (m.getExampleEntity() == null) {
+                                m.setExampleEntity(res.get(0).get(m.getEntityVariableName()));
+                            }
+                            break;
+                        }
+                    }
+
+                    if (resultModel == null) {
+                        System.out.println("No model with answer found");
+                    } else {
+                        System.out.println("Model with answer found");
+                        System.out.println("Weight: " + resultModel.getWeight());
+                        System.out.println(resultModel);
+                        System.out.println("-------------------------");
+                    }
+
                     System.out.println("total parse time: " + time0 + " msec");
                     System.out.println("total pattern match: " + time1 + " msec");
                     System.out.println("total pattern resolve: " + time2 + " msec");
