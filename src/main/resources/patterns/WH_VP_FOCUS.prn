@@ -7,9 +7,10 @@
     ))
 
 
-%boundThroughAttribute(?ans, 1, ?en).
-%entities(2, ?en).
-%siblingConstraints(2, ?en)
+boundThroughAttribute(?ans, 1, ?en).
+entities(2, ?en).
+siblingConstraints(2, ?en).
+optionalCategory(?ans, Person)
 
 boundThroughAttribute(?en, 1, ?ans).
 entities(2, ?en).
