@@ -72,23 +72,26 @@ public class Test {
                         System.out.println("-------------------------");
                     }
                     System.out.println();
+                    
                     QueryMapping qm = new QueryMapping();
                     ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntology.getInstance());
                     System.out.println("#####################################");
                     System.out.println("######### MAPPED MODELS #############");
                     System.out.println("#####################################");
-                    for (int i = 0; i < mappedModels.size(); i++) {
-                        System.out.println("Weight: " + mappedModels.get(i).getWeight());
-                        System.out.println("Number: " + mappedModels.get(i).getModelNumber());
-                        System.out.println(mappedModels.get(i));
+                    for (QueryModel mappedModel : mappedModels) {
+                        System.out.println("Weight: " + mappedModel.getWeight());
+                        System.out.println("Number: " + mappedModel.getModelNumber());
+                        System.out.println(mappedModel);
                         System.out.println("-------------------------");
                     }
-
+                    
+                    System.out.println("#####################################");
+                    System.out.println("######### SPARQL RESULT #############");
+                    System.out.println("#####################################");
                     String answer = "Answer not found";
                     QueryModel resultModel = null;
                     DBpediaOntology ontology = DBpediaOntology.getInstance();
                     for (QueryModel m : mappedModels) {
-                        //String sparqlQuery = ontology.modelToSparqlQuery(m);
                         ArrayList<HashMap<String, String>> res = ontology.executeSparql(m, 10);
                         if (!res.isEmpty()) {
                             resultModel = m;
@@ -105,9 +108,9 @@ public class Test {
                             break;
                         }
                     }
-                    System.out.println(answer);
-                    if (resultModel!=null) {
-                        System.out.println("Answer found with model\n"+resultModel);
+                    System.out.println("answer: " + answer);
+                    if (resultModel != null) {
+                        System.out.println("Answer found with model " + resultModel.getModelNumber() + "\n" + resultModel);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
