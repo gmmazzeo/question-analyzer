@@ -82,7 +82,7 @@ public class QueryResolver2 {
                 res = combineQueryConstraints(res, resolveOptionalCategoryConstraint(c), true, false);
             }
         }
-        System.out.println("Inital query models: " + res.size());
+        System.out.println("Initial query models: " + res.size());
         for (Iterator<QueryModel> it = res.iterator(); it.hasNext();) {
             QueryModel qm = it.next();
             if (!reduceIsAttributes(qm) || qm.getConstraints().isEmpty() && qm.getExampleEntity() == null) {
