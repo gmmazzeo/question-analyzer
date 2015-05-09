@@ -40,7 +40,7 @@ public class Parser {
         long start = System.currentTimeMillis();
         entityAnnotations = (ArrayList<NamedEntityAnnotationResult>) ontology.annotateNamedEntities(text);
         long stop = System.currentTimeMillis();
-        System.out.println("TagMe time: " + (stop - start));
+//        System.out.println("TagMe time: " + (stop - start));
 
         start = System.currentTimeMillis();
         Annotation qaTree = new Annotation(text);
@@ -50,7 +50,7 @@ public class Parser {
         List<CoreMap> qssTree = qaTree.get(CoreAnnotations.SentencesAnnotation.class);
         List<CoreMap> qssTokens = qaTokens.get(CoreAnnotations.SentencesAnnotation.class);
         stop = System.currentTimeMillis();
-        System.out.println("Annotate time: " + (stop - start));
+//        System.out.println("Annotate time: " + (stop - start));
 
         if (qssTree.isEmpty()) {
             throw new Exception("Empty question");
@@ -64,7 +64,7 @@ public class Parser {
         start = System.currentTimeMillis();
         SyntacticTree qt = new SyntacticTree(qsTree, qsTokens, entityAnnotations);
         stop = System.currentTimeMillis();
-        System.out.println("Tree time: " + (stop - start));
+//        System.out.println("Tree time: " + (stop - start));
 
         //qt.compactNamedEntities();
         return qt;
