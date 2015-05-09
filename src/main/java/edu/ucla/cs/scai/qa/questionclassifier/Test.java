@@ -59,7 +59,7 @@ public class Test {
                             it.remove();
                         }
                     }
-                    System.out.println("Final query models with weight above threshold : " + initialModels.size());
+                    System.out.println("Final query models with weight above threshold: " + initialModels.size());
                     System.out.println("#####################################");
                     System.out.println("######### INITIAL MODELS ############");
                     System.out.println("#####################################");

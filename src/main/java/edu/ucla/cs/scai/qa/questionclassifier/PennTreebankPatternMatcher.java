@@ -51,9 +51,7 @@ public class PennTreebankPatternMatcher {
         return retval;
     }
 
-    private static ArrayList<String> getResourcesFromDirectory(
-            final File directory,
-            final Pattern pattern) {
+    private static ArrayList<String> getResourcesFromDirectory(final File directory, final Pattern pattern) {
         System.out.println("Loading patterns in " + directory.getAbsolutePath());
         final ArrayList<String> retval = new ArrayList<>();
         final File[] fileList = directory.listFiles();
@@ -128,7 +126,7 @@ public class PennTreebankPatternMatcher {
 
     public static void main(String[] args) throws Exception {
         TagMeClient tm = new TagMeClient();
-        BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald5")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(PennTreebankPatternMatcher.class.getResourceAsStream("/qald3")));
         String l = in.readLine();
         int tot = 0;
         int ok = 0;
@@ -143,7 +141,8 @@ public class PennTreebankPatternMatcher {
         while (l != null && l.length() > 0) {
             if (!l.startsWith("%")) {
                 tot++;
-                System.out.println("\n\n************************************************************************************************\nQuestion n. " + tot + "\n" + l);
+//                System.out.println("\n\n************************************************************************************************\nQuestion n. " + tot + "\n" + l);
+                System.out.println("\n\n" + l);
 //                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
 //                    System.out.println(r);
 //                }                
@@ -230,7 +229,6 @@ public class PennTreebankPatternMatcher {
                     QueryModel resultModel = null;
                     DBpediaOntology ontology = DBpediaOntology.getInstance();
                     for (QueryModel m : mappedModels) {
-                        //String sparqlQuery = ontology.modelToSparqlQuery(m);
                         ArrayList<HashMap<String, String>> res = ontology.executeSparql(m);
                         if (!res.isEmpty()) {
                             resultModel = m;
@@ -249,11 +247,6 @@ public class PennTreebankPatternMatcher {
                         System.out.println(resultModel);
                         System.out.println("-------------------------");
                     }
-
-                    System.out.println("total parse time: " + time0 + " msec");
-                    System.out.println("total pattern match: " + time1 + " msec");
-                    System.out.println("total pattern resolve: " + time2 + " msec");
-                    System.out.println("total mapping time: " + time3 + " msec");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
