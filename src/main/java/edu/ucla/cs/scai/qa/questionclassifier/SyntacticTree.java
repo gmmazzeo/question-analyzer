@@ -66,7 +66,7 @@ public class SyntacticTree {
         root.fillStringBuilder(sb, 0, nodeLabels);
         return sb.toString();
     }
-    
+
     public boolean match(PennTreebankPattern pattern) {
         HashMap<SyntacticTreeNode, PennTreebankPatternNode> pairs = new HashMap<>();
         if (root.match(pattern.root, pairs)) {

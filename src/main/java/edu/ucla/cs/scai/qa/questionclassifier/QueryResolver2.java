@@ -161,7 +161,7 @@ public class QueryResolver2 {
 
             SyntacticTreeNode[] inNpAdvp = extractInNpAdvpFromPp(ppNode);
 
-            if (!inNpAdvp[0].children.get(0).lemma.equals("of") || inNpAdvp[2] != null) {
+            if (!(inNpAdvp[0].children.get(0).lemma.equals("of") || inNpAdvp[0].children.get(0).lemma.equals("in")|| inNpAdvp[0].children.get(0).lemma.equals("on")) || inNpAdvp[2] != null) {
                 return null; //this was added to limit the possibile combinations - in which cases nouns linked through a preposition different from "of" can represent attribute, entities or category names?
             }
 
@@ -201,7 +201,7 @@ public class QueryResolver2 {
             }
             boolean validMatching = true;
             for (SyntacticTreeNode n : nodes) {
-                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT") && !n.value.equals("POS")) { //condition 2 is not satisfied
+                if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT") && !n.value.equals("POS") && !n.value.equals("JJ")) { //condition 2 is not satisfied
                     validMatching = false;
                     break;
                 }
@@ -362,7 +362,7 @@ public class QueryResolver2 {
     //resolves a NP/WHNP node, which can be either simple or compound
     private ArrayList<QueryModel> resolveEntityNode(SyntacticTreeNode node, String entityVariableName, boolean includeSpecificEntity, boolean includeCategoryEntities, ArrayList<SyntacticTreeNode> prefix) throws Exception {
         ArrayList<QueryModel> res = new ArrayList<>();
-        for (SyntacticTreeNode c : node.children) { //nodes containing numbers can't be entities - why? 
+        for (SyntacticTreeNode c : node.children) { //nodes containing numbers can't be entities - why?
             if (c.value.equals("CD")) {
                 return res;
             }
@@ -422,87 +422,70 @@ public class QueryResolver2 {
                 }
                 //minWeight = (minWeight == maxWeight) ? 0 : minWeight;
 
-                try {
-                    QueryModel qm1 = new QueryModel(entityVariableName, null);
-                    QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", lookupEntity(entityNodes), false);
-                    qm1.getConstraints().add(qc);
-                    if (annotationsFound) {
-                        qm1.setWeight(0.8 * maxWeight);
-                        HashSet<String> entitiesToIgnore = new HashSet<>();
-                        qm1.getIgnoreEntitiesForLookup().put(qc.getValueExpr().substring(13, qc.getValueExpr().length() - 1), entitiesToIgnore);
-                        for (NamedEntityAnnotationResult ar : annotations) {
-                            entitiesToIgnore.add(ar.getNamedEntity().getUri());
-                        }
+                QueryModel qm1 = new QueryModel(entityVariableName, null);
+                QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", lookupEntity(entityNodes), false);
+                qm1.getConstraints().add(qc);
+                if (annotationsFound) {
+                    qm1.setWeight(0.8 * maxWeight);
+                    HashSet<String> entitiesToIgnore = new HashSet<>();
+                    qm1.getIgnoreEntitiesForLookup().put(qc.getValueExpr().substring(13, qc.getValueExpr().length() - 1), entitiesToIgnore);
+                    for (NamedEntityAnnotationResult ar : annotations) {
+                        entitiesToIgnore.add(ar.getNamedEntity().getUri());
+                    }
+                } else {
+                    if (plural) {
+                        qm1.setWeight(0.5 * (partialAnnotationOverlap ? 0.8 : 1));
                     } else {
-                        if (plural) {
-                            qm1.setWeight(0.5 * (partialAnnotationOverlap ? 0.2 : 1));
-                        } else {
-                            qm1.setWeight(1 * (partialAnnotationOverlap ? 0.2 : 1));
-                        }
+                        qm1.setWeight(1 * (partialAnnotationOverlap ? 0.8 : 1));
                     }
-                    res.add(qm1);
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+                res.add(qm1);
 
-                try {
-                    QueryModel qm2 = new QueryModel(entityVariableName, null);
-                    qm2.setWeight(1);
-                    qm2.getConstraints().add(new QueryConstraint(entityVariableName, "isLiteral", lookupLiteral(entityNodes), false));
-                    if (annotationsFound) {
-                        qm2.setWeight(0.5 * minWeight);
-                    } else if (partialAnnotationOverlap) {
-                        qm2.setWeight(0.2);
-                    }
-                    res.add(qm2);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                QueryModel qm2 = new QueryModel(entityVariableName, null);
+                qm2.setWeight(0.8);
+                qm2.getConstraints().add(new QueryConstraint(entityVariableName, "isLiteral", lookupLiteral(entityNodes), false));
+                if (annotationsFound) {
+                    qm2.setWeight(0.5 * minWeight);
+                } else if (partialAnnotationOverlap) {
+                    qm2.setWeight(0.2);
                 }
-
+                res.add(qm2);
             }
             if (includeCategoryEntities) {
-                try {
-                    QueryModel qm = new QueryModel(entityVariableName, null);
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(entityNodes), false));
-                    if (annotationsFound) {
-                        //TODO: max weight should be used - if max weight is low, it is more likely that this node represent a category
-                        //the idea is: the node is either an entity or a category (it cannot be both)
-                        //so, the sum of the weights should for the different models be constants
-                        //even the weights for literals should be involded in this reasoning
-                        qm.setWeight(1 - (maxWeight + minWeight) * 0.5);
-                    } else {
-                        qm.setWeight(partialAnnotationOverlap ? 0.2 : 1);
-                    }
-                    res.add(qm);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                QueryModel qm = new QueryModel(entityVariableName, null);
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, "rdf:type", lookupCategory(entityNodes), false));
+                if (annotationsFound) {
+                    //TODO: max weight should be used - if max weight is low, it is more likely that this node represent a category
+                    //the idea is: the node is either an entity or a category (it cannot be both)
+                    //so, the sum of the weights should for the different models be constants
+                    //even the weights for literals should be involded in this reasoning
+                    qm.setWeight(1 - (maxWeight + minWeight) * 0.5);
+                } else {
+                    qm.setWeight(partialAnnotationOverlap ? 0.2 : 0.8);
                 }
-
+                res.add(qm);
             }
         } else if ((node.npCompound || node.whnpCompound || node.value.equals("WHPP")) && !node.saxonGenitiveParent) {
             //get the first NP child - TODO: what if the node has more NP children?
-            SyntacticTreeNode np1 = null;
+            SyntacticTreeNode np = null;
             for (SyntacticTreeNode c : node.children) {
                 if (c.value.equals("NP") || c.value.equals("WHNP")) {
-                    np1 = c;
+                    np = c;
                     break;
                 }
             }
-            if (np1 == null) {
+            if (np == null) {
                 return res; //node has not the structure we are looking for
             }
 
-            ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np1, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
-            try {
-                ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np1, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
-                res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
-            } catch (Exception e) {
-            }
+            ArrayList<QueryModel> qmsMainEntity = resolveEntityNode(np, entityVariableName, includeSpecificEntity, includeCategoryEntities, prefix);
+            ArrayList<QueryModel> qmsConstraints = resolveSiblingConstraints(np, entityVariableName, new ArrayList<SyntacticTreeNode>(), false);
+            res = combineQueryConstraints(qmsMainEntity, qmsConstraints, true, false);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
                 ArrayList<SyntacticTreeNode> newPrefix = new ArrayList<>(prefix);
-                newPrefix.addAll(np1.getLeafParents());
+                newPrefix.addAll(np.getLeafParents());
                 newPrefix.addAll(npExt[0].getLeafParents());
                 ArrayList<QueryModel> qm2 = resolveEntityNode(npExt[1], entityVariableName, includeSpecificEntity, includeCategoryEntities, newPrefix);
                 res.addAll(qm2);
@@ -521,7 +504,7 @@ public class QueryResolver2 {
             qm.getConstraints().add(new QueryConstraint(valueVariableName, "isLiteral", "literalValue(" + literalValue + ")", false));
             for (NamedEntityAnnotationResult ar : tree.namedEntityAnnotations) {
                 if (overlap(node, ar)) {
-                    qm.setWeight(0.5);
+                    qm.setWeight(0.2);
                     break;
                 }
             }
@@ -598,37 +581,40 @@ public class QueryResolver2 {
                 }
             }
 
-            try {
-                String lookupAttribute = lookupAttribute(attributeNodes);
-                ArrayList<QueryModel> qms1 = resolveEntityNode(inNpAdvp[1], entityVariableName, true, true, new ArrayList<SyntacticTreeNode>());
-                for (QueryModel qm : qms1) {
-                    qm.setAttributeVariableName(valueVariableName);
-                    qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute, valueVariableName, false));
-                    if (plural) {
-                        qm.setWeight(qm.getWeight() * 0.8);
-                    }
+            String lookupAttribute = lookupAttribute(attributeNodes);
+            ArrayList<QueryModel> qms1 = resolveEntityNode(inNpAdvp[1], entityVariableName, true, true, new ArrayList<SyntacticTreeNode>());
+            for (QueryModel qm : qms1) {
+                qm.setAttributeVariableName(valueVariableName);
+                qm.getConstraints().add(new QueryConstraint(entityVariableName, lookupAttribute, valueVariableName, false));
+                if (plural) {
+                    qm.setWeight(qm.getWeight() * 0.9);
                 }
-                res.addAll(qms1);
-
-                String newEntityVariable = getNextEntityVariableName();
-                ArrayList<QueryModel> qms2 = resolveValueNode(inNpAdvp[1], entityVariableName, newEntityVariable, new ArrayList<SyntacticTreeNode>());
-                for (QueryModel qm : qms2) {
-                    qm.setAttributeVariableName(valueVariableName);
-                    qm.getConstraints().add(new QueryConstraint(newEntityVariable, lookupAttribute, valueVariableName, false));
-                    if (plural) {
-                        qm.setWeight(qm.getWeight() * 0.8);
-                    }
+                if (attributePrefix.toString().contains("of") && npAttributeNode.toString().matches("the [a-z]")) {
+                    qm.setWeight(qm.getWeight() * 0.8);
                 }
-                res.addAll(qms2);
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            res.addAll(qms1);
+
+            String newEntityVariable = getNextEntityVariableName();
+            ArrayList<QueryModel> qms2 = resolveValueNode(inNpAdvp[1], entityVariableName, newEntityVariable, new ArrayList<SyntacticTreeNode>());
+            for (QueryModel qm : qms2) {
+                qm.setAttributeVariableName(valueVariableName);
+                qm.getConstraints().add(new QueryConstraint(newEntityVariable, lookupAttribute, valueVariableName, false));
+                if (plural) {
+                    qm.setWeight(qm.getWeight() * 0.9);
+                }
+            }
+            res.addAll(qms2);
 
             SyntacticTreeNode[] npExt = npExtension(node);
             if (npExt != null) {
                 attributeNodes.addAll(npExt[0].getLeafParents());
-                res.addAll(resolveValueNode(npExt[1], entityVariableName, valueVariableName, attributeNodes));
+                ArrayList<QueryModel> qms3 = resolveValueNode(npExt[1], entityVariableName, valueVariableName, attributeNodes);
+                for (QueryModel qm : qms3) {if (plural) {
+                        qm.setWeight(qm.getWeight() * 0.9);
+                    }
+                }
+                res.addAll(qms3);
             }
 
         } else {
