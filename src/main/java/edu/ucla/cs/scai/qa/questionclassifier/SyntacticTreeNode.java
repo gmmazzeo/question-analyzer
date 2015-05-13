@@ -59,6 +59,7 @@ public class SyntacticTreeNode implements Externalizable {
         standardTagsForLookup.add("CD");
         standardTagsForLookup.add("CC");
         standardTagsForLookup.add("JJ");
+        standardTagsForLookup.add("JJS");
         standardTagsForLookup.add("RB");
     }
 

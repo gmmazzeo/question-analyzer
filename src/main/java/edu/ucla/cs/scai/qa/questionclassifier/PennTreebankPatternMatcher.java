@@ -6,8 +6,8 @@
 package edu.ucla.cs.scai.qa.questionclassifier;
 
 import edu.ucla.cs.scai.swim.qa.ontology.QueryMapping;
-import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import edu.ucla.cs.scai.swim.qa.ontology.QueryModel;
+import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.DBpediaOntology;
 import edu.ucla.cs.scai.swim.qa.ontology.dbpedia.TagMeClient;
 import java.io.BufferedReader;
 import java.io.File;
@@ -145,7 +145,7 @@ public class PennTreebankPatternMatcher {
                 System.out.println("\n\n" + l);
 //                for (DBpediaEntityAnnotationResult r:tm.getTagMeResult(l)) {
 //                    System.out.println(r);
-//                }                
+//                }
                 try {
                     long start = System.currentTimeMillis();
                     SyntacticTree st = matcher.parser.parse(l);

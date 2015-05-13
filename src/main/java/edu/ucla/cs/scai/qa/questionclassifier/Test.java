@@ -51,12 +51,14 @@ public class Test {
 
                     Collections.sort(initialModels);
                     double threshold = 0.1;
-                    double maxWeight = initialModels.isEmpty() ? 0 : initialModels.get(0).getWeight();
-                    for (Iterator<QueryModel> it = initialModels.iterator(); it.hasNext();) {
-                        QueryModel im = it.next();
-                        im.setWeight(im.getWeight() / maxWeight);
-                        if (im.getWeight() < threshold) {
-                            it.remove();
+                    double maxWeight = initialModels.size() < 2 ? 1 : initialModels.get(0).getWeight();
+                    for (QueryModel qm : initialModels) {
+                        qm.setWeight(qm.getWeight() / maxWeight);
+                    }
+                    for (int i = 0 ; i < initialModels.size(); i++) {
+                        if (initialModels.get(i).getWeight() < threshold) {
+                            initialModels.remove(i);
+                            i--;
                         }
                     }
                     System.out.println("Final query models with weight above threshold: " + initialModels.size());
@@ -72,7 +74,7 @@ public class Test {
                         System.out.println("-------------------------");
                     }
                     System.out.println();
-                    
+
                     QueryMapping qm = new QueryMapping();
                     ArrayList<QueryModel> mappedModels = qm.mapOnOntology(initialModels, DBpediaOntology.getInstance());
                     System.out.println("#####################################");
@@ -84,7 +86,7 @@ public class Test {
                         System.out.println(mappedModel);
                         System.out.println("-------------------------");
                     }
-                    
+
                     System.out.println("#####################################");
                     System.out.println("######### SPARQL RESULT #############");
                     System.out.println("#####################################");
@@ -92,7 +94,7 @@ public class Test {
                     QueryModel resultModel = null;
                     DBpediaOntology ontology = DBpediaOntology.getInstance();
                     for (QueryModel m : mappedModels) {
-                        ArrayList<HashMap<String, String>> res = ontology.executeSparql(m, 10);
+                        ArrayList<HashMap<String, String>> res = ontology.executeSparql(m, 20);
                         if (!res.isEmpty()) {
                             resultModel = m;
                             if (m.getExampleEntity() == null) {
@@ -108,7 +110,7 @@ public class Test {
                             break;
                         }
                     }
-                    System.out.println("answer: " + answer);
+                    System.out.println("answer:\n" + answer);
                     if (resultModel != null) {
                         System.out.println("Answer found with model " + resultModel.getModelNumber() + "\n" + resultModel);
                     }

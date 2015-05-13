@@ -200,13 +200,16 @@ public class QueryResolver2 {
                 continue;
             }
             boolean validMatching = true;
+            boolean leastOneNNMatch = false;
             for (SyntacticTreeNode n : nodes) {
                 if (!overlap(n, ar) && !n.value.equals("DT") && !n.value.equals("WDT") && !n.value.equals("POS") && !n.value.equals("JJ")) { //condition 2 is not satisfied
                     validMatching = false;
                     break;
+                } else if (overlap(n, ar) && n.value.contains("NN")) {
+                    leastOneNNMatch = true;
                 }
             }
-            if (validMatching) {
+            if (validMatching || leastOneNNMatch) {
                 res.add(ar);
             }
         }
@@ -412,7 +415,6 @@ public class QueryResolver2 {
                 for (NamedEntityAnnotationResult ar : annotations) {
                     QueryModel qm = new QueryModel(entityVariableName, null);
                     qm.setWeight(ar.getWeight());
-                    //System.out.println(ar.getNamedEntity().getName() + " " + ar.getWeight());
                     maxWeight = Math.max(maxWeight, ar.getWeight());
                     minWeight = Math.min(minWeight, ar.getWeight());
                     QueryConstraint qc = new QueryConstraint(entityVariableName, "isEntity", ar.getNamedEntity().getUri(), false);
