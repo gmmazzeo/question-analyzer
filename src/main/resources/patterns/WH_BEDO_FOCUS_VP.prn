@@ -3,7 +3,7 @@
     (WHNP (WP))
     (SQ (VBZ|VBP|VBN|VBD (*/be|do))
       (NP#1)
-      (VP#2))
+      (VP#2 (PP ^(NP))))
     ))
 
 boundThroughAttribute(?en, 2, ?ans).
@@ -13,5 +13,4 @@ boundThroughAttribute(?val, 2, ?ans).
 values(1, ?en, ?val)
 
 %What did Bruce Carver die from?
-%What is the total amount of men and women serving in the FDNY?
 %Who is the daughter of Ingrid Bergman married to?

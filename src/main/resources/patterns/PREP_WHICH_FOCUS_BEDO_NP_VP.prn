@@ -6,6 +6,9 @@
       (VP#4))
     ))
 
+boundThroughAttribute(?en, 2+4, ?ans).
+entities(3, ?en)
+
 entities(2, ?ans).
 entities(3, ?subj).
 boundThroughAttribute(?subj, 4+1, ?ans)

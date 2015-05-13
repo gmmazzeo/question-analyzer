@@ -1,0 +1,14 @@
+(ROOT
+  (SBARQ
+    (WHNP
+      (WHADJP (WRB (*/how)) (JJ (*/many|much)))
+      (NNS|NN#1))
+    (SQ (VBP) (PP (IN#2) (NP#3)))
+    ))
+
+boundThroughAttribute(?en, 1+2, ?ans).
+entities(3, ?en)
+
+boundThroughAttribute(?en, 1+2, ?ans).
+values(3, ?en2, ?en)
+

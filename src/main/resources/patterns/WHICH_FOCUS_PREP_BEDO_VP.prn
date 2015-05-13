@@ -1,7 +1,7 @@
 (ROOT
   (SBARQ
     (WHNP#1
-      (WHNP|NP# (WDT))
+      (WHNP|NP (WDT))
       (PP))
     (SQ (VBZ|VBD|VBP#5 (*/be|do))
       (VP)
@@ -12,7 +12,6 @@
 %siblingConstraints(1, ?ans).
 %optionalCategory(?ans, 1)
 
-%might need qm below to support literals
 entities(1, ?ans).
 siblingConstraints(5, ?ans)
 

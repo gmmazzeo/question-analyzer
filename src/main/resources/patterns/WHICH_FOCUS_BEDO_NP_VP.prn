@@ -17,6 +17,8 @@ entities(1, ?ans, 0, 1)
 boundThroughAttribute(?subj, 3+1, ?ans).
 values(2, ?en, ?subj)
 
+boundThroughAttribute(?subj, 3+1, ?ans).
+entities(2, ?subj)
 
 %Which awards did WikiLeaks win?
 %Which budget did the first movie of Zdenek Sverak have?

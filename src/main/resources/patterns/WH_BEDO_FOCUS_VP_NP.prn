@@ -1,0 +1,15 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ (VBZ|VBP|VBN|VBD (*/be|do))
+      (NP#1)
+      (VP#2 (PP (NP#3))))
+    ))
+
+boundThroughAttribute(?en, 2+1, ?ans).
+entities(3, ?en)
+
+boundThroughAttribute(?val, 2+1, ?ans).
+values(3, ?en, ?val)
+
+%What is the total amount of men and women serving in the FDNY?

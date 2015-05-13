@@ -1,0 +1,13 @@
+(ROOT
+  (SBARQ
+    (WHNP (WP))
+    (SQ
+      (VP (VBZ|VBD|VBN#1)
+        (NP#2)
+        (PP (NP#3))))
+    ))
+
+boundThroughAttribute(?en, 1+2, ?ans).
+entities(3, ?en).
+
+%Who composed the music for Harold and Maude?
